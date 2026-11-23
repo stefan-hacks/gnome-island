@@ -155,8 +155,8 @@ install the package and optionally enable it declaratively:
 # flake.nix
 {
   inputs.isle.url = "github:zickrian/isle";
-  # or for your fork:
-  # inputs.isle.url = "github:your-user/isle";
+  # Or use your own fork before upstreaming:
+  # inputs.isle.url = "github:stefan-hacks/isle";
 
   outputs = { self, nixpkgs, home-manager, isle, ... }:
     # NixOS system configuration
@@ -195,6 +195,80 @@ install the package and optionally enable it declaratively:
 With the Home Manager module, log out and back in after switching.
 
 To update, run `nix flake update isle` and rebuild.
+
+### Testing your fork in a VM before upstreaming
+
+You can try your fork in a NixOS VM without touching your running system:
+
+```nix
+# vm-test.nix — save this file, then run:
+# nixos-rebuild build-vm --flake .#test-vm
+# ./result/bin/run-test-vm
+
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Point at your local fork checkout:
+    isle.url = "path:/home/stefan-hacks/Projects/isle";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { self, nixpkgs, isle, home-manager, ... }: {
+    nixosConfigurations.test-vm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        home-manager.nixosModules.home-manager
+        {
+          # Minimal GNOME desktop
+          services.xserver.enable = true;
+          services.xserver.displayManager.gdm.enable = true;
+          services.xserver.desktopManager.gnome.enable = true;
+          services.displayManager.autoLogin.enable = true;
+          services.displayManager.autoLogin.user = "test";
+
+          # VM convenience
+          virtualisation.memorySize = 4096;
+          virtualisation.diskSize = 8192;
+
+          users.users.test = {
+            isNormalUser = true;
+            extraGroups = [ "wheel" "networkmanager" ];
+            initialPassword = "test";
+          };
+
+          # Enable the extension for the test user
+          home-manager.users.test = {
+            imports = [ isle.homeManagerModules.default ];
+            programs.isle.enable = true;
+            programs.isle.startDaemon = true;
+            programs.isle.settings = {
+              "org/gnome/shell/extensions/isle" = {
+                island-theme = "gnome";
+                top-bar-color = true;
+              };
+            };
+          };
+
+          # Make the package available system-wide too
+          environment.systemPackages = [ isle.packages.x86_64-linux.isle ];
+        }
+      ];
+    };
+  };
+}
+```
+
+Build and run:
+
+```sh
+nixos-rebuild build-vm --flake .#test-vm
+./result/bin/run-test-vm
+```
+
+Inside the VM, log in as `test` / `test`. The extension is already enabled and the daemon is running. Switch between GNOME light and dark styles in Settings → Appearance → Style to see the adaptive `gnome` theme change in real time.
 
 To update a package, install the new release's package the same way (or run
 `makepkg -si` again with the updated `PKGBUILD`); don't also run the command
