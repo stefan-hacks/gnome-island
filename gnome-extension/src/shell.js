@@ -254,8 +254,6 @@ export class TopBar extends Signals.EventEmitter {
     get opacity() {
         if (this._settings.get_user_value('top-bar-opacity'))
             return this._settings.get_int('top-bar-opacity');
-        if (this._settings.get_string('island-theme') === 'gnome')
-            return 100;
         return this._settings.get_string('top-bar-style') === 'black' ? 100 : 0;
     }
 
@@ -562,7 +560,9 @@ export class TopBar extends Signals.EventEmitter {
             return 'background-color: transparent';
         if (this._settings.get_string('island-theme') === 'gnome') {
             const dark = this._gnomeScheme === 'prefer-dark';
-            return dark ? 'background-color: #1e1e1e' : 'background-color: #f6f5f4';
+            if (opacity >= 100)
+                return dark ? 'background-color: #1e1e1e' : 'background-color: #f6f5f4';
+            return dark ? `background-color: rgba(30, 30, 30, ${opacity / 100})` : `background-color: rgba(246, 245, 244, ${opacity / 100})`;
         }
         return opacity >= 100 ? 'background-color: #000000' : `background-color: rgba(0, 0, 0, ${opacity / 100})`;
     }

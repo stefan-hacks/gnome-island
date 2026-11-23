@@ -79,11 +79,15 @@ it) and see-through like glass, with no colour of its own. Settings → Appearan
 black while an app's window on the main display reaches it (its top within 5 px
 of the bar: maximized, tiled or moved up there), not in the overview; the bar
 eases between the two as GNOME's does, and the island stays where it is. The island has
-two looks, chosen in Settings → Appearance → Island ("Black, or clear glass
-that shows what is behind it, blurred"); Black is the default:
+three looks, chosen in Settings → Appearance → Island ("Black, GNOME, or clear glass
+that shows what is behind it, blurred"); GNOME is the default:
 
 - **Black**: a black notch hanging from the top edge of the screen with
   concave shoulders.
+- **GNOME**: the colour of GNOME's own panel and menus, so the island blends in
+  whether GNOME's style is light or dark. It follows the system's colour scheme
+  (Settings → Appearance → Style in GNOME) and switches between them without
+  restarting.
 - **Glass**: clear glass, thick at its edge. What is behind it (windows and
   wallpaper) is lightly blurred (GNOME Shell's blur, radius 14) and toned in the
   same pass, its shapes and colours still there, a little darkened: a light
