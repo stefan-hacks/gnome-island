@@ -148,6 +148,54 @@ makepkg -si
 gnome-extensions enable isle@zickrian.github.io
 ```
 
+**NixOS (flake).** Add the flake to your system or Home Manager inputs, then
+install the package and optionally enable it declaratively:
+
+```nix
+# flake.nix
+{
+  inputs.isle.url = "github:zickrian/isle";
+  # or for your fork:
+  # inputs.isle.url = "github:your-user/isle";
+
+  outputs = { self, nixpkgs, home-manager, isle, ... }:
+    # NixOS system configuration
+    {
+      nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          # Install the package system-wide
+          { environment.systemPackages = [ isle.packages.x86_64-linux.isle ]; }
+        ];
+      };
+
+      # Or Home Manager
+      homeConfigurations.username = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        modules = [
+          isle.homeManagerModules.default
+          {
+            programs.isle.enable = true;
+            # Optional: start the isled daemon automatically
+            programs.isle.startDaemon = true;
+            # Optional: set default gsettings
+            programs.isle.settings = {
+              "org/gnome/shell/extensions/isle" = {
+                island-theme = "gnome";
+                top-bar-color = true;
+              };
+            };
+          }
+        ];
+      };
+    };
+}
+```
+
+With the Home Manager module, log out and back in after switching.
+
+To update, run `nix flake update isle` and rebuild.
+
 To update a package, install the new release's package the same way (or run
 `makepkg -si` again with the updated `PKGBUILD`); don't also run the command
 above, which would add a second copy in your home folder.
