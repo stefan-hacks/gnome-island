@@ -195,9 +195,10 @@ fi
 
 if [ "$FIRST" = 1 ]; then
 step "Setting up the top bar"
-# Isle's look: a slim glass top bar with the island hanging from it like a notch.
+# Isle's look: a slim GNOME dark grey top bar with the island matching it.
 # Only on a first install; an update keeps what the user chose since.
-gsettings --schemadir "$DEST/schemas" set org.gnome.shell.extensions.isle top-bar-style glass
+gsettings --schemadir "$DEST/schemas" set org.gnome.shell.extensions.isle island-theme gnome
+gsettings --schemadir "$DEST/schemas" set org.gnome.shell.extensions.isle top-bar-color true
 gsettings --schemadir "$DEST/schemas" set org.gnome.shell.extensions.isle compact-top-bar true
 gsettings --schemadir "$DEST/schemas" set org.gnome.shell.extensions.isle island-in-top-bar true
 fi

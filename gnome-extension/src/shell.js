@@ -235,6 +235,8 @@ export class TopBar extends Signals.EventEmitter {
     get opacity() {
         if (this._settings.get_user_value('top-bar-opacity'))
             return this._settings.get_int('top-bar-opacity');
+        if (this._settings.get_string('island-theme') === 'gnome')
+            return 100;
         return this._settings.get_string('top-bar-style') === 'black' ? 100 : 0;
     }
 
@@ -297,7 +299,8 @@ export class TopBar extends Signals.EventEmitter {
     /** Whether the bar is as black as the island; otherwise the island hangs from the screen's top edge.
      * A glass island never is, nor one by a bar Isle doesn't colour (its colour isn't known). */
     get blendsIn() {
-        return this.colors && this.opacity >= 100 && this._settings.get_string('island-theme') === 'black';
+        const theme = this._settings.get_string('island-theme');
+        return this.colors && this.opacity >= 100 && (theme === 'black' || theme === 'gnome');
     }
 
     /** Keeps the top bar's centre clear for the island: GNOME's clock there takes its width, or Isle's spacer once
@@ -530,12 +533,14 @@ export class TopBar extends Signals.EventEmitter {
         this._syncColor();
     }
 
-    /** Black at `opacity` %, as a declaration; null for none (the theme's colour). */
+    /** Black (or GNOME dark grey) at `opacity` %, as a declaration; null for none (the theme's colour). */
     _barRule(opacity) {
         if (opacity === null)
             return null;
         if (opacity <= 0)
             return 'background-color: transparent';
+        if (this._settings.get_string('island-theme') === 'gnome')
+            return 'background-color: #1e1e1e';
         return opacity >= 100 ? 'background-color: #000000' : `background-color: rgba(0, 0, 0, ${opacity / 100})`;
     }
 

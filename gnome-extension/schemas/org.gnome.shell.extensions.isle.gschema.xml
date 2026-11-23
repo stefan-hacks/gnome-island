@@ -13,11 +13,12 @@
     <key name="island-theme" type="s">
       <choices>
         <choice value="black"/>
+        <choice value="gnome"/>
         <choice value="glass"/>
       </choices>
-      <default>'black'</default>
+      <default>'gnome'</default>
       <summary>The island's look</summary>
-      <description>black: Isle's own black island. glass: clear glass over what is behind it, blurred, its edge catching the light.</description>
+      <description>black: Isle's own black island. gnome: GNOME's default dark grey, blending with the top bar and menus. glass: clear glass over what is behind it, blurred, its edge catching the light.</description>
     </key>
     <key name="open-size" type="s">
       <choices>
@@ -269,6 +270,11 @@
       <summary>Answer Codex from the island</summary>
       <description>When on, Isle adds hooks to Codex's hooks.json so it hears when Codex needs you or is done; off removes them.</description>
     </key>
+    <key name="agent-alerts-hermes" type="b">
+      <default>true</default>
+      <summary>Answer Hermes from the island</summary>
+      <description>When on, Isle adds hooks to Hermes's settings so it hears when Hermes needs you or is done; off removes them.</description>
+    </key>
     <key name="agents-announced" type="as">
       <default>[]</default>
       <summary>AI agents already told they are connected</summary>
@@ -390,7 +396,7 @@
     <key name="voice-provider" type="s">
       <default>'auto'</default>
       <summary>AI the voice assistant asks</summary>
-      <description>“agy” (Antigravity), “claude” (Claude Code), “codex” (Codex), “grok” (Grok), “opencode” (opencode) or “pi” (Pi), each with its own sign-in; “auto” for the first installed and signed in.</description>
+      <description>“agy” (Antigravity), “claude” (Claude Code), “codex” (Codex), “grok” (Grok), “hermes" (Hermes), "opencode” (opencode) or “pi” (Pi), each with its own sign-in; “auto” for the first installed and signed in.</description>
     </key>
     <key name="voice-claude-model" type="s">
       <default>'sonnet'</default>
@@ -421,6 +427,11 @@
       <default>'gemini-3.8-flash-low'</default>
       <summary>Model the voice assistant asks</summary>
       <description>A model id from “agy models”; empty for agy's default.</description>
+    </key>
+    <key name="voice-hermes-model" type="s">
+      <default>''</default>
+      <summary>Model Hermes answers with</summary>
+      <description>A model id from Hermes; empty for the one Hermes itself uses.</description>
     </key>
     <key name="voice-speech-model" type="s">
       <default>'small'</default>

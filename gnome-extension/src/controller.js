@@ -169,7 +169,7 @@ const VOICE_WORKING = ['transcribing', 'thinking', 'acting'];
 // by hand lately. Notifications count only when some arrived unseen (others were shown as alerts).
 const DEFAULT_PAGE_ORDER = ['call', 'notifications', 'music', 'focus'];
 /** The AI agents Isle can hear from (see `Agents1` in the daemon). */
-const AGENT_PROVIDERS = ['claude', 'codex'];
+const AGENT_PROVIDERS = ['claude', 'codex', 'hermes'];
 
 /** Whether `alert` waits on screen while no one is there, its time counted once they are back: a reminder,
  * or a notification, as GNOME's banner does. */

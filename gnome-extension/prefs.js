@@ -179,7 +179,7 @@ export default class IslePreferences extends ExtensionPreferences {
         // Only the AIs installed here are offered; with none, the assistant says how to get one.
         const provider = choiceRow(settings, 'voice-provider', 'AI', installed.length
             ? 'Answers with your own sign-in; Isle runs its actions'
-            : 'Install Claude Code, Codex, Grok, opencode, Pi or Antigravity (agy), and sign in', [
+            : 'Install Claude Code, Codex, Grok, opencode, Pi, Antigravity (agy) or Hermes, and sign in', [
             ['auto', automatic ? `Automatic (${automatic.name})` : 'None installed'],
             ...installed.map(({id, name}) => [id, name]),
         ]);
@@ -361,8 +361,9 @@ export default class IslePreferences extends ExtensionPreferences {
         const page = new Adw.PreferencesPage({title: 'Island', icon_name: 'preferences-desktop-appearance-symbolic'});
 
         const look = new Adw.PreferencesGroup({title: 'Appearance'});
-        look.add(choiceRow(settings, 'island-theme', 'Island', 'Black, or clear glass that shows what is behind it, blurred', [
+        look.add(choiceRow(settings, 'island-theme', 'Island', 'Black, GNOME dark grey, or clear glass that shows what is behind it, blurred', [
             ['black', 'Black'],
+            ['gnome', 'GNOME'],
             ['glass', 'Glass'],
         ]));
         look.add(glassRow(settings, window));
@@ -828,6 +829,7 @@ function agentsFound() {
     return [
         {provider: 'claude', title: 'Claude Code', subtitle: 'Allow, deny or always allow, and when it is done'},
         {provider: 'codex', title: 'Codex', subtitle: 'Allow or deny, and when it is done · in Codex, type /hooks once and allow Isle'},
+        {provider: 'hermes', title: 'Hermes', subtitle: 'Allow or deny, and when it is done'},
     ].filter(({provider}) => agents[provider]?.found);
 }
 
@@ -1357,6 +1359,8 @@ const AI_PROVIDERS = [
         about: 'the models of the providers you signed in to in Pi', noPlan: true},
     {id: 'agy', name: 'Antigravity', planName: 'Antigravity', command: 'agy', modelKey: 'voice-agy-model',
         about: 'what Antigravity answers with'},
+    {id: 'hermes', name: 'Hermes', planName: 'Hermes', command: 'hermes-agent', modelKey: 'voice-hermes-model',
+        about: 'what Hermes answers with', noPlan: true},
 ];
 
 /** isled's `Models`: per AI `{plan, default, default_name, models: [{id, name}]}`, followed while Settings is open. */
@@ -1507,6 +1511,18 @@ function signedIn(id) {
         // Before agy 1.4, and since.
         return exists(GLib.get_home_dir(), '.gemini/antigravity-cli/antigravity-oauth-token') ||
             exists(GLib.get_home_dir(), '.gemini/jetski-standalone-oauth-token');
+    case 'hermes': {
+        // Hermes Agent: via Ollama Cloud API key or local Hermes config.
+        if (env('OLLAMA_CLOUD_API_KEY') || env('OLLAMA_API_KEY') || env('HERMES_API_KEY'))
+            return true;
+        try {
+            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hermes', 'config.json']));
+            const json = JSON.parse(new TextDecoder().decode(bytes));
+            return Boolean(json.api_key || json.ollama_cloud_api_key);
+        } catch {
+            return false;
+        }
+    }
     default:
         return false;
     }

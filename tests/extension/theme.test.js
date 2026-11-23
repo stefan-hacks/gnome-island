@@ -13,23 +13,27 @@ import * as Theme from '../../gnome-extension/src/theme.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../gnome-extension');
 
-test('the schema offers Black and Glass, Black by default', () => {
+test('the schema offers Black, GNOME and Glass, GNOME by default', () => {
     const schema = readFileSync(resolve(root, 'schemas/org.gnome.shell.extensions.isle.gschema.xml'), 'utf8');
     const key = schema.match(/<key name="island-theme"[\s\S]*?<\/key>/)[0];
-    assert.deepEqual([...key.matchAll(/<choice value="([^"]+)"\/>/g)].map(m => m[1]), ['black', 'glass']);
-    assert.match(key, /<default>'black'<\/default>/);
+    assert.deepEqual([...key.matchAll(/<choice value="([^"]+)"\/>/g)].map(m => m[1]), ['black', 'gnome', 'glass']);
+    assert.match(key, /<default>'gnome'<\/default>/);
 });
 
-test('glass shows what is behind it; black, and any name it doesn\'t know, is solid black', () => {
+test('glass shows what is behind it; black, and any name it doesn\'t know, is solid black; gnome is GNOME dark grey', () => {
     Theme.setTheme('glass');
     assert.equal(Theme.translucent(), true);
     assert.ok(Theme.blur());
-    for (const name of ['black', 'gnome', '']) {
+    for (const name of ['black', '']) {
         Theme.setTheme(name);
         assert.equal(Theme.translucent(), false);
         assert.equal(Theme.blur(), null);
         assert.deepEqual(Theme.fill(), [0, 0, 0, 1]);
     }
+    Theme.setTheme('gnome');
+    assert.equal(Theme.translucent(), false);
+    assert.equal(Theme.blur(), null);
+    assert.deepEqual(Theme.fill(), [0.118, 0.118, 0.118, 1]);
 });
 
 test('the glass tint runs from clear glass to dark smoked glass, still blurred', () => {

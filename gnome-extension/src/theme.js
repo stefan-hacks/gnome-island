@@ -8,6 +8,8 @@
 // colour kept × saturation (`small` on a closed island or an alert, `large` open), a sheen and a glow added.
 const LOOKS = {
     black: {fill: [0, 0, 0, 1], solid: [0, 0, 0], edge: null, blur: null},
+    // GNOME dark grey: the panel and menus of GNOME's default dark style, so the island blends in.
+    gnome: {fill: [0.118, 0.118, 0.118, 1], solid: [0.118, 0.118, 0.118], edge: null, blur: null},
     // Clear glass, thick at its edge: what is behind it lightly blurred, its shapes and colours still there, a little
     // darkened; a light backdrop held deeper from a fifth of the way up (a white page ends a dark grey, white text reads
     // at about 9:1); the edge bending what is behind it, its colours parting into a thin rainbow, and catching the
