@@ -143,6 +143,25 @@
 #panel.isle-panel .panel-button.screen-sharing-indicator:active:hover,
 #panel.isle-panel .panel-button.screen-sharing-indicator:checked:hover { box-shadow: inset 0 0 0 100px #ff9638; }
 
+/* GNOME light: the bar is light grey and the text/icons near-black, to match Adwaita light menus. */
+#panel.isle-panel-light .panel-button { color: #1e1e1e; }
+#panel.isle-panel-light .panel-button:focus, #panel.isle-panel-light .panel-button:hover { box-shadow: inset 0 0 0 100px rgba(0, 0, 0, 0.08); }
+#panel.isle-panel-light .panel-button:active, #panel.isle-panel-light .panel-button:checked { box-shadow: inset 0 0 0 100px rgba(0, 0, 0, 0.14); }
+#panel.isle-panel-light .panel-button:active:hover, #panel.isle-panel-light .panel-button:checked:hover { box-shadow: inset 0 0 0 100px rgba(0, 0, 0, 0.18); }
+#panel.isle-panel-light .panel-button#panelActivities .workspace-dot { background-color: #1e1e1e; }
+#panel.isle-panel-light .panel-button.screen-recording-indicator:focus,
+#panel.isle-panel-light .panel-button.screen-recording-indicator:hover { box-shadow: inset 0 0 0 100px #d61f2d; }
+#panel.isle-panel-light .panel-button.screen-recording-indicator:active,
+#panel.isle-panel-light .panel-button.screen-recording-indicator:checked { box-shadow: inset 0 0 0 100px #e02a37; }
+#panel.isle-panel-light .panel-button.screen-recording-indicator:active:hover,
+#panel.isle-panel-light .panel-button.screen-recording-indicator:checked:hover { box-shadow: inset 0 0 0 100px #e13340; }
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:focus,
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:hover { box-shadow: inset 0 0 0 100px #ff861a; }
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:active,
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:checked { box-shadow: inset 0 0 0 100px #ff902e; }
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:active:hover,
+#panel.isle-panel-light .panel-button.screen-sharing-indicator:checked:hover { box-shadow: inset 0 0 0 100px #ff9638; }
+
 /* Isle's own clock in the bar (Settings → Clock in the top bar): figures that keep their width as minutes turn. */
 #panel .isle-bar-clock-label { font-feature-settings: "tnum"; }
 

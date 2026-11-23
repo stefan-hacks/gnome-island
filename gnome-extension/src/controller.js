@@ -339,6 +339,21 @@ export class Controller {
 
     /** The last step: hooks the island to GNOME and isled, then lets isled's held changes through. */
     _connectAll() {
+        // Watch GNOME's light/dark preference so the 'gnome' theme adapts.
+        try {
+            this._interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+            const syncGnomeScheme = () => {
+                const scheme = this._interfaceSettings.get_string('color-scheme');
+                Theme.setGnomeScheme(scheme);
+                if (this._settings.get_string('island-theme') === 'gnome')
+                    this._syncTheme();
+            };
+            this._interfaceChanged = this._interfaceSettings.connect('changed::color-scheme', syncGnomeScheme);
+            syncGnomeScheme();
+        } catch {
+            // Not on GNOME or the schema is missing; keep the default dark.
+        }
+
         this._primaryChanged = global.display.get_selection().connect('owner-changed', (_selection, type) => {
             if (type === Meta.SelectionType.SELECTION_PRIMARY)
                 this._selectedIn = global.display.focus_window;

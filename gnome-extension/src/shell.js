@@ -5,6 +5,7 @@
 // OSD and keyboard state. Everything here is undone in `destroy()`.
 
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
@@ -27,6 +28,8 @@ const MAX_RESTYLES_PER_SECOND = 5;
 const SHADOW_BELOW = 50;
 /** Style class keeping the bar's text white in GNOME's light style too. */
 const BAR_CLASS = 'isle-panel';
+/** Style class giving the bar a light background and dark text (GNOME light). */
+const LIGHT_BAR_CLASS = 'isle-panel-light';
 /** Style class giving the glass bar's text a shadow to read on any wallpaper. */
 const GLASS_BAR_CLASS = 'isle-glass-bar';
 /** Style class making the top bar slimmer; see stylesheet.css. */
@@ -68,6 +71,22 @@ export class TopBar extends Signals.EventEmitter {
         this._reserved = -1;
         this._spacer = null;
         this._movedAway = this._clockMovedAway();
+
+        // Track GNOME's light/dark preference for the adaptive 'gnome' theme.
+        try {
+            this._interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+            this._gnomeScheme = this._interfaceSettings.get_string('color-scheme');
+            this._interfaceChanged = this._interfaceSettings.connect('changed::color-scheme', () => {
+                this._gnomeScheme = this._interfaceSettings.get_string('color-scheme');
+                if (this._settings.get_string('island-theme') === 'gnome') {
+                    this._yielded = false;
+                    this._applyStyle();
+                }
+            });
+        } catch {
+            this._gnomeScheme = 'prefer-dark';
+        }
+
         this._syncDateMenu();
         // Another extension may move GNOME's clock to the bar's left or right (#62): it is then that extension's,
         // shown where it put it, and the island's room in the centre is kept by a spacer of Isle's instead.
@@ -492,8 +511,10 @@ export class TopBar extends Signals.EventEmitter {
         // Its colour left to the theme or another extension (#63): nor its text's white and shadow, which go with
         // Isle's colours. Its height is still Isle's, round the island.
         const colored = styled && this.colors;
+        const gnomeLight = this._settings.get_string('island-theme') === 'gnome' && this._gnomeScheme !== 'prefer-dark';
         setStyleClasses(Main.panel, {
-            [BAR_CLASS]: colored,
+            [BAR_CLASS]: colored && !gnomeLight,
+            [LIGHT_BAR_CLASS]: colored && gnomeLight,
             [COMPACT_BAR_CLASS]: styled && this._settings.get_boolean('compact-top-bar'),
             [NOTCH_BAR_CLASS]: styled && inBar,
             [PILL_BAR_CLASS]: styled && inBar && this._settings.get_string('island-shape') === 'pill',
@@ -539,8 +560,10 @@ export class TopBar extends Signals.EventEmitter {
             return null;
         if (opacity <= 0)
             return 'background-color: transparent';
-        if (this._settings.get_string('island-theme') === 'gnome')
-            return 'background-color: #1e1e1e';
+        if (this._settings.get_string('island-theme') === 'gnome') {
+            const dark = this._gnomeScheme === 'prefer-dark';
+            return dark ? 'background-color: #1e1e1e' : 'background-color: #f6f5f4';
+        }
         return opacity >= 100 ? 'background-color: #000000' : `background-color: rgba(0, 0, 0, ${opacity / 100})`;
     }
 
@@ -575,6 +598,8 @@ export class TopBar extends Signals.EventEmitter {
         Main.panel.disconnect(this._heightChanged);
         Main.panel.disconnect(this._styleChanged);
         this._unwatchWindows();
+        if (this._interfaceChanged)
+            this._interfaceSettings.disconnect(this._interfaceChanged);
         this._barMoved.forEach(id => Main.layoutManager.panelBox.disconnect(id));
         if (this._dragButtonWas === 0 && this._dragGesture.required_button === PRIMARY_BUTTON)
             this._dragGesture.required_button = 0;

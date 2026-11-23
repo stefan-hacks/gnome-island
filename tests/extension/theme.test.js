@@ -36,6 +36,23 @@ test('glass shows what is behind it; black, and any name it doesn\'t know, is so
     assert.deepEqual(Theme.fill(), [0.118, 0.118, 0.118, 1]);
 });
 
+test('gnome theme switches between dark and light with setGnomeScheme', () => {
+    Theme.setTheme('gnome');
+    Theme.setGnomeScheme('prefer-dark');
+    assert.deepEqual(Theme.fill(), [0.118, 0.118, 0.118, 1]);
+    assert.deepEqual(Theme.solid(), [0.118, 0.118, 0.118]);
+    assert.equal(Theme.gnomeDark(), true);
+
+    Theme.setGnomeScheme('default');
+    assert.deepEqual(Theme.fill(), [0.965, 0.965, 0.965, 1]);
+    assert.deepEqual(Theme.solid(), [0.965, 0.965, 0.965]);
+    assert.equal(Theme.gnomeDark(), false);
+
+    Theme.setGnomeScheme('prefer-light');
+    assert.deepEqual(Theme.fill(), [0.965, 0.965, 0.965, 1]);
+    assert.equal(Theme.gnomeDark(), false);
+});
+
 test('the glass tint runs from clear glass to dark smoked glass, still blurred', () => {
     // How light a mid-grey backdrop ends up, after the tone and the smoke (as glass.js draws it).
     const tone = () => {

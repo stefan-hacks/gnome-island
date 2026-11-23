@@ -20,6 +20,9 @@ const LOOKS = {
             knee: 0.22, sheen: 0.03, glow: 0.05, lens: 26, band: 24, spread: 0.7, rim: 0.5, rimWidth: 1.1}},
 };
 
+// Light GNOME: Adwaita light background for the panel and menus.
+const GNOME_LIGHT = {fill: [0.965, 0.965, 0.965, 1], solid: [0.965, 0.965, 0.965]};
+
 // Glass at its darkest (Settings' tint at 100): dark smoked glass, as GNOME's blurred menus look: what is behind
 // blurred, its light dimmed to about two fifths and its colour kept, under a thin dark smoke; a faint rim. Every tone
 // the clear glass sets is set here too, so at 100 it is this glass exactly, whatever the clear one is.
@@ -31,6 +34,8 @@ const DARK_GLASS = {fill: [0.02, 0.025, 0.03, 0.3], solid: [0.06, 0.07, 0.07],
 let current = 'black';
 /** Glass with Settings' tint applied (see `setTheme`). */
 let tinted = LOOKS.glass;
+/** Whether the GNOME scheme is dark ('prefer-dark') or light (anything else). */
+let gnomeScheme = 'prefer-dark';
 
 const mix = (a, b, t) => a + (b - a) * t;
 
@@ -49,6 +54,19 @@ export function setTheme(name, tint = 0) {
         edge: {...clear.edge, top: mix(clear.edge.top, dark.edge.top, t), bottom: mix(clear.edge.bottom, dark.edge.bottom, t)},
         blur: {...clear.blur, ...Object.fromEntries(Object.entries(dark.blur).map(([k, v]) => [k, mix(clear.blur[k], v, ease[k] ?? late)]))},
     };
+}
+
+/** Sets the GNOME colour scheme so the 'gnome' theme adapts: 'prefer-dark' or anything else for light. */
+export function setGnomeScheme(scheme) {
+    gnomeScheme = scheme;
+    const dark = gnomeScheme === 'prefer-dark';
+    LOOKS.gnome.fill = dark ? [0.118, 0.118, 0.118, 1] : [...GNOME_LIGHT.fill];
+    LOOKS.gnome.solid = dark ? [0.118, 0.118, 0.118] : [...GNOME_LIGHT.solid];
+}
+
+/** Whether the current 'gnome' theme is in dark mode. */
+export function gnomeDark() {
+    return gnomeScheme === 'prefer-dark';
 }
 
 /** The look in use, glass with its tint. */
