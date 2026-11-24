@@ -123,13 +123,9 @@ main() {
     bash "$package/install.sh"
 
     # The package's uninstaller stays around as a command.
-    install -Dm755 "$package/uninstall.sh" "$HOME.local/bin/gnome-island-uninstall"
+    install -Dm755 "$package/uninstall.sh" "$HOME/.local/bin/gnome-island-uninstall"
     echo
-    # Not when a speech model is there already (an update, or a voice setup it moved over).
-    if ! compgen -G "${XDG_DATA_HOME:-$HOME/.local/share}/isle/models/ggml-*-q8_0.bin" >/dev/null; then
-        echo "Voice assistant (optional): press Super+I and Set up, or run ~/.local/bin/isle-setup-voice once."
-    fi
-    echo "To check it, run ~/.local/bin/isled --doctor; to remove GNOME Island, run ~.local/bin/gnome-island-uninstall."
+    echo "To check it, run ~/.local/bin/isled --doctor; to remove GNOME Island, run ~/.local/bin/gnome-island-uninstall."
 }
 
 # All read before anything runs: a download cut short never runs half a script.
