@@ -20,7 +20,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 tar -C "$WORK" -xzf "$TARBALL"
-SRC="$(find "$WORK" -mindepth 1 -maxdepth 1 -type d -name 'isle-*' | head -n1)"
+SRC="$(find "$WORK" -mindepth 1 -maxdepth 1 -type d -name 'gnome-island-*' | head -n1)"
 [ -x "$SRC/bin/isled" ] || { echo "$TARBALL is not a release package." >&2; exit 1; }
 VERSION="$(grep -oE '"version-name": *"[^"]*"' "$SRC/gnome-extension/metadata.json" | cut -d'"' -f4)"
 mkdir -p dist
