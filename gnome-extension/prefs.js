@@ -627,13 +627,14 @@ function lookGroup(settings) {
         syncCustom();
         const initial = new Gdk.RGBA();
         initial.parse(settings.get_string('bot-color').startsWith('#') ? settings.get_string('bot-color') : '#8e7dff');
-            (dialog, result) => {
-                try {
-                    settings.set_string('bot-color', hexOf(dialog.choose_rgba_finish(result)));
-                } catch {
-                    // Cancelled: as it was.
-                }
-            });
+        const dialog = new Gtk.ColorDialog({title: 'Bot colour', with_alpha: false});
+        dialog.choose_rgba(customColor.get_root(), initial, null, (dialog, result) => {
+            try {
+                settings.set_string('bot-color', hexOf(dialog.choose_rgba_finish(result)));
+            } catch {
+                // Cancelled: as it was.
+            }
+        });
     });
     const colors = pickerRow(settings, 'bot-color', 'Colour', Object.entries(COLORS).map(([color, {label}]) =>
         [color, botTile(26, {shape: 'circle', palette: paletteFor(color)}).area, label]), {custom: customColor, perLine: 6, least: 4});
