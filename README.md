@@ -4,7 +4,7 @@
 
 **A notch-style island for the GNOME desktop.**
 
-Music with synced lyrics, calls, notifications, a focus timer, reminders, a
+System vitals, music with synced lyrics, calls, notifications, a focus timer, reminders, a
 calendar that tells you when to join a meeting, a clipboard shelf, app usage,
 and Cava visualizer bars, living in a notch at the top of your screen.
 
@@ -14,19 +14,6 @@ and Cava visualizer bars, living in a notch at the top of your screen.
 
 </div>
 
-> **Note:** This is a fork of [Isle by zickrian](https://github.com/stefan-hacks/gnome-island) with additional features:
-> - **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
-> - **Lyrics from more providers** — LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key)
-> - **Cava visualizer** — audio bars behind the player and lyrics
-> - **Richer closed island** — song title and artist scroll in the closed island; timer shows beside music
-> - **Settings previews** — the island opens briefly to show what a setting changes
-> - **Keep GNOME's clock** — option to leave GNOME's own clock in the top bar
-> - **Vertical clipboard with columns** — 1, 2, or 3 columns in vertical clipboard layout
-> - **GNOME text scaling** — respects GNOME's text-scaling-factor across the UI
-> - **NixOS flake & Home Manager** — install declaratively on NixOS
-> - This fork removes all AI and voice assistant features.
-> - This fork is not synced with upstream and evolves independently.
-
 GNOME Island turns the centre of the top bar into a notch.
 At rest it shows the time and what is going on (a song, a timer, a
 recording, or two of them at once). Rest the pointer on it and it opens with spring physics into a
@@ -34,9 +21,21 @@ small panel with tabs for each page; passing over it on the way elsewhere
 leaves it closed. Alerts for volume, charging, Caps Lock and notifications
 appear in the same place instead of in the middle of the screen.
 
+## Features
+
+- **System monitoring** — CPU usage, frequency, per-core stats, memory, swap, load average, network speed, storage, temperatures, fans, voltages, battery, and GPU (NVIDIA/AMD) with color-coded thresholds
+- **Music with synced lyrics** — LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key)
+- **Cava visualizer** — audio bars behind the player and lyrics
+- **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
+- **Richer closed island** — song title and artist scroll in the closed island; timer shows beside music
+- **Settings previews** — the island opens briefly to show what a setting changes
+- **Keep GNOME's clock** — option to leave GNOME's own clock in the top bar
+- **Vertical clipboard with columns** — 1, 2, or 3 columns in vertical clipboard layout
+- **GNOME text scaling** — respects GNOME's text-scaling-factor across the UI
+- **NixOS flake & Home Manager** — install declaratively on NixOS
+
 ## Contents
 
-- [Preview](#preview)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -48,35 +47,6 @@ appear in the same place instead of in the middle of the screen.
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [License](#license)
-
-## Preview
-
-<table>
-<tr>
-<td width="50%" align="center"><img src="docs/images/music.webp" alt="The Music page in glass: cover art, the song, a scrubber and controls" width="100%"><br><sub>Music</sub></td>
-<td width="50%" align="center"><img src="docs/images/lyrics.webp" alt="Synced lyrics, the glass tinted in the cover's colour" width="100%"><br><sub>Lyrics</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/notifications.webp" alt="The Notifications page: two messages, with Clear and Do Not Disturb" width="100%"><br><sub>Notifications</sub></td>
-<td width="50%" align="center"><img src="docs/images/calendar.webp" alt="The Calendar: the month beside the day's events, and world clocks under them" width="100%"><br><sub>Calendar</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/timer.webp" alt="The focus timer: its ring at 24:58, the work and break lengths, and Pause" width="100%"><br><sub>Timer</sub></td>
-<td width="50%" align="center"><img src="docs/images/reminders.webp" alt="The Reminders page: three reminders and a line for a new one" width="100%"><br><sub>Reminders</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/clipboard.webp" alt="The clipboard history: a note, a command and a link" width="100%"><br><sub>Clipboard</sub></td>
-<td width="50%" align="center"><img src="docs/images/files.webp" alt="The files tray: two pictures and a document, and Phone" width="100%"><br><sub>Files</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/devices.webp" alt="The Devices page: headphones, a mouse and a keyboard with their batteries" width="100%"><br><sub>Devices</sub></td>
-<td width="50%" align="center"><img src="docs/images/apps.webp" alt="App usage today: four apps with a bar and their time each" width="100%"><br><sub>Screen time</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/pill-notification.webp" alt="The closed pill as a message arrives" width="100%"><br><sub>Alerts</sub></td>
-<td width="50%" align="center"><img src="docs/images/pill-charging.webp" alt="The closed pill as the charger is plugged in: 57%" width="100%"><br><sub>Charging</sub></td>
-</tr>
-</table>
 
 ## Requirements
 
@@ -139,7 +109,7 @@ Add the flake to your system or Home Manager inputs:
             programs.gnome-island.enable = true;
             programs.gnome-island.enableUserService = true;
             programs.gnome-island.settings = {
-              "org/gnome/shell/extensions/isle" = {
+              "org/gnome/shell/extensions/gnome-island" = {
                 island-theme = "gnome";
                 top-bar-color = true;
               };
@@ -197,7 +167,7 @@ You can try GNOME Island in a NixOS VM without touching your running system:
             programs.gnome-island.enable = true;
             programs.gnome-island.enableUserService = true;
             programs.gnome-island.settings = {
-              "org/gnome/shell/extensions/isle" = {
+              "org/gnome/shell/extensions/gnome-island" = {
                 island-theme = "gnome";
                 top-bar-color = true;
               };
@@ -281,6 +251,7 @@ Click the gear right of the clock in the open island (or GNOME Island's gear in 
   display, on the main one, the one you are using, or all of them; opening when the
   pointer rests on it (and for how long) or only on a click; how long auto-hide waits.
 - **Music player:** lyrics from LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key), each with a switch and order you choose; Cava visualizer bars behind the player and lyrics, with height, opacity, zoom, position, sensitivity, number of bars, smoothness, and audio source settings.
+- **System:** CPU usage, frequency, per-core stats, memory, swap, load average, network speed, storage, temperatures, fans, voltages, battery, and GPU (NVIDIA/AMD) with color-coded thresholds.
 - **Alerts:** apps' notifications in the island (or GNOME's own banners
   instead); over full-screen apps too (off by default); volume and brightness; charging, network, Bluetooth, a Bluetooth
   device's low battery (off by default) and Caps Lock, each on its own; new songs, sounds; lyrics online;
@@ -320,7 +291,7 @@ camera or the microphone itself.
 
 GNOME Island has no server and no telemetry; your clipboard history, reminders,
 events, timer, and app usage stay in
-`~/.local/share/isle`. It goes
+`~/.local/share/gnome-island`. It goes
 online only for synced lyrics ([LRCLIB](https://lrclib.net), then NetEase and,
 with your own key, Musixmatch, in the order Settings → Music player gives) and
 cover art, once per song (lyrics, and each provider, can be turned off in
@@ -370,19 +341,19 @@ turn them off in the Extensions app.
 report): it gathers the versions, what works and recent logs, without your
 data. Please [open an issue](../../issues) and paste it there.
 
-With a NixOS package, GNOME Island's commands are on your `PATH`: run
-them by name alone (`isled --doctor`, `isled --report`).
+With a NixOS package, GNOME Island's commands are on your `PATH`:
+run them by name alone (`isled --doctor`, `isled --report`).
 
 ## Uninstalling
 
 ```sh
-~/.local/bin/isle-uninstall
+~/.local/bin/gnome-island-uninstall
 ```
 
 (or `./uninstall.sh` from the release package or the source folder). This
 removes the extension, the programs, the service, the font, and GNOME Island's caches; it also lifts a battery charge
 limit GNOME Island set. Your tasks, calendar events, clipboard history, shelf and
-timer settings stay in `~/.local/share/isle` until you delete them.
+timer settings stay in `~/.local/share/gnome-island` until you delete them.
 
 Remove GNOME Island this way, not with the Extensions app's Remove button, which
 deletes only the extension and leaves `isled` behind.
@@ -425,12 +396,9 @@ and [CHANGELOG.md](CHANGELOG.md) for what changed. Everyone taking part
 follows the [Code of Conduct](CODE_OF_CONDUCT.md); please report security
 problems privately as described in [SECURITY.md](SECURITY.md).
 
-This fork diverges from the upstream [Isle](https://github.com/stefan-hacks/gnome-island) project.
-Changes here are not expected to be upstreamed and the project evolves independently.
-
 ## License
 
-Copyright © 2026 zickrian
+Copyright © 2026 stefan-hacks
 
 GNOME Island is free software: you can redistribute it and/or modify it under the
 terms of the [GNU General Public License](LICENSE) as published by the Free
@@ -446,8 +414,3 @@ from [LRCLIB](https://lrclib.net).
 The calendar icon takes its shape
 from [Lucide](https://lucide.dev)'s "calendar-days", under the ISC License
 ([notice](gnome-extension/NOTICE-lucide.txt)).
-
-The demo video shows "Clouds" by Tibor Mokanszki from the Ubuntu 24.04
-wallpapers, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/);
-the video is shared under the same licence. Its songs, lyrics, notifications
-and events are made up.
