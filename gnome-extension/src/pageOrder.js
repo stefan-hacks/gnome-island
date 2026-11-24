@@ -5,8 +5,8 @@
 // run it anywhere (tests/). The Call tab is not among them: it comes first, and only during a call.
 
 /** The pages that can be moved, in the order they had before it was a setting: the order with none set. */
-export const DEFAULT_ORDER = ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps', 'devices',
-    'usage'];
+export const DEFAULT_ORDER = ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps',
+    'devices'];
 
 /**
  * `wanted` (the `page-order` setting) made whole: names not in `defaults` and repeats are dropped, and each page it

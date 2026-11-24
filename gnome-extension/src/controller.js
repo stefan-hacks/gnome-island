@@ -50,7 +50,49 @@ import {TimerPage} from './pages/timer.js';
 import {UsagePage} from './pages/usage.js';
 import {ReminderWatcher} from './reminders.js';
 import * as Theme from './theme.js';
-import {GREETING, InstalledApps, UNDO_MS, VoiceView, stopUnit, actionTypes, aiSettings, openSetUp, openSignIn, runActions, signInHint, stopPending, voiceContext} from './voice.js';
+// Voice assistant stubs (feature removed)
+const GREETING = null;
+const InstalledApps = class { destroy() {} };
+const UNDO_MS = 5000;
+const VoiceView = class extends St.Widget {
+    constructor() { super(); }
+    setState() {}
+    setActive() {}
+    setLevel() {}
+    setHistory() {}
+    showUndo() {}
+    openChat() {}
+    closeChat() {}
+    followUp() {}
+    startTyping() {}
+    exchange() {}
+    fit() {}
+    decideCard() {}
+    connect() { return 0; }
+    destroy() {}
+    get cardWaiting() { return false; }
+    get micWaiting() { return false; }
+    get typing() { return false; }
+    get phase() { return 'idle'; }
+    get chatOpen() { return false; }
+    get pointerOn() { return false; }
+    get preferredWidth() { return 0; }
+    set greeting(v) {}
+    set look(v) {}
+    set chatLook(v) {}
+    set shortcut(v) {}
+    set withShortcut(v) {}
+};
+const stopUnit = () => {};
+const actionTypes = () => ({});
+const aiSettings = () => ({});
+const openSetUp = () => false;
+const openSignIn = () => false;
+const runActions = () => Promise.resolve([]);
+const signInHint = () => '';
+const stopPending = () => {};
+const voiceContext = () => ({});
+
 import {autoHide, revealBand} from './visibilityRules.js';
 import {TextWriter} from './writer.js';
 
@@ -169,7 +211,7 @@ const VOICE_WORKING = ['transcribing', 'thinking', 'acting'];
 // by hand lately. Notifications count only when some arrived unseen (others were shown as alerts).
 const DEFAULT_PAGE_ORDER = ['call', 'notifications', 'music', 'focus'];
 /** The AI agents Isle can hear from (see `Agents1` in the daemon). */
-const AGENT_PROVIDERS = ['claude', 'codex', 'hermes'];
+const AGENT_PROVIDERS = [];
 
 /** Whether `alert` waits on screen while no one is there, its time counted once they are back: a reminder,
  * or a notification, as GNOME's banner does. */
@@ -424,9 +466,9 @@ export class Controller {
                 done();
             }));
         });
-        this._syncVoiceEnabled();
+        // this._syncVoiceEnabled(); // Voice assistant removed
         this._bindPageShortcuts();
-        this._syncUsage();
+        // this._syncUsage(); // Voice assistant removed
         this._syncEventAlerts();
         this._syncPages();
         // The pointer met while it was still being built (after unlocking, at rest on it) is told now.
@@ -495,7 +537,7 @@ export class Controller {
                 this._island.setTintMotion(time, level);
         });
         // A request still at work shows its progress, as from the closed island; a new one would be lost.
-        expanded.connect('voice-requested', () => this._voiceWorking ? this._reopenVoice() : this._openVoice({typing: true}));
+        // Voice assistant removed: expanded.connect('voice-requested', () => this._voiceWorking ? this._reopenVoice() : this._openVoice({typing: true}));
         // Settings open in their own window; the island gets out of its way.
         expanded.connect('settings-requested', () => {
             this.collapse();
@@ -593,15 +635,15 @@ export class Controller {
         this._focusMonitorChanged = global.display.connect('window-entered-monitor', () => this._syncMonitor());
         // On every display, it leaves one a fullscreen window takes (see `_wantedMonitor`).
         this._fullscreenChanged = global.display.connect('in-fullscreen-changed', () => this._syncMonitor());
-        this._settingsChanged.push(this._settings.connect('changed::voice-assistant', () => {
-            this._syncVoiceEnabled();
-            this._syncUsage();
-        }));
-        this._settingsChanged.push(this._settings.connect('changed::voice-shortcut', () => (this._voice.shortcut = this._voiceShortcut)));
-        for (const key of ['bot-shape', 'bot-color', 'bot-glow'])
-            this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncBotLook()));
-        for (const key of ['usage-enabled', 'usage-claude', 'usage-codex', 'usage-grok', 'usage-warn', 'usage-critical'])
-            this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncUsage()));
+        // Voice assistant removed: this._settingsChanged.push(this._settings.connect('changed::voice-assistant', () => {
+        //     this._syncVoiceEnabled();
+        //     this._syncUsage();
+        // }));
+        // Voice assistant removed: this._settingsChanged.push(this._settings.connect('changed::voice-shortcut', () => (this._voice.shortcut = this._voiceShortcut)));
+        // Voice assistant removed: for (const key of ['bot-shape', 'bot-color', 'bot-glow'])
+        //     this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncBotLook()));
+        // Voice assistant removed: for (const key of ['usage-enabled', 'usage-claude', 'usage-codex', 'usage-grok', 'usage-warn', 'usage-critical'])
+        //     this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncUsage()));
         for (const key of ['event-alerts', 'event-alert-minutes'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncEventAlerts()));
         for (const key of ['hidden-pages', 'world-clocks', 'app-usage', 'devices-page', 'open-size'])
@@ -683,12 +725,12 @@ export class Controller {
         daemon.connect('usage-alert', (_daemon, provider, window, percent, resetsAt) => {
             // Not in Do Not Disturb, as other alerts.
             if (!this._notifications.dnd)
-                this._post(Alerts.usage(provider, window, percent, resetsAt, this._settings.get_int('usage-critical')));
+                this._post(Alerts.usage(provider, window, percent, resetsAt, 95));
         });
         // isled forgets the settings when it restarts; they are sent again whenever it appears.
         daemon.connect('appeared', (_daemon, name) => {
             if (name === 'usage')
-                this._syncUsage();
+                // this._syncUsage(); // Voice assistant removed
             else if (name === 'updates')
                 this._syncUpdates();
             else if (name === 'media')
@@ -1681,8 +1723,8 @@ export class Controller {
 
     /** The assistant's shape and colours, from Settings (see bot.js). */
     _readBotLook() {
-        return {shape: this._settings.get_string('bot-shape'),
-            palette: paletteFor(this._settings.get_string('bot-color'), this._settings.get_string('bot-glow'))};
+        return {shape: 'circle',
+            palette: paletteFor('blue', 'medium')};
     }
 
     /** Settings changed the bot: the voice view and the island's glow follow. */
@@ -2561,14 +2603,14 @@ export class Controller {
     /** Sends the usage settings to isled, and the warning marks to the page. */
     _syncUsage() {
         const config = {
-            enabled: this._settings.get_boolean('usage-enabled'),
-            claude: this._settings.get_boolean('usage-claude'),
-            codex: this._settings.get_boolean('usage-codex'),
-            grok: this._settings.get_boolean('usage-grok'),
+            enabled: false,
+            claude: false,
+            codex: false,
+            grok: false,
             // Off, a plan seen there starts no AI to list its models.
-            assistant: this._settings.get_boolean('voice-assistant'),
-            warn: this._settings.get_int('usage-warn'),
-            critical: this._settings.get_int('usage-critical'),
+            assistant: false,
+            warn: 80,
+            critical: 95,
         };
         this._expanded.pageNamed('usage')?.setMarks(config.warn, config.critical);
         this._daemon.call('usage', 'SetConfig', JSON.stringify(config));
@@ -2578,7 +2620,7 @@ export class Controller {
 
     /** Binds the shortcut and shows the mic button while the assistant is turned on. */
     _syncVoiceEnabled() {
-        const enabled = this._settings.get_boolean('voice-assistant');
+        const enabled = false;
         if (enabled && !this._voiceBound) {
             Main.wm.addKeybinding('voice-shortcut', this._settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
                 Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW | Shell.ActionMode.POPUP,
@@ -2775,7 +2817,7 @@ export class Controller {
 
     /** The assistant's shortcut as people write it, or '' when it has none. */
     get _voiceShortcut() {
-        return Format.shortcutLabel(this._settings.get_strv('voice-shortcut')[0] ?? '');
+        return Format.shortcutLabel([][0] ?? '');
     }
 
     /** How to ask again, under an error: the shortcut, if there is one. */
@@ -2826,8 +2868,8 @@ export class Controller {
             json = JSON.stringify({
                 ...aiSettings(this._settings),
                 actions: actionTypes(this._settings),
-                whisper_model: this._settings.get_string('voice-speech-model'),
-                language: this._settings.get_string('voice-language'),
+                whisper_model: 'small',
+                language: '',
             });
         }
         // Closed, or asked to listen again, meanwhile.

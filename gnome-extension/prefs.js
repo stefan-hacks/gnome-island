@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 zickrian
 
-// Isle's Settings window: GSettings for the island and the assistant, plus what isled keeps itself
-// (timer lengths, clipboard history, AI models), over D-Bus.
 
 import Adw from 'gi://Adw';
 import Gdk from 'gi://Gdk';
@@ -25,22 +23,17 @@ const DAEMON = 'io.github.zickrian.isle.Daemon';
 const DAEMON_PATH = '/io/github/zickrian/isle/Daemon';
 const POMODORO_INTERFACE = 'io.github.zickrian.isle.Pomodoro1';
 const CLIPBOARD_INTERFACE = 'io.github.zickrian.isle.Clipboard1';
-const AGENTS_INTERFACE = 'io.github.zickrian.isle.Agents1';
-const ASSISTANT_INTERFACE = 'io.github.zickrian.isle.Assistant1';
 /** Edits to the timer are sent once typing pauses for this long. */
 const SAVE_DELAY_MS = 400;
 
 // Runs in a process of its own when Settings opens, never inside GNOME Shell.
 export default class IslePreferences extends ExtensionPreferences {
-    // Island, Clipboard, Timer, Assistant, AI Usage and About, in that order.
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         window.set_default_size(560, 680);
         window.add(this._islandPage(settings, window));
         window.add(this._clipboardPage(settings, window));
         window.add(this._timerPage(settings, window));
-        window.add(this._voicePage(settings, window));
-        window.add(this._usagePage(settings, window));
         window.add(this._aboutPage(settings, window));
         // A page asked for by the island (its Update button: About), once, also while open.
         const showAsked = () => {
@@ -105,213 +98,7 @@ export default class IslePreferences extends ExtensionPreferences {
     }
 
     // AI plan usage: only the providers signed in on this computer are listed.
-    _usagePage(settings, window) {
-        const page = new Adw.PreferencesPage({title: 'AI Usage', icon_name: 'power-profile-performance-symbolic'});
-        const found = usageProviders();
-        const group = new Adw.PreferencesGroup({
-            title: 'AI Usage',
-            description: found.length
-                ? 'How much of your plans\' limits is used, on a Usage page in the open island, with a warning ' +
-                  'as one nears its end. Found from the apps you are signed in to; nothing else to set up.'
-                : 'Sign in to Claude Code, Codex or Grok and your plan shows up here.',
-        });
-        const enabled = switchRow(settings, 'usage-enabled', 'Show AI usage', 'The Usage page and its warnings');
-        group.add(enabled);
-        const rows = found.map(({key, title, subtitle}) => switchRow(settings, key, title, subtitle));
-        const warn = spinRow(settings, 'usage-warn', 'Warn at', 'Share of a limit, in %', 50, 99);
-        const critical = spinRow(settings, 'usage-critical', 'Warn again at', 'Share of a limit, in %', 50, 100);
-        // The second warning never comes before the first.
-        const ordered = [
-            settings.connect('changed::usage-warn', () => {
-                if (settings.get_int('usage-critical') < settings.get_int('usage-warn'))
-                    settings.set_int('usage-critical', settings.get_int('usage-warn'));
-            }),
-            settings.connect('changed::usage-critical', () => {
-                if (settings.get_int('usage-critical') < settings.get_int('usage-warn'))
-                    settings.set_int('usage-warn', settings.get_int('usage-critical'));
-            }),
-        ];
-        window.connect('close-request', () => {
-            ordered.forEach(id => settings.disconnect(id));
-            return false;
-        });
-        for (const row of found.length ? [...rows, warn, critical] : []) {
-            settings.bind('usage-enabled', row, 'sensitive', Gio.SettingsBindFlags.GET);
-            group.add(row);
-        }
-        enabled.sensitive = found.length > 0;
-        page.add(group);
 
-        // Only the AIs found on this computer; none, and the group is not there at all.
-        const agents = agentsFound();
-        if (agents.length) {
-            const agentGroup = new Adw.PreferencesGroup({
-                title: 'AI Agents',
-                description: 'Answer your coding agents from the island when they ask, and know when they are done. ' +
-                    'On by default; off, Isle stops getting that agent\'s alerts.',
-            });
-            for (const {provider, title, subtitle} of agents) {
-                agentGroup.add(switchRow(settings, `agent-alerts-${provider}`, title, subtitle));
-            }
-            page.add(agentGroup);
-        }
-        return page;
-    }
-
-    // The assistant: which AI and model, speech, the conversation, and its look.
-    _voicePage(settings, window) {
-        const page = new Adw.PreferencesPage({title: 'Assistant', icon_name: 'audio-input-microphone-symbolic'});
-        const installed = AI_PROVIDERS.filter(provider => findProgram(provider.command));
-        const group = new Adw.PreferencesGroup({
-            title: 'Voice Assistant',
-            description: 'Press the shortcut (or the ✦ in the open island) and speak. Speech is recognised on this ' +
-                'computer (Set up downloads it, once); the request goes to the AI you pick, with your ' +
-                'own sign-in and plan.',
-        });
-        group.add(switchRow(settings, 'voice-assistant', 'AI Assistant',
-            'The shortcut and the ✦ in the open island. Off: Isle never asks an AI'));
-        const shortcut = shortcutRow(settings, 'voice-shortcut', 'Shortcut', 'Opens the assistant and listens');
-        settings.bind('voice-assistant', shortcut, 'sensitive', Gio.SettingsBindFlags.GET);
-        group.add(shortcut);
-
-        // Automatic is the first signed in, else the first installed: as isled picks (brain.rs `pick`).
-        const automatic = installed.find(p => signedIn(p.id)) ?? installed[0];
-        // Only the AIs installed here are offered; with none, the assistant says how to get one.
-        const provider = choiceRow(settings, 'voice-provider', 'AI', installed.length
-            ? 'Answers with your own sign-in; Isle runs its actions'
-            : 'Install Claude Code, Codex, Grok, opencode, Pi, Antigravity (agy) or Hermes, and sign in', [
-            ['auto', automatic ? `Automatic (${automatic.name})` : 'None installed'],
-            ...installed.map(({id, name}) => [id, name]),
-        ]);
-        // A long list (opencode's, every provider's models) can be searched by name; a long name wraps.
-        const model = new Adw.ComboRow({title: 'Model', factory: valueItem(), list_factory: wrappingItems(),
-            expression: new Gtk.PropertyExpression(Gtk.StringObject, null, 'string')});
-        let modelChoices = [];
-        let modelKey = null;
-        // Swapping the list moves the selection; that must not write a model of its own.
-        let syncing = false;
-        const syncModel = () => {
-            syncing = true;
-            try {
-                fillModel();
-            } finally {
-                syncing = false;
-            }
-        };
-        // Each AI's plan and the models it allows, as isled last found them (`Assistant1.Models`).
-        const catalog = new ModelCatalog(settings);
-        const fillModel = () => {
-            const wanted = settings.get_string('voice-provider');
-            const current = installed.find(p => p.id === wanted) ?? automatic;
-            model.visible = Boolean(current);
-            if (!current)
-                return;
-            modelKey = current.modelKey;
-            const entry = catalog.of(current.id);
-            let value = settings.get_string(modelKey);
-            // Only what the plan allows; until isled has asked, just the AI's own default.
-            const def = entry?.default_name ? `Default (${entry.default_name})` : `${current.name}’s default`;
-            modelChoices = [['', def], ...(entry?.models ?? []).map(({id, name}) => [id, name])];
-            // agy's efforts are models of their own, and Isle offers each at medium only: a pick from before
-            // at another effort becomes its medium, as isled already answers with.
-            const medium = current.id === 'agy' ? value.replace(/-(none|minimal|low|high|xhigh|max)$/, '-medium') : value;
-            if (medium !== value && modelChoices.some(([id]) => id === medium)) {
-                value = medium;
-                settings.set_string(modelKey, medium);
-            }
-            // A pick the plan no longer allows stays (it comes back once allowed), marked as not used now.
-            if (!modelChoices.some(([id]) => id === value)) {
-                const known = entry?.models?.length > 0;
-                // opencode's ids are "provider/model", as opencode spells them.
-                const shown = current.noPlan ? value : value[0].toUpperCase() + value.slice(1);
-                // opencode has no plan: a model its providers no longer list is just not there now.
-                const missing = current.noPlan ? 'not available now' : 'not on your plan';
-                modelChoices.push([value, known ? `${shown} · ${missing}` : shown]);
-            }
-            // "Claude Max", "ChatGPT Plus"; a plan that names its AI already as it is ("SuperGrok").
-            const named = current.planName && entry?.plan?.toLowerCase().includes(current.planName.toLowerCase());
-            const plan = named ? entry.plan : [current.planName, entry?.plan].filter(Boolean).join(' ');
-            const about = entry?.plan ? `${plan} · ${current.about}` : current.about[0].toUpperCase() + current.about.slice(1);
-            const checking = current.noPlan ? 'Finding your providers’ models…' : 'Checking which models your plan includes…';
-            model.subtitle = entry || catalog.loaded ? about : checking;
-            model.enable_search = modelChoices.length > 12;
-            model.model = Gtk.StringList.new(modelChoices.map(([, label]) => label));
-            model.selected = Math.max(0, modelChoices.findIndex(([id]) => id === value));
-        };
-        model.connect('notify::selected', () => {
-            if (syncing)
-                return;
-            const value = modelChoices[model.selected]?.[0];
-            if (modelKey && value !== undefined && value !== settings.get_string(modelKey))
-                settings.set_string(modelKey, value);
-        });
-        // The AI, or its model set elsewhere (the assistant itself, Reset all settings): the row follows.
-        const followModel = key => {
-            if (key === modelKey && modelChoices[model.selected]?.[0] !== settings.get_string(key))
-                syncModel();
-        };
-        const changed = [settings.connect('changed::voice-provider', syncModel),
-            ...AI_PROVIDERS.map(p => settings.connect(`changed::${p.modelKey}`, (_settings, key) => followModel(key)))];
-        catalog.connect(syncModel);
-        // Closed, not just destroyed: the settings' handler would keep the row (and this) alive.
-        window.connect('close-request', () => {
-            changed.forEach(id => settings.disconnect(id));
-            catalog.destroy();
-            return false;
-        });
-        syncModel();
-
-        const options = [provider, model];
-        options.push(choiceRow(settings, 'voice-speech-model', 'Speech recognition', 'Bigger is more accurate, and slower; downloaded once', [
-            ['tiny', 'Tiny (44 MB)'],
-            ['base', 'Base (82 MB)'],
-            ['small', 'Small (265 MB)'],
-            ['medium', 'Medium (823 MB)'],
-        ]));
-        options.push(choiceRow(settings, 'voice-language', 'Language', 'The language you speak', [
-            ['', 'Any (detected)'],
-            ['id,en', 'Indonesian or English'],
-            ['id', 'Indonesian'],
-            ['en', 'English'],
-        ]));
-        options.push(choiceRow(settings, 'voice-keep-chat', 'Keep the conversation', 'Never more than a day; then it is deleted, with the AI\'s copy', [
-            ['day', 'Until midnight'],
-            ['idle-2h', '2 hours without a word'],
-            ['idle-30m', '30 minutes without a word'],
-        ]));
-        const clearChat = new Adw.ActionRow({title: 'Clear the conversation now', subtitle: 'Deletes it here and the AI\'s copy of it',
-            activatable: true});
-        clearChat.add_suffix(new Gtk.Image({icon_name: 'user-trash-symbolic'}));
-        clearChat.connect('activated', () => confirm(clearChat.get_root(), {
-            heading: 'Clear the conversation?',
-            body: 'The assistant starts afresh; what was said is deleted here and from the AI\'s own history on this computer.',
-            action: 'Clear',
-        }, () => Gio.DBus.session.call(DAEMON, DAEMON_PATH, ASSISTANT_INTERFACE, 'ClearChat', null, null,
-            Gio.DBusCallFlags.NONE, -1, null, null)));
-        options.push(clearChat);
-        options.push(switchRow(settings, 'voice-use-selection', 'Use selected text',
-            'Send the text you have selected, so the AI can work on it; never from terminals or password managers'));
-        options.push(switchRow(settings, 'voice-read-notifications', 'Read notifications',
-            'Let the AI read your recent notifications when you ask about them'));
-        for (const row of options) {
-            settings.bind('voice-assistant', row, 'sensitive', Gio.SettingsBindFlags.GET);
-            group.add(row);
-        }
-        page.add(group);
-        const look = lookGroup(settings);
-        settings.bind('voice-assistant', look, 'sensitive', Gio.SettingsBindFlags.GET);
-        page.add(look);
-
-        const notes = new Adw.PreferencesGroup({
-            title: 'About the AIs',
-            description: 'Claude Code and Codex answer within your Claude or ChatGPT plan\'s limits; opencode and Pi ' +
-                'with the providers you signed in to in them (Pi searches no web). Antigravity\'s terms bar third-party tools from its ' +
-                'service; Isle only runs the official agy app, but use it at your own risk. Each is kept to ' +
-                'answering: commands and file changes go through Isle, which asks you first.',
-        });
-        page.add(notes);
-        return page;
-    }
 
     // History on or off, clearing it, and the apps whose copies are never kept.
     _clipboardPage(settings, window) {
@@ -675,10 +462,8 @@ function pickerRow(settings, key, title, choices, {custom = null, perLine = 8, l
     return row;
 }
 
-// The assistant's look: a live preview of it in the island's pill (listening, thinking, glad), its shape,
 // its colour and the light it brings to the island.
 function lookGroup(settings) {
-    const group = new Adw.PreferencesGroup({title: 'Look', description: 'How the assistant looks, and the light it brings to the island.'});
     const bot = new Bot(lookOf(settings));
     const cache = {};
     const motion = {time: 0, level: 0};
@@ -758,7 +543,6 @@ function lookGroup(settings) {
         syncCustom();
         const initial = new Gdk.RGBA();
         initial.parse(settings.get_string('bot-color').startsWith('#') ? settings.get_string('bot-color') : '#8e7dff');
-        new Gtk.ColorDialog({title: 'Assistant colour', with_alpha: false}).choose_rgba(customColor.get_root(), initial, null,
             (dialog, result) => {
                 try {
                     settings.set_string('bot-color', hexOf(dialog.choose_rgba_finish(result)));
@@ -816,22 +600,6 @@ function lookGroup(settings) {
     return group;
 }
 
-/** The AI agents isled found installed: `{provider, title, subtitle}` each. */
-function agentsFound() {
-    let agents = {};
-    try {
-        const proxy = Gio.DBusProxy.new_for_bus_sync(Gio.BusType.SESSION, Gio.DBusProxyFlags.NONE,
-            null, DAEMON, DAEMON_PATH, AGENTS_INTERFACE, null);
-        agents = JSON.parse(proxy.get_cached_property('Agents')?.unpack() ?? '{}');
-    } catch (e) {
-        console.warn(`Isle: could not ask which AI agents are installed: ${e.message}`);
-    }
-    return [
-        {provider: 'claude', title: 'Claude Code', subtitle: 'Allow, deny or always allow, and when it is done'},
-        {provider: 'codex', title: 'Codex', subtitle: 'Allow or deny, and when it is done · in Codex, type /hooks once and allow Isle'},
-        {provider: 'hermes', title: 'Hermes', subtitle: 'Allow or deny, and when it is done'},
-    ].filter(({provider}) => agents[provider]?.found);
-}
 
 /** A switch bound to a boolean key. */
 function switchRow(settings, key, title, subtitle) {
@@ -997,7 +765,6 @@ const PAGES = [
 /** The pages a shortcut of their own may open from anywhere, as the controller's SHORTCUT_PAGES, with their names. */
 const SHORTCUT_PAGES = [...PAGES.map(([name, title, iconName]) => [name, title, iconName]),
     ['apps', 'Apps', 'view-app-grid-symbolic'], ['devices', 'Devices', 'bluetooth-active-symbolic'],
-    ['usage', 'AI Usage', 'power-profile-performance-symbolic']];
 
 /** A shortcut per page, none at first: GNOME's own shortcuts keep their keys (see `shortcutRow`). */
 function shortcutsGroup(settings) {
@@ -1110,18 +877,9 @@ function pagesGroup(settings, window) {
     const devices = switchRow(settings, 'devices-page', 'Devices',
         'Connected Bluetooth devices and their battery; its tab shows while one is connected');
     devices.add_prefix(new Gtk.Image({icon_name: 'bluetooth-active-symbolic'}));
-    const usage = switchRow(settings, 'usage-enabled', 'AI Usage', 'Your AI plans’ limits, and warnings as one nears its end');
-    usage.add_prefix(new Gtk.Image({icon_name: 'power-profile-performance-symbolic'}));
     // Only its switch goes grey: its tab can still be moved meanwhile.
-    if (!usageProviders().length) {
-        lockSwitch(usage, true);
-        usage.subtitle = 'Sign in to Claude Code, Codex or Grok to see your plan';
     }
-    // Not a page but the ✦ beside the tabs: turning it off is how to use Isle without any AI.
-    const assistant = switchRow(settings, 'voice-assistant', 'AI Assistant', 'The ✦ in the open island and its shortcut');
-    assistant.add_prefix(new Gtk.Image({icon_name: 'audio-input-microphone-symbolic'}));
 
-    // Every page's row by name, each with arrows to move its tab; laid out in the tabs' order, the assistant last.
     const byName = new Map([...rows, ['apps', apps], ['devices', devices], ['usage', usage]]);
     const order = () => pageOrder(settings.get_strv('page-order'));
     const arrows = new Map();
@@ -1148,7 +906,7 @@ function pagesGroup(settings, window) {
     group.header_suffix = reset;
     const laidOut = [];
     const layOut = () => {
-        const wanted = [...order().map(name => byName.get(name)), assistant];
+        const wanted = [...order().map(name => byName.get(name))];
         if (wanted.every((row, at) => laidOut[at] === row))
             return;
         laidOut.forEach(row => group.remove(row));
@@ -1343,210 +1101,12 @@ function chooseCity(window, onPick) {
     dialog.present(window);
 }
 
-/** The AI CLIs the voice assistant can ask, in the order "Automatic" tries them, signed-in ones first (as isled does). */
-const AI_PROVIDERS = [
-    {id: 'claude', name: 'Claude Code', planName: 'Claude', command: 'claude', modelKey: 'voice-claude-model',
-        about: 'what Claude answers with'},
-    {id: 'codex', name: 'Codex (ChatGPT)', planName: 'ChatGPT', command: 'codex', modelKey: 'voice-codex-model',
-        about: 'what ChatGPT answers with, quickly'},
-    {id: 'grok', name: 'Grok', planName: 'Grok', command: 'grok', modelKey: 'voice-grok-model',
-        about: 'what Grok answers with, quickly'},
-    // Its plan is named whole ("OpenCode Go", "Free models"); its list: recent, free and plan models.
-    {id: 'opencode', name: 'opencode', planName: '', command: 'opencode', modelKey: 'voice-opencode-model',
-        about: 'your recent opencode models, your providers’, the free ones and your plan’s', noPlan: true},
-    // Pi (#64) has no plan of its own: the models of the providers signed in to in Pi, or with an API key.
-    {id: 'pi', name: 'Pi', planName: '', command: 'pi', modelKey: 'voice-pi-model',
-        about: 'the models of the providers you signed in to in Pi', noPlan: true},
-    {id: 'agy', name: 'Antigravity', planName: 'Antigravity', command: 'agy', modelKey: 'voice-agy-model',
-        about: 'what Antigravity answers with'},
-    {id: 'hermes', name: 'Hermes', planName: 'Hermes', command: 'hermes-agent', modelKey: 'voice-hermes-model',
-        about: 'what Hermes answers with', noPlan: true},
-];
 
-/** isled's `Models`: per AI `{plan, default, default_name, models: [{id, name}]}`, followed while Settings is open. */
-class ModelCatalog {
-    /** Reads the property now and follows its changes. */
-    constructor(settings) {
-        this._settings = settings;
-        this._models = {};
-        this._callbacks = [];
-        this._subscription = Gio.DBus.session.signal_subscribe(DAEMON, 'org.freedesktop.DBus.Properties',
-            'PropertiesChanged', DAEMON_PATH, ASSISTANT_INTERFACE, Gio.DBusSignalFlags.NONE,
-            (_conn, _sender, _path, _iface, _signal, params) => {
-                const models = params.deepUnpack()[1].Models?.deepUnpack();
-                if (models !== undefined)
-                    this._set(models);
-            });
-        Gio.DBus.session.call(DAEMON, DAEMON_PATH, 'org.freedesktop.DBus.Properties', 'Get',
-            new GLib.Variant('(ss)', [ASSISTANT_INTERFACE, 'Models']), null, Gio.DBusCallFlags.NONE, -1, null,
-            (conn, result) => {
-                try {
-                    this._set(conn.call_finish(result).deepUnpack()[0].deepUnpack());
-                } catch {
-                    // An isled from before 1.4 (or none): Settings offers only each AI's own default.
-                    this._set('{}');
-                }
-            });
-        // The plan may have changed since: isled asks again, and the list follows. With the assistant
-        // off Isle asks no AI, so only once it is turned on.
-        this._assistantChanged = settings.connect('changed::voice-assistant', () => this._refresh());
-        this._refresh();
-    }
 
-    /** Has isled ask each AI again, only with the assistant on. */
-    _refresh() {
-        if (this._settings.get_boolean('voice-assistant')) {
-            Gio.DBus.session.call(DAEMON, DAEMON_PATH, ASSISTANT_INTERFACE, 'RefreshModels', null, null,
-                Gio.DBusCallFlags.NONE, -1, null, null);
-        }
-    }
 
-    /** Whether isled answered (or isn't there to): no more waiting for it. */
-    get loaded() {
-        return this._loaded ?? false;
-    }
-
-    /** Bad JSON counts as nothing known. */
-    _set(json) {
-        this._loaded = true;
-        try {
-            this._models = JSON.parse(json) ?? {};
-        } catch {
-            this._models = {};
-        }
-        this._callbacks.forEach(callback => callback());
-    }
-
-    /** AI `id`'s entry, or null. */
-    of(id) {
-        return this._models[id] ?? null;
-    }
-
-    /** Called on every change; no disconnect, `destroy` drops them all. */
-    connect(callback) {
-        this._callbacks.push(callback);
-    }
-
-    /** Must run when the window closes, or the D-Bus handler keeps it alive. */
-    destroy() {
-        Gio.DBus.session.signal_unsubscribe(this._subscription);
-        this._settings.disconnect(this._assistantChanged);
-        this._callbacks = [];
-    }
-}
-
-/** Where Claude Code keeps its settings and sign-in: `$CLAUDE_CONFIG_DIR`, else ~/.claude. */
-function claudeConfigDir() {
-    return GLib.getenv('CLAUDE_CONFIG_DIR') || GLib.build_filenamev([GLib.get_home_dir(), '.claude']);
-}
-
-/** The user's own Codex home: `$CODEX_HOME`, else ~/.codex. */
-function codexHome() {
-    return GLib.getenv('CODEX_HOME') || GLib.build_filenamev([GLib.get_home_dir(), '.codex']);
-}
-
-/** The user's own Grok home: `$GROK_HOME`, else ~/.grok. */
-function grokHome() {
-    return GLib.getenv('GROK_HOME') || GLib.build_filenamev([GLib.get_home_dir(), '.grok']);
-}
-
-/** Whether AI `id` has a sign-in, checked as isled does (brain.rs `signed_in`). */
-function signedIn(id) {
-    const exists = (...parts) => GLib.file_test(GLib.build_filenamev(parts), GLib.FileTest.EXISTS);
-    const env = name => Boolean(GLib.getenv(name));
-    switch (id) {
-    case 'claude': {
-        if (exists(claudeConfigDir(), '.credentials.json') ||
-            ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX'].some(env))
-            return true;
-        // An API key or a cloud set in its settings.json.
-        try {
-            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([claudeConfigDir(), 'settings.json']));
-            const json = JSON.parse(new TextDecoder().decode(bytes));
-            const kept = JSON.stringify(['env', 'apiKeyHelper', 'awsAuthRefresh', 'awsCredentialExport', 'forceLoginMethod']
-                .filter(key => key in json).map(key => [key, json[key]]));
-            return ['apiKeyHelper', 'ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_USE_'].some(key => kept.includes(key));
-        } catch {
-            return false;
-        }
-    }
-    case 'codex':
-        return exists(codexHome(), 'auth.json') || env('OPENAI_API_KEY');
-    case 'grok': {
-        if (env('XAI_API_KEY'))
-            return true;
-        // As isled reads it (grok.rs `sign_in_from`): an entry with a token and a user id.
-        try {
-            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([grokHome(), 'auth.json']));
-            const auth = JSON.parse(new TextDecoder().decode(bytes)) ?? {};
-            return Object.values(auth).some(entry => entry?.key && entry?.user_id);
-        } catch {
-            return false;
-        }
-    }
-    case 'opencode': {
-        // As isled counts them: API keys and OAuth sign-ins, never an empty file.
-        try {
-            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([GLib.get_user_data_dir(), 'opencode', 'auth.json']));
-            const auth = JSON.parse(new TextDecoder().decode(bytes)) ?? {};
-            return Object.values(auth).some(entry => ['api', 'oauth'].includes(entry?.type));
-        } catch {
-            return false;
-        }
-    }
-    case 'pi': {
-        // As isled counts it (pi.rs `signed_in`): a sign-in or key it keeps, a provider of your own, an API key.
-        const dir = GLib.getenv('PI_CODING_AGENT_DIR') || GLib.build_filenamev([GLib.get_home_dir(), '.pi', 'agent']);
-        if (exists(dir, 'models.json') || ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'GEMINI_API_KEY', 'OPENROUTER_API_KEY',
-            'XAI_API_KEY', 'GROQ_API_KEY', 'DEEPSEEK_API_KEY', 'MISTRAL_API_KEY', 'CEREBRAS_API_KEY', 'OPENCODE_API_KEY'].some(env))
-            return true;
-        try {
-            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([dir, 'auth.json']));
-            return Object.keys(JSON.parse(new TextDecoder().decode(bytes)) ?? {}).length > 0;
-        } catch {
-            return false;
-        }
-    }
-    case 'agy':
-        // Before agy 1.4, and since.
-        return exists(GLib.get_home_dir(), '.gemini/antigravity-cli/antigravity-oauth-token') ||
-            exists(GLib.get_home_dir(), '.gemini/jetski-standalone-oauth-token');
-    case 'hermes': {
-        // Hermes Agent: via Ollama Cloud API key or local Hermes config.
-        if (env('OLLAMA_CLOUD_API_KEY') || env('OLLAMA_API_KEY') || env('HERMES_API_KEY'))
-            return true;
-        try {
-            const [, bytes] = GLib.file_get_contents(GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hermes', 'config.json']));
-            const json = JSON.parse(new TextDecoder().decode(bytes));
-            return Boolean(json.api_key || json.ollama_cloud_api_key);
-        } catch {
-            return false;
-        }
-    }
-    default:
-        return false;
-    }
-}
 
 /** `command` on the PATH or where installers and Node version managers put it, as isled looks; else null. */
 // The same places isled looks in (brain.rs `install_dirs`), for an AI installed with npm, nvm, Homebrew…
-function findProgram(command) {
-    const home = GLib.get_home_dir();
-    const env = (name, fallback) => GLib.getenv(name) || fallback;
-    const dirs = [
-        GLib.build_filenamev([home, '.local/bin']), GLib.build_filenamev([home, '.npm-global/bin']),
-        GLib.build_filenamev([env('BUN_INSTALL', `${home}/.bun`), 'bin']),
-        GLib.build_filenamev([env('VOLTA_HOME', `${home}/.volta`), 'bin']),
-        env('PNPM_HOME', `${home}/.local/share/pnpm`),
-        ...['.local/share/fnm/aliases/default/bin', '.fnm/aliases/default/bin', '.claude/local', '.grok/bin',
-            '.opencode/bin', '.local/share/mise/shims', '.asdf/shims', '.yarn/bin', '.linuxbrew/bin', '.nix-profile/bin']
-            .map(dir => GLib.build_filenamev([home, dir])),
-        '/home/linuxbrew/.linuxbrew/bin', '/run/current-system/sw/bin',
-    ];
-    return GLib.find_program_in_path(command) ?? [...dirs, ...nvmBins(home), '/usr/local/bin']
-        .map(dir => GLib.build_filenamev([dir, command]))
-        .find(path => GLib.file_test(path, GLib.FileTest.IS_EXECUTABLE)) ?? null;
-}
 
 /** nvm's Nodes' bin folders, newest first. */
 function nvmBins(home) {
@@ -1571,21 +1131,7 @@ function nvmBins(home) {
     return versions.map(name => GLib.build_filenamev([root, name, 'bin']));
 }
 
-/** The AI providers signed in here, as rows to switch: Claude Code's sign-in, Codex's (or its logs), and Grok's. */
 // Where isled reads them (usage.rs): Claude Code's config dir, the user's Codex home and Isle's own.
-function usageProviders() {
-    const providers = [];
-    // The plan's name is isled's (Settings → Assistant, the Usage page), as the apps name it.
-    if (GLib.file_test(GLib.build_filenamev([claudeConfigDir(), '.credentials.json']), GLib.FileTest.EXISTS))
-        providers.push({key: 'usage-claude', title: 'Claude', subtitle: 'Signed in with Claude Code'});
-    const signedIn = GLib.file_test(GLib.build_filenamev([codexHome(), 'auth.json']), GLib.FileTest.EXISTS);
-    const sessions = [[codexHome(), 'sessions'], [GLib.get_user_data_dir(), 'isle', 'codex', 'sessions']];
-    if (signedIn || sessions.some(dir => GLib.file_test(GLib.build_filenamev(dir), GLib.FileTest.IS_DIR)))
-        providers.push({key: 'usage-codex', title: 'ChatGPT', subtitle: 'Signed in with Codex'});
-    if (GLib.file_test(GLib.build_filenamev([grokHome(), 'auth.json']), GLib.FileTest.EXISTS))
-        providers.push({key: 'usage-grok', title: 'Grok', subtitle: 'Signed in with Grok'});
-    return providers;
-}
 
 /** Items of a drop-down's list that wrap a long name rather than cutting it. */
 function wrappingItems() {
@@ -1723,7 +1269,6 @@ function shortcutTakenBy(accelerator, settings, ownKey) {
                 return `your shortcut “${own.get_string('name')}”`;
         }
     }
-    const isle = [['voice-shortcut', 'Assistant'], ...SHORTCUT_PAGES.map(([name, title]) => [`shortcut-${name}`, title])];
     for (const [other, title] of isle) {
         if (other !== ownKey && same(settings.get_strv(other)))
             return `Isle’s ${title} shortcut`;
@@ -2169,4 +1714,13 @@ function fillIgnoredApps(group, settings) {
     const changed = settings.connect(`changed::${key}`, refresh);
     group.connect('destroy', () => settings.disconnect(changed));
     refresh();
+}
+
+/** Whether `command` is on the PATH, as `which` would find it. */
+function findProgram(command) {
+    try {
+        return GLib.find_program_in_path(command) !== null;
+    } catch {
+        return false;
+    }
 }
