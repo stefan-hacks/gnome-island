@@ -15,8 +15,6 @@ import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import {paletteFor} from './bot.js';
-import {BotIcon} from './botIcon.js';
 import {miniBarColor} from './barColors.js';
 import {vividColorOfFile} from './colors.js';
 import {onUiScale, px, uiScale} from './compat.js';
@@ -135,12 +133,8 @@ export const CompactView = GObject.registerClass({
         this._micOff = new St.Icon({gicon: icon('isle-mic-off-symbolic'), icon_size: 15, style_class: 'isle-call-muted', y_align: Clutter.ActorAlign.CENTER});
         // isled is not running: what needs it cannot work (see the controller's service watch).
         this._serviceDown = new St.Icon({gicon: icon('dialog-warning-symbolic'), icon_size: 15, style_class: 'isle-compact-warning', y_align: Clutter.ActorAlign.CENTER});
-        // The assistant at work with the island closed: still, but for a blink and a glance every few seconds.
-        // In a slot as big as the cover's, as far in from the edge; a little smaller, as a solid shape looks bigger.
-        this._assistant = new BotIcon(SIZES.hanging.art, this._botLook(), {body: SIZES.hanging.bot});
-        this._assistant.y_align = Clutter.ActorAlign.CENTER;
-        this._botLookChanged = ['bot-shape', 'bot-color', 'bot-glow'].map(key =>
-            settings.connect(`changed::${key}`, () => (this._assistant.look = this._botLook())));
+        // Bot/AI/assistant features removed in this fork.
+        this._assistant = null;
 
         const center = new St.Widget({layout_manager: new CentreLayout(), x_expand: true});
         const times = new St.Widget({layout_manager: new CentreLayout(), y_align: Clutter.ActorAlign.CENTER});
@@ -206,8 +200,8 @@ export const CompactView = GObject.registerClass({
         this._inset = -1;
         // The sides are told not to expand, or their children's x_expand (which the alignment needs) would widen them.
         for (const actor of [this._timerIcon, this._ring, this._art, this._dot, this._recordingDot, this._phone, this._bars, this._micOff,
-            this._serviceDown, this._assistant, this._secondRing, this._secondArt, this._secondPhone])
-            actor.set({x_align: Clutter.ActorAlign.CENTER, x_expand: true});
+            this._serviceDown, this._secondRing, this._secondArt, this._secondPhone])
+            actor?.set({x_align: Clutter.ActorAlign.CENTER, x_expand: true});
         // From its square's start: the room `_fit` leaves after it keeps it off the island's end.
         this._timerTime.set({x_align: Clutter.ActorAlign.START, x_expand: true});
 
@@ -523,7 +517,6 @@ export const CompactView = GObject.registerClass({
         const size = SIZES[this._inBar ? 'inBar' : 'hanging'];
         this._art.resize(size.art, size.artRadius);
         this._secondArt.resize(size.art, size.artRadius);
-        this._assistant.resize(size.art, size.bot);
         this._ring.resize(size.ring);
         this._secondRing.resize(size.ring);
         this._sizeTitle();
@@ -599,9 +592,6 @@ export const CompactView = GObject.registerClass({
             : {music: this._bars, timer: anyDot ? null : this._timerTime}[primary] ?? null;
         if (onCall && this._call.muted)
             right = this._micOff;
-        if (this._assistantBusy)
-            right = this._assistant;
-        this._assistant.alive = right === this._assistant;
         if (this._isServiceDown)
             right = this._serviceDown;
         this._privacyDots.update(dots);
@@ -784,10 +774,9 @@ export const CompactView = GObject.registerClass({
         }
     }
 
-    /** The assistant's shape and colours, from Settings (see bot.js). */
+    /** The assistant's shape and colours — bot/AI features removed in this fork. */
     _botLook() {
-        return {shape: this._settings.get_string('bot-shape'),
-            palette: paletteFor(this._settings.get_string('bot-color'), this._settings.get_string('bot-glow'))};
+        return {shape: 'circle', palette: {glow: null, body: null, eyes: null}};
     }
 
     /** Stops timers and signals, and destroys the signs not in a slot right now. */
@@ -803,14 +792,12 @@ export const CompactView = GObject.registerClass({
         this._settings.disconnect(this._titleWidthChanged);
         this._settings.disconnect(this._moonChanged);
         this._settings.disconnect(this._barsChanged);
-        for (const id of this._botLookChanged)
-            this._settings.disconnect(id);
         this._privacy.disconnect(this._privacyChanged);
         this._call.disconnect(this._callChanged);
         // Slots may hold actors that are not currently children.
-        for (const actor of [this._timerIcon, this._ring, this._art, this._dot, this._recordingDot, this._bars, this._phone, this._micOff, this._assistant, this._serviceDown,
-            this._timerTime, this._secondRing, this._secondArt, this._secondPhone]) {
-            if (!actor.get_parent())
+        for (const actor of [this._timerIcon, this._ring, this._art, this._dot, this._recordingDot, this._bars, this._phone, this._micOff,
+            this._serviceDown, this._timerTime, this._secondRing, this._secondArt, this._secondPhone]) {
+            if (actor && !actor.get_parent())
                 actor.destroy();
         }
     }
