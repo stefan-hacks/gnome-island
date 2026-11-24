@@ -1710,6 +1710,32 @@
 #isleIsland.isle-accent-system .isle-cal-accounts { color: st-lighten(-st-accent-color, 25%); }
 
 /* Dark tint: the accent flat, as GNOME's own toggles. */
+
+/* ── System / Vitals ── */
+.isle-system-scroll { padding: 0 8px; }
+.isle-system-content { padding: 8px 0; spacing: 2px; }
+.isle-system-section { padding: 8px 12px 4px; font-size: 11px; font-weight: bold; color: st-transparentize(-st-fg-color, 0.4); }
+.isle-vitals-row { padding: 6px 12px; border-radius: 8px; spacing: 10px; }
+.isle-vitals-row:hover { background-color: st-transparentize(-st-fg-color, 0.92); }
+.isle-vitals-icon { color: st-transparentize(-st-fg-color, 0.3); }
+.isle-vitals-title { font-size: 13px; font-weight: 500; }
+.isle-vitals-subtitle { font-size: 11px; color: st-transparentize(-st-fg-color, 0.5); }
+.isle-vitals-value { font-size: 13px; font-weight: 600; font-feature-settings: "tnum"; min-width: 120px; text-align: right; }
+
+#isleIsland.isle-glass-dark .isle-vitals-row:hover { background-color: st-transparentize(-st-fg-color, 0.92); }
+#isleIsland.isle-glass-light .isle-vitals-row:hover { background-color: st-transparentize(-st-fg-color, 0.92); }
+
+/* Vitals threshold colours */
+.isle-vitals-normal { color: -st-fg-color; }
+.isle-vitals-warn { color: #ffb000; }
+.isle-vitals-critical { color: #ff4444; }
+
+#isleIsland.isle-glass-dark .isle-vitals-warn { color: #ffb000; }
+#isleIsland.isle-glass-dark .isle-vitals-critical { color: #ff5555; }
+#isleIsland.isle-glass-light .isle-vitals-warn { color: #cc8800; }
+#isleIsland.isle-glass-light .isle-vitals-critical { color: #cc0000; }
+
+/* Dark tint: the accent flat, as GNOME's own toggles. */
 #isleIsland.isle-glass-dark .isle-pill-accent,
 #isleIsland.isle-glass-dark .isle-card-run,
 #isleIsland.isle-glass-dark .isle-pill-decision,

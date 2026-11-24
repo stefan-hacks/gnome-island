@@ -49,6 +49,7 @@ import {DevicesPage} from './pages/devices.js';
 import {MediaPage} from './pages/media.js';
 import {NotificationsPage} from './pages/notifications.js';
 import {ShelfPage} from './pages/shelf.js';
+import {SystemPage} from './pages/system.js';
 import {TasksPage} from './pages/tasks.js';
 import {TimerPage} from './pages/timer.js';
 import {UsagePage} from './pages/usage.js';
@@ -189,7 +190,7 @@ const PILL_HEADER_TOP = 8;
 /** The pages a shortcut of their own may open from anywhere (Settings → Shortcuts; `shortcut-<page>`, none set at
  * first: the usual ones are GNOME's). As prefs.js lists them. */
 const SHORTCUT_PAGES = ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps', 'devices',
-    'usage'];
+    'usage', 'system'];
 
 /** A question back is shown this long before the island listens for the reply. */
 const VOICE_LISTEN_AGAIN_MS = 900;
@@ -502,6 +503,7 @@ export class Controller {
             () => new CalendarPage(this._daemon, this._settings, size),
             () => new AppsPage(this._daemon, this._appUsage, size),
             () => new DevicesPage(this._daemon, size),
+            () => new SystemPage(this._daemon, size),
             () => new UsagePage(this._daemon, size),
         ];
     }

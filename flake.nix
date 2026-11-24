@@ -40,7 +40,7 @@
 
       flake = {
         homeManagerModules = rec {
-          gnome-island = import ./packaging/nix/home-manager.nix self;
+          gnome-island = import ./packaging/nix/home-manager.nix;
           default = gnome-island;
         };
 

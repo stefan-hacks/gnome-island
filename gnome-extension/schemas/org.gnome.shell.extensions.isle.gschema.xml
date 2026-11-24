@@ -344,12 +344,12 @@
     <key name="hidden-pages" type="as">
       <default>[]</default>
       <summary>Pages left out of the island</summary>
-      <description>Names of the open island’s pages that have no tab: music, notifications, focus, reminders, shelf, calendar. The Apps and Usage pages have their own switches (app-usage, usage-enabled).</description>
+      <description>Names of the open island’s pages that have no tab: music, notifications, focus, reminders, shelf, calendar, system. The Apps and Devices pages have their own switches (app-usage, devices-page).</description>
     </key>
     <key name="page-order" type="as">
       <default>[]</default>
       <summary>The order of the open island’s tabs</summary>
-      <description>Page names, left to right: music, notifications, focus, reminders, shelf, calendar, apps, devices, usage. Empty for Isle’s own order (as listed); a page left out goes after the one it follows there. The Call tab always comes first, during a call.</description>
+      <description>Page names, left to right: music, notifications, focus, reminders, shelf, calendar, apps, devices, system, usage. Empty for Isle’s own order (as listed); a page left out goes after the one it follows there. The Call tab always comes first, during a call.</description>
     </key>
     <key name="app-usage" type="b">
       <default>false</default>
@@ -505,6 +505,11 @@
       <default>[]</default>
       <summary>Shortcut to the Usage page</summary>
       <description>Opens the island on the Usage page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
+    </key>
+    <key name="shortcut-system" type="as">
+      <default>[]</default>
+      <summary>Shortcut to the System page</summary>
+      <description>Opens the island on the System page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
     </key>
     <key name="chimes" type="b">
       <default>true</default>

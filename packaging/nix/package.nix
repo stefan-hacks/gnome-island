@@ -55,6 +55,9 @@ rustPlatform.buildRustPackage {
     lockFile = src + "/Cargo.lock";
   };
 
+  # Tests include integration tests that hang in sandboxed builds.
+  doCheck = false;
+
   # Build only the daemon and shelf by default; whisper needs Vulkan which is optional.
   buildPhase = ''
     runHook preBuild

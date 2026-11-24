@@ -100,6 +100,7 @@ export const PREVIEWS = {
     'shortcut-apps': null,
     'shortcut-devices': null,
     'shortcut-usage': null,
+    'shortcut-system': null,
 
     // Written by the shell itself (a page remembered, a question answered once, a count cleared): never a preview.
     'check-updates': null,

@@ -1008,13 +1008,14 @@ const PAGES = [
     ['reminders', 'Reminders', 'object-select-symbolic', 'Your to-do list'],
     ['shelf', 'Shelf', 'edit-paste-symbolic', 'Clipboard history (Super+V), the files tray and sharing with a phone'],
     ['calendar', 'Calendar', 'x-office-calendar-symbolic', 'The month, its events and world clocks'],
+    ['system', 'System', 'utilities-system-monitor-symbolic', 'CPU, memory, network, storage and temperature sensors'],
 ];
 
 /** The pages a shortcut of their own may open from anywhere, as the controller's SHORTCUT_PAGES, with their names. */
 const SHORTCUT_PAGES = [...PAGES.map(([name, title, iconName]) => [name, title, iconName]),
     ['apps', 'Apps', 'view-app-grid-symbolic'], ['devices', 'Devices', 'bluetooth-active-symbolic'],
-
-/** A shortcut per page, none at first: GNOME's own shortcuts keep their keys (see `shortcutRow`). */
+    ['system', 'System', 'utilities-system-monitor-symbolic'],
+];
 function shortcutsGroup(settings) {
     const group = new Adw.PreferencesGroup({
         title: 'Shortcuts',

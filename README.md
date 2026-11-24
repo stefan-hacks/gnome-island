@@ -275,7 +275,7 @@ Click the gear right of the clock in the open island (or GNOME Island's gear in 
   is behind it (windows and wallpaper) blurred, with a slider from clear to dark smoked glass; the top bar on a slider from glass (default) to black, and black anyway while a window reaches it (off by default);
   the island's shape, a notch joined to the top or a pill floating free;
   a little space below the island inside the bar (on by default); auto-hide (always, with a top bar that hides, or beside maximized windows; off by default); a 24- or 12-hour clock (or as GNOME's), and the date beside it; a standard or large open island; privacy dots; which pages the open island has (Music,
-  Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices, Usage) and whether it
+  Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices, System, Usage) and whether it
   has the Usage page at all; a shortcut of your own for each page (none at first); world clocks, and their cities;
   the closed island inside the bar or hanging below it; with more than one
   display, on the main one, the one you are using, or all of them; opening when the

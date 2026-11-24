@@ -4,13 +4,14 @@
 #   imports = [ inputs.gnome-island.homeManagerModules.gnome-island ];
 #   programs.gnome-island.enable = true;
 #
-{ self }:
-
 { config, lib, pkgs, ... }:
 
 let
   cfg = config.programs.gnome-island;
-  pkg = self.packages.${pkgs.system}.gnome-island or (pkgs.callPackage ./package.nix { });
+  src = ../../.;  # The gnome-island source root (packaging/nix/../../.)
+  metadata = lib.importJSON (src + "/gnome-extension/metadata.json");
+  version = metadata.version-name or "dev";
+  pkg = pkgs.callPackage ./package.nix { inherit src version; };
 in
 
 {
@@ -34,8 +35,6 @@ in
             compact-top-bar = true;
             island-in-top-bar = true;
             clock-format = "24h";
-            voice-assistant = true;
-            voice-provider = "hermes";
           };
         }
       '';
