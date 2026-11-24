@@ -25,7 +25,7 @@
 
 let
   metadata = lib.importJSON (src + "/gnome-extension/metadata.json");
-  pname = "isle";
+  pname = "gnome-island";
 in
 
 rustPlatform.buildRustPackage {
@@ -126,7 +126,7 @@ EOF
 
   meta = with lib; {
     description = "A notch-style island for the GNOME Shell top bar";
-    homepage = "https://github.com/zickrian/isle";
+    homepage = "https://github.com/stefan-hacks/gnome-island";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
     maintainers = [ ];

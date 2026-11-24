@@ -1,6 +1,6 @@
 <div align="center">
 
-# Isle
+# GNOME Island
 
 **A notch-style island for the GNOME desktop.**
 
@@ -13,15 +13,16 @@ your screen.
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 ![GNOME Shell 46–51](https://img.shields.io/badge/GNOME%20Shell-46%E2%80%9351-4a86cf.svg)
 ![Rust 1.92+](https://img.shields.io/badge/Rust-1.92%2B-orange.svg)
-[![Buy me a coffee](https://img.shields.io/badge/support-buy%20me%20a%20coffee-ffdd00.svg)](https://sociabuzz.com/zickrian/tribe)
-
-<img src="docs/images/demo.webp" alt="Isle on a GNOME desktop: the assistant playing music when asked, a command waiting for Run, every page of the island one hover away, and Claude Code asking for permission" width="800">
-
-[![Watch the full demo on YouTube](https://img.shields.io/badge/Watch%20the%20full%20demo-2%20min%2C%20with%20sound-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/D65nLECDgOo)
 
 </div>
 
-Isle turns the centre of the top bar into a black notch.
+> **Note:** This is a fork of [Isle by zickrian](https://github.com/zickrian/isle) with additional features:
+> - **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
+> - **Hermes agent support** — use Hermes Agent as your voice assistant provider
+> - **NixOS flake & Home Manager** — install declaratively on NixOS
+> - This fork is not synced with upstream and evolves independently.
+
+GNOME Island turns the centre of the top bar into a black notch.
 At rest it shows the time and what is going on (a song, a timer, a
 recording, or two of them at once). Rest the pointer on it and it opens with spring physics into a
 small panel with tabs for each page; passing over it on the way elsewhere
@@ -44,7 +45,6 @@ appear in the same place instead of in the middle of the screen.
 - [Uninstalling](#uninstalling)
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
-- [Support](#support)
 - [License](#license)
 
 ## Preview
@@ -86,18 +86,20 @@ appear in the same place instead of in the middle of the screen.
   Debian 13, …), on a 64-bit Intel or AMD PC (x86_64). Check with
   `gnome-shell --version`.
 - `curl`, which most systems have (if not: `sudo apt install curl`). Install
-  Isle as yourself, not with `sudo`.
+  GNOME Island as yourself, not with `sudo`.
 - For the voice assistant (optional): a microphone and
-  one of Claude Code, Codex, Grok, opencode, Pi or Antigravity signed in (Codex, Pi and the npm
+  one of Claude Code, Codex, Grok, opencode, Pi, Antigravity or **Hermes** signed in (Codex, Pi and the npm
   install of Claude Code need Node.js 18 or newer); see
   [Voice assistant](#voice-assistant).
 
 ## Installation
 
+### Quick install (curl)
+
 1. Run this in a terminal:
 
    ```sh
-   curl -fsSL https://raw.githubusercontent.com/zickrian/isle/main/get.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/stefan-hacks/gnome-island/main/get.sh | bash
    ```
 
 2. **Log out and back in**: GNOME Shell on Wayland only loads a new
@@ -108,64 +110,29 @@ That's all. The script downloads the latest release, checks it, and installs
 it for your user only: no root, no compiler and no cloning needed. Run the
 same command again to update; your settings stay as you set them.
 
-The [installation guide](docs/install.md) goes through it step by step, with
-updating, uninstalling, installing offline and what to do if the island does
-not appear.
-
 > [!NOTE]
 > The installer never changes other extensions. When one would fight with
 > the island (Blur my Shell's top bar blur, or an extension that takes the
-> same place in the top bar), it says so and how to turn that off. Isle's
+> same place in the top bar), it says so and how to turn that off. GNOME Island's
 > look is the same on every desktop: a slim top bar with no colour of its
 > own, and the island as a black notch.
 
-### Other ways to install
+### NixOS (flake)
 
-**Ubuntu and Debian (.deb), Fedora (.rpm).** Each
-[release](../../releases) also has a system-wide package, for every user of
-the computer. Install it, log out and back in (GNOME Shell only finds a new
-extension at login), then turn Isle on once as each user, in the Extensions
-app or with `gnome-extensions enable`:
-
-```sh
-sudo apt install ./isle_*_amd64.deb        # Ubuntu 24.04 and newer, Debian 13
-sudo dnf install ./isle-*.x86_64.rpm       # Fedora 40 and newer
-# Log out and back in, then:
-gnome-extensions enable isle@zickrian.github.io
-```
-
-**Arch Linux.** Isle is not in the AUR yet (`yay -S isle-bin` finds
-nothing). Build its package from the `PKGBUILD` in
-[`packaging/aur`](packaging/aur), made from the release tarball, or use the
-one-line install above:
-
-```sh
-sudo pacman -S --needed base-devel git
-git clone --depth 1 https://github.com/zickrian/isle.git
-cd isle/packaging/aur
-makepkg -si
-# Log out and back in, then:
-gnome-extensions enable isle@zickrian.github.io
-```
-
-**NixOS (flake).** Add the flake to your system or Home Manager inputs, then
-install the package and optionally enable it declaratively:
+Add the flake to your system or Home Manager inputs:
 
 ```nix
 # flake.nix
 {
-  inputs.isle.url = "github:zickrian/isle";
-  # Or use your own fork before upstreaming:
-  # inputs.isle.url = "github:stefan-hacks/isle";
+  inputs.gnome-island.url = "github:stefan-hacks/gnome-island";
 
-  outputs = { self, nixpkgs, home-manager, isle, ... }:
-    # NixOS system configuration
+  outputs = { self, nixpkgs, home-manager, gnome-island, ... }:
     {
+      # NixOS system-wide
       nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          # Install the package system-wide
-          { environment.systemPackages = [ isle.packages.x86_64-linux.isle ]; }
+          { environment.systemPackages = [ gnome-island.packages.x86_64-linux.gnome-island ]; }
         ];
       };
 
@@ -173,13 +140,11 @@ install the package and optionally enable it declaratively:
       homeConfigurations.username = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         modules = [
-          isle.homeManagerModules.default
+          gnome-island.homeManagerModules.default
           {
-            programs.isle.enable = true;
-            # Optional: start the isled daemon automatically
-            programs.isle.startDaemon = true;
-            # Optional: set default gsettings
-            programs.isle.settings = {
+            programs.gnome-island.enable = true;
+            programs.gnome-island.enableUserService = true;
+            programs.gnome-island.settings = {
               "org/gnome/shell/extensions/isle" = {
                 island-theme = "gnome";
                 top-bar-color = true;
@@ -194,42 +159,36 @@ install the package and optionally enable it declaratively:
 
 With the Home Manager module, log out and back in after switching.
 
-To update, run `nix flake update isle` and rebuild.
+To update, run `nix flake update gnome-island` and rebuild.
 
-### Testing your fork in a VM before upstreaming
+### Testing in a NixOS VM
 
-You can try your fork in a NixOS VM without touching your running system:
+You can try GNOME Island in a NixOS VM without touching your running system:
 
 ```nix
-# vm-test.nix — save this file, then run:
-# nixos-rebuild build-vm --flake .#test-vm
-# ./result/bin/run-test-vm
-
+# vm-test.nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # Point at your local fork checkout:
-    isle.url = "path:/home/stefan-hacks/Projects/isle";
+    gnome-island.url = "github:stefan-hacks/gnome-island";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, isle, home-manager, ... }: {
+  outputs = { self, nixpkgs, gnome-island, home-manager, ... }: {
     nixosConfigurations.test-vm = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         home-manager.nixosModules.home-manager
         {
-          # Minimal GNOME desktop
           services.xserver.enable = true;
           services.xserver.displayManager.gdm.enable = true;
           services.xserver.desktopManager.gnome.enable = true;
           services.displayManager.autoLogin.enable = true;
           services.displayManager.autoLogin.user = "test";
 
-          # VM convenience
           virtualisation.memorySize = 4096;
           virtualisation.diskSize = 8192;
 
@@ -239,12 +198,11 @@ You can try your fork in a NixOS VM without touching your running system:
             initialPassword = "test";
           };
 
-          # Enable the extension for the test user
           home-manager.users.test = {
-            imports = [ isle.homeManagerModules.default ];
-            programs.isle.enable = true;
-            programs.isle.startDaemon = true;
-            programs.isle.settings = {
+            imports = [ gnome-island.homeManagerModules.default ];
+            programs.gnome-island.enable = true;
+            programs.gnome-island.enableUserService = true;
+            programs.gnome-island.settings = {
               "org/gnome/shell/extensions/isle" = {
                 island-theme = "gnome";
                 top-bar-color = true;
@@ -252,8 +210,7 @@ You can try your fork in a NixOS VM without touching your running system:
             };
           };
 
-          # Make the package available system-wide too
-          environment.systemPackages = [ isle.packages.x86_64-linux.isle ];
+          environment.systemPackages = [ gnome-island.packages.x86_64-linux.gnome-island ];
         }
       ];
     };
@@ -270,29 +227,9 @@ nixos-rebuild build-vm --flake .#test-vm
 
 Inside the VM, log in as `test` / `test`. The extension is already enabled and the daemon is running. Switch between GNOME light and dark styles in Settings → Appearance → Style to see the adaptive `gnome` theme change in real time.
 
-To update a package, install the new release's package the same way (or run
-`makepkg -si` again with the updated `PKGBUILD`); don't also run the command
-above, which would add a second copy in your home folder.
+### From source
 
-A copy installed with the command above, in your home folder, takes
-precedence over a system-wide package; `isle-uninstall` removes it and the
-package's takes over. Releases can be checked with
-`gh attestation verify <file> --repo zickrian/isle` (see
-[SECURITY.md](SECURITY.md#verifying-a-release)).
-
-<details>
-<summary><b>From the release tarball, or from source</b></summary>
-
-**From a release package.** Download `isle-<version>-x86_64-linux.tar.gz`
-from [Releases](../../releases), then:
-
-```sh
-tar -xzf isle-*-x86_64-linux.tar.gz
-cd isle-*-x86_64-linux
-./install.sh
-```
-
-**From source**, for development or other architectures. You need Rust 1.92
+For development or other architectures. You need Rust 1.92
 or newer (1.88 without the shelf helper) ([rustup](https://rustup.rs); Ubuntu 24.04's own `cargo` is too
 old), for the shelf's drag and drop the GTK 4 development files, and for the
 voice assistant's speech recognition (whisper.cpp) cmake, libclang, and for
@@ -302,12 +239,10 @@ the GPU the Vulkan headers and glslc:
 sudo apt install git build-essential pkg-config libgtk-4-dev cmake libclang-dev libvulkan-dev glslc
 # Fedora: git gcc-c++ pkgconf gtk4-devel cmake clang-devel vulkan-loader-devel glslc
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-git clone https://github.com/zickrian/isle.git
-cd isle
+git clone https://github.com/stefan-hacks/gnome-island.git
+cd gnome-island
 ./install.sh
 ```
-
-</details>
 
 ## Usage
 
@@ -338,15 +273,15 @@ way: alerts, notifications and reminders wait and show once it is gone, and
 a burst of notifications comes as one ("6 new notifications"), each still
 unread in the list. A reminder stays until you are back at the computer.
 While you share or record the screen, alerts leave out what notifications
-say, and the clipboard history stays hidden. If Isle's background service
+say, and the clipboard history stays hidden. If GNOME Island's background service
 stops, a warning shows in the closed island; click it to start it again.
 
 ## Settings
 
-Click the gear right of the clock in the open island (or Isle's gear in the
+Click the gear right of the clock in the open island (or GNOME Island's gear in the
 **Extensions** app):
 
-- **Island:** Isle's own black island, or Glass, clear glass that shows what
+- **Island:** GNOME Island's own black island, **GNOME** (follows your light/dark preference), or Glass, clear glass that shows what
   is behind it (windows and wallpaper) blurred, with a slider from clear to dark smoked glass; the top bar on a slider from glass (default) to black, and black anyway while a window reaches it (off by default);
   the island's shape, a notch joined to the top or a pill floating free;
   a little space below the island inside the bar (on by default); auto-hide (always, with a top bar that hides, or beside maximized windows; off by default); a 24- or 12-hour clock (or as GNOME's), and the date beside it; a standard or large open island; privacy dots; which pages the open island has (Music,
@@ -372,7 +307,7 @@ Click the gear right of the clock in the open island (or Isle's gear in the
   you selected (off by default) or read your notifications; how long a quiet
   conversation is kept, and clearing it now.
 - **AI Usage:** on or off, which plans to show, and when to warn; and
-  under **AI Agents**, a switch for each of Claude Code and Codex that is
+  under **AI Agents**, a switch for each of Claude Code, Codex and Hermes that is
   installed (on by default; none listed when neither is).
 - **About:** the version and whether it is up to date (with how to update,
   and the switch for asking GitHub once a day), help, a bug report to copy
@@ -383,14 +318,14 @@ Click the gear right of the clock in the open island (or Isle's gear in the
 Press **Super+I** (or the mic in the open island) and speak. The island
 listens until you pause, turns your words into text **on this computer**,
 then asks the AI you picked; it shows each step ("Searching ~/Downloads for
-“signature”…") and does what the answer asks.
+"signature"…") and does what the answer asks.
 
 It works as an **agent**: a request with several steps ("open Firefox, then
 put it on the left", "find my CV and open it", "open Spotify, play some
 jazz and turn the volume down to 30") is done one step after another, each
 step seeing what the last one did (whether the app opened, which windows
-are there). You can **close the island while it works**: it carries on in
-the background, with a small mic in the closed island, and the answer comes
+are there). You can **close the island while it works**: it carries on in the
+background, with a small mic in the closed island, and the answer comes
 as an alert; click the island or press Super+I to watch it, and **Stop** to
 end it. Its answer's own actions run before it answers, so it never
 says "done" when a step failed: it tries another way, or says what did not
@@ -417,7 +352,7 @@ card with the one command it proposes, why, and what to know about it:
 or **Removes files or apps**. Press **Run** (Enter) or **Deny** (Esc); with
 the island closed, the card comes as an alert. A command runs in the
 background as a systemd unit of its own, so you can close the island or
-lock the screen, and Isle follows it to its end, even after isled restarts
+lock the screen, and GNOME Island follows it to its end, even after `isled` restarts
 (a command still running when you log out ends with your session); the card
 shows how long it has run and its last lines, and **Stop** ends it (for a
 package manager, press it twice: stopping one halfway can leave things half
@@ -433,27 +368,20 @@ after 10 minutes, and a command is stopped after 30.
    | AI | Install | Sign in | Notes |
    |---|---|---|---|
    | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (or `npm i -g @anthropic-ai/claude-code`) | run `claude` | Uses your Claude plan; Sonnet by default; Haiku is the fastest but follows the request's language and tools less reliably |
-   | [Codex](https://github.com/openai/codex) (ChatGPT) | `npm i -g @openai/codex` | `codex login` | How Isle uses ChatGPT: your ChatGPT plan (Free works too, with lower limits), with the model your Codex uses |
-   | [Grok](https://x.ai/build) | `curl -fsSL https://x.ai/cli/install.sh \| bash` | `grok login` | Uses your Grok plan (Free works too); Isle runs it in its own folder, kept to answering |
-   | [opencode](https://opencode.ai) | `curl -fsSL https://opencode.ai/install \| bash` | `opencode auth login` | Uses the providers you signed in to in opencode (your own API keys or subscriptions), with the model your opencode uses; Isle runs it in its own folders with every tool but web search turned off. No usage page: the providers bill you directly |
-   | [Pi](https://pi.dev) | `npm i -g @earendil-works/pi-coding-agent` | run `pi`, then `/login` (or an API key such as `ANTHROPIC_API_KEY`) | Uses the providers you signed in to in Pi, with the model your Pi uses; Isle runs it with no tools, extensions, skills or context files of yours, its conversations in a folder of its own. It does not search the web. Signed in to ChatGPT in Pi, only the models that account can use are offered (as Codex lists them). No usage page: the providers bill you directly |
-   | [Antigravity](https://antigravity.google) | its installer | run `agy` | Its terms bar third-party tools from the service; Isle only runs the official `agy`, at your own risk |
+   | [Codex](https://github.com/openai/codex) (ChatGPT) | `npm i -g @openai/codex` | `codex login` | How GNOME Island uses ChatGPT: your ChatGPT plan (Free works too, with lower limits), with the model your Codex uses |
+   | [Grok](https://x.ai/build) | `curl -fsSL https://x.ai/cli/install.sh \| bash` | `grok login` | Uses your Grok plan (Free works too); GNOME Island runs it in its own folder, kept to answering |
+   | [opencode](https://opencode.ai) | `curl -fsSL https://opencode.ai/install \| bash` | `opencode auth login` | Uses the providers you signed in to in opencode (your own API keys or subscriptions), with the model your opencode uses; GNOME Island runs it in its own folders with every tool but web search turned off. No usage page: the providers bill you directly |
+   | [Pi](https://pi.dev) | `npm i -g @earendil-works/pi-coding-agent` | run `pi`, then `/login` (or an API key such as `ANTHROPIC_API_KEY`) | Uses the providers you signed in to in Pi, with the model your Pi uses; GNOME Island runs it with no tools, extensions, skills or context files of yours, its conversations in a folder of its own. It does not search the web. Signed in to ChatGPT in Pi, only the models that account can use are offered (as Codex lists them). No usage page: the providers bill you directly |
+   | [Antigravity](https://antigravity.google) | its installer | run `agy` | Its terms bar third-party tools from the service; GNOME Island only runs the official `agy`, at your own risk |
+   | **Hermes** | Hermes Agent desktop app | Set `OLLAMA_CLOUD_API_KEY` or `HERMES_API_KEY` env var, or add key to `~/.config/hermes/config.json` | Uses your Ollama Cloud API key; GNOME Island runs it with the model you pick in Settings |
 
    Settings → Assistant lists only the models your plan includes, by their full names, with your plan's
-   name. If your plan stops including the one you picked (a subscription that lapsed), Isle answers with
+   name. If your plan stops including the one you picked (a subscription that lapsed), GNOME Island answers with
    the plan's default and says so once, then goes back to your pick when the plan includes it again.
-   Claude's Fable models are not offered: in the assistant they would use your usage credits without asking.
-   opencode shows your OpenCode plan (Free models, OpenCode Zen or OpenCode Go; Go Plus and Go Teams
-   show as Go, as they include the same models) and offers only: the models you used last in opencode,
-   OpenCode's free models, and your plan's (Zen's, or Go's as OpenCode Go lists them now). Every one is a
-   model `opencode models` lists for you; nothing else is offered. It needs no sign-in for the free
-   models. Isle uses only what you signed in to with `opencode auth login` (opencode 1.4.8 or newer):
-   custom providers in your own `opencode.json` (a local Ollama, say) and API keys kept only in
-   environment variables are not used.
 
 2. Set up speech recognition, once: press **Set up** when the assistant asks
-   for it, or run `~/.local/bin/isle-setup-voice` in a terminal (`isle-setup-voice` with a .deb,
-   .rpm or AUR package; from the source folder: `scripts/setup-voice.sh`). It downloads the speech
+   for it, or run `~/.local/bin/isle-setup-voice` in a terminal (`isle-setup-voice` with a
+   package; from the source folder: `scripts/setup-voice.sh`). It downloads the speech
    model chosen in Settings, `small` by default (265 MB; `tiny` 44 MB, `base`
    82 MB, `medium` 823 MB; `isle-setup-voice base` names one and picks it in
    Settings), which `isle-whisper` runs with
@@ -461,29 +389,27 @@ after 10 minutes, and a command is stopped after 30.
    install. On a computer with a graphics card (NVIDIA, AMD or Intel Arc,
    through Vulkan) it runs there, in about a second; otherwise on the
    processor, in several seconds (it needs AVX2: Intel since 2013, AMD since
-   2015). An older Isle's Python environment (up to 3 GB) is no longer
-   needed: updating Isle moves you over and deletes it by itself, or run
-   `isle-setup-voice --remove-old`.
+   2015).
 3. Pick the AI in **Settings → Assistant**, or leave it on Automatic, which
    uses the first one you are signed in to: Claude Code, then Codex, then
-   Grok, then opencode, then Pi, then Antigravity. An AI installed later is found by itself.
+   Grok, then opencode, then Pi, then Antigravity, then Hermes. An AI installed later is found by itself.
 4. Check with `~/.local/bin/isled --doctor` (`isled --doctor` with a
    package): it lists speech recognition (the models
    downloaded, and the GPU or processor it runs on) and each AI, where it is
-   installed and whether you are signed in, as Isle itself sees them.
-   Isle finds AIs installed with npm (also a prefix of your own), nvm,
+   installed and whether you are signed in, as GNOME Island itself sees them.
+   GNOME Island finds AIs installed with npm (also a prefix of your own), nvm,
    volta, fnm, pnpm, bun, Homebrew, mise, asdf, Nix or their own installers,
    and takes what your login shell sets for them (`CLAUDE_CONFIG_DIR`,
    `CODEX_HOME`, an API key, a proxy), as code editors do.
 
-Without any of them, Super+I says what to install, and the rest of Isle works
+Without any of them, Super+I says what to install, and the rest of GNOME Island works
 as before.
 
 **Safety:** the AI only answers. It cannot run commands or change files
-itself: Isle runs its actions, which are limited to the ones above. Each AI
+itself: GNOME Island runs its actions, which are limited to the ones above. Each AI
 is started with only web search and reading pages: Claude Code with just its
 web tools, Codex with its shell, file, browser and computer-use tools off,
-and agy behind a hook that refuses anything else.
+and `agy` behind a hook that refuses anything else.
 
 - **Looking** runs at once, without asking, but only programs on a fixed
   list that only read (`uname`, `cat /etc/os-release`, `apt-cache policy`,
@@ -492,13 +418,13 @@ and agy behind a hook that refuses anything else.
   directly with its arguments, never through a shell, and never with an
   option that would install, remove or change anything.
 - **Changing** anything is a command you see in full and run yourself with
-  **Run**. Isle starts exactly the command on the card and nothing else
+  **Run**. GNOME Island starts exactly the command on the card and nothing else
   (GNOME Shell checks this before starting it); one that needs root asks
   with GNOME's password dialog, gets only the system's own folders on its
   `PATH`, and its output is written to its log as you, not as root. Commands
   that would wipe the system (`rm -rf /` or your home folder, `mkfs`, `dd`
   onto a disk, a fork bomb) are refused before you are even asked.
-- **Files:** Isle searches your files by name for it, reads small text
+- **Files:** GNOME Island searches your files by name for it, reads small text
   files you ask about, opens documents and media but never programs, and
   never looks in hidden folders that hold keys or passwords (`.ssh`,
   `.gnupg`, keyrings), even through a link. Secrets in a command's output
@@ -527,7 +453,7 @@ readable by you alone, and the AI's copy apart from your own chats with it.
 
 ## AI usage
 
-Isle finds your plans from the apps you are signed in to: **Claude** with
+GNOME Island finds your plans from the apps you are signed in to: **Claude** with
 Claude Code's sign-in, and **ChatGPT** with Codex's.
 It shows each limit your plan has (a 5-hour window, the week, a model's
 week), when it resets, and warns at 80% and 95% (set in Settings). A plan
@@ -535,7 +461,7 @@ you are not signed in to does not show at all.
 
 Claude's numbers come from the same page Claude Code's `/usage` reads, and
 ChatGPT's from the one Codex's `/status` reads; neither is a documented API,
-so they may change. Isle asks each every ten minutes (at
+so they may change. GNOME Island asks each every ten minutes (at
 most every two while the Usage page is open), and not while the screen is
 locked. Offline, as at login before the
 network is up, it tries again within a minute; when Claude's server fails it
@@ -544,7 +470,7 @@ with usage turned off it asks nothing at all. When ChatGPT can't be asked
 (offline, or Codex's sign-in ran out), its numbers come from Codex's own
 logs, as of your last use of Codex.
 
-**AI agents.** Isle connects to Claude Code and Codex when it finds them,
+**AI agents.** GNOME Island connects to Claude Code, Codex and Hermes when it finds them,
 also when you install one later, and says so once. It adds its hooks to
 `~/.claude/settings.json` (PermissionRequest, Notification and Stop) and to
 `~/.codex/hooks.json` (PermissionRequest and Stop); Codex asks once, at its
@@ -552,18 +478,18 @@ next start, whether to trust them (or trust them in `/hooks`), and a Codex
 older than 0.124 gets `notify` in its `config.toml` instead, for done
 alerts only. Each hook runs `isled --agent-hook`, which asks the island and
 waits for your answer. With no answer (the alert put away, the agent's
-window in front, Do Not Disturb, isled not running) it says nothing, and the
-agent asks in its terminal as it would without Isle; answering in Claude
+window in front, Do Not Disturb, `isled` not running) it says nothing, and the
+agent asks in its terminal as it would without GNOME Island; answering in Claude
 Code's terminal first takes the alert away. **Always** keeps the rule
 Claude Code itself suggests, where it suggests it (usually the project's
 `.claude/settings.local.json`). Your own hooks and settings are kept as they
 are; turning a switch off in **Settings → AI Usage → AI Agents**, or
-uninstalling Isle, takes out Isle's entries only. Nothing leaves the
+uninstalling GNOME Island, takes out GNOME Island's entries only. Nothing leaves the
 computer.
 
 ## Resource usage
 
-Isle is built to run all day unnoticed. Measured on Ubuntu 24.04 with
+GNOME Island is built to run all day unnoticed. Measured on Ubuntu 24.04 with
 GNOME 46 (version 1.0.0):
 
 | Part | Memory | CPU when idle |
@@ -582,23 +508,23 @@ GNOME 46 (version 1.0.0):
 | Cache (`~/.cache/isle`) | about 100 KB per song's cover and 6 KB per lyrics |
 
 Animations run on the display's frame clock only while a spring moves and
-stop when it settles: closed and idle, Isle draws no frames at all, and over 40
+stop when it settles: closed and idle, GNOME Island draws no frames at all, and over 40
 openings, page changes, lyrics and alerts 99.8% of frames came in time for 60 Hz. The clock wakes once a minute, lyrics exactly when the
 next line starts, and pages only tick while they are open; only while the
-music page shows does Isle ask the player where it is, once a second. The call preview
+music page shows does GNOME Island ask the player where it is, once a second. The call preview
 reuses the window's picture already on the graphics card, so it costs about
-nothing, and only exists while the Call page is open; Isle never opens the
+nothing, and only exists while the Call page is open; GNOME Island never opens the
 camera or the microphone itself.
 
 ## Data & network
 
-Isle has no server and no telemetry; your clipboard history, reminders,
+GNOME Island has no server and no telemetry; your clipboard history, reminders,
 events, timer, app usage and the assistant's chats stay in
 `~/.local/share/isle`, and speech is recognised on this computer. It goes
 online only for synced lyrics ([LRCLIB](https://lrclib.net)) and cover art,
 once per song (lyrics can be turned off in Settings); your Claude plan's
 usage (`api.anthropic.com`, with
-Claude Code's own sign-in); a look for a newer Isle on GitHub at most once a
+Claude Code's own sign-in); a look for a newer GNOME Island on GitHub at most once a
 day (also in Settings); the speech model, downloaded once from Hugging Face
 when you set up voice; and the voice assistant, whose requests go to the AI
 you picked and may include a web search by it. A meeting's link is read
@@ -610,7 +536,7 @@ after 10 idle minutes, on Stop, or when the screen locks
 ([how it is kept safe](SECURITY.md#sharing-the-shelf-with-a-phone)).
 Copies from password managers
 are never kept, and only GNOME Shell may read the clipboard history from
-Isle's service or steer its assistant. The call preview is drawn by GNOME
+GNOME Island's service or steer its assistant. The call preview is drawn by GNOME
 Shell from what is on screen and never recorded.
 [SECURITY.md](SECURITY.md#what-leaves-your-computer) lists exactly what is
 sent where, and the assistant's safety rules.
@@ -636,7 +562,7 @@ incoming connections keeps it out too: with ufw, the island offers the
 command (**Copy fix**), `sudo ufw allow from <your network> to any port 47830:47839 proto tcp`;
 with firewalld on a zone that blocks them (Fedora Workstation's own does not),
 `sudo firewall-cmd --permanent --add-port=47830-47839/tcp && sudo firewall-cmd --reload`.
-Isle never changes the firewall itself, and listens only while you share.
+GNOME Island never changes the firewall itself, and listens only while you share.
 
 **Another extension covers the island.** Extensions that restyle or move the
 top bar (Dash to Panel, Hide Top Bar, other islands) can get in the way;
@@ -649,7 +575,7 @@ is missing (speech recognition, an AI, or its sign-in) and what to run.
 report): it gathers the versions, what works and recent logs, without your
 data. Please [open an issue](../../issues) and paste it there.
 
-With a .deb, .rpm or AUR package, Isle's commands are in `/usr/bin`: run
+With a NixOS package, GNOME Island's commands are on your `PATH`: run
 them by name alone (`isled --doctor`, `isled --report`).
 
 ## Uninstalling
@@ -660,17 +586,13 @@ them by name alone (`isled --doctor`, `isled --report`).
 
 (or `./uninstall.sh` from the release package or the source folder). This
 removes the extension, the programs, the service, the font, the voice
-assistant's speech recognition and Isle's caches, and lifts a battery charge
-limit Isle set; it also takes Isle's hooks out of Claude Code's and Codex's
+assistant's speech recognition and GNOME Island's caches, and lifts a battery charge
+limit GNOME Island set; it also takes GNOME Island's hooks out of Claude Code's and Codex's
 settings. Your tasks, calendar events, clipboard history, shelf and
 timer settings stay in `~/.local/share/isle` until you delete them.
 
-Remove Isle this way, not with the Extensions app's Remove button, which
-deletes only the extension and leaves `isled` and its hooks behind. For a
-system-wide package, each user runs `isled --unhook-all` first (and
-`isle-charge-limit 100` if the assistant set a battery charge limit), then
-remove it with `sudo apt remove isle`, `sudo dnf remove isle` or
-`sudo pacman -R isle-bin`.
+Remove GNOME Island this way, not with the Extensions app's Remove button, which
+deletes only the extension and leaves `isled` and its hooks behind.
 
 ## How it works
 
@@ -694,7 +616,7 @@ else lives in Rust behind a D-Bus API.
 | Path | Contents |
 |---|---|
 | `crates/isle-core` | Platform-independent logic: LRC parsing, track-title clean-up, Pomodoro, tasks, calendar, shelf, clipboard history. Unit tested. |
-| `crates/isle-daemon` | `isled`, the D-Bus service; `src/assistant` is the voice assistant (speech, the three AIs, the agent loop, its tools), `src/usage.rs` the AI usage, `src/agents` the AI agents' hooks, `src/meeting.rs` meeting links, `src/updates.rs` the look for new versions, and `src/caller.rs` who may call what. |
+| `crates/isle-daemon` | `isled`, the D-Bus service; `src/assistant` is the voice assistant (speech, the AIs, the agent loop, its tools), `src/usage.rs` the AI usage, `src/agents` the AI agents' hooks, `src/meeting.rs` meeting links, `src/updates.rs` the look for new versions, and `src/caller.rs` who may call what. |
 | `crates/isle-shelf` | `isle-shelf`, the files tray's drag-and-drop window. |
 | `crates/isle-whisper` | `isle-whisper`, the voice assistant's speech recognition: whisper.cpp, on the GPU through Vulkan or on the processor. |
 | `gnome-extension` | The GNOME Shell extension; `src/actionRules.js` holds the assistant's rules that need no GNOME, so they are tested anywhere. |
@@ -712,34 +634,14 @@ and [CHANGELOG.md](CHANGELOG.md) for what changed. Everyone taking part
 follows the [Code of Conduct](CODE_OF_CONDUCT.md); please report security
 problems privately as described in [SECURITY.md](SECURITY.md).
 
-### Contributors
-
-Thanks to everyone who has made Isle better:
-
-- [@caffeinepx](https://github.com/caffeinepx): Grok in the voice assistant
-  and on the AI usage page; music from Zen and Firefox that keeps its place;
-  a sun or a moon by each World Clock.
-- [@Ashishranjan980](https://github.com/Ashishranjan980): the Apps page, where
-  your time in each app goes.
-- [@jvspier](https://github.com/jvspier): the island on every display, and a
-  top bar moved to the bottom by another extension.
-- [@AlphaBeast97](https://github.com/AlphaBeast97): opencode 2 in the voice
-  assistant, with your own opencode sign-ins; the arrow keys in the
-  Clipboard.
-- [@Hazem-Samir](https://github.com/Hazem-Samir): the brightness in the island
-  with more than one display.
-
-## Support
-
-Isle is free and always will be. If it makes your desktop nicer, you can
-[buy me a coffee](https://sociabuzz.com/zickrian/tribe). A star, a bug report
-or telling a friend helps just as much.
+This fork diverges from the upstream [Isle](https://github.com/zickrian/isle) project.
+Changes here are not expected to be upstreamed and the project evolves independently.
 
 ## License
 
 Copyright © 2026 zickrian
 
-Isle is free software: you can redistribute it and/or modify it under the
+GNOME Island is free software: you can redistribute it and/or modify it under the
 terms of the [GNU General Public License](LICENSE) as published by the Free
 Software Foundation, either version 3 of the License, or (at your option) any
 later version. It is distributed in the hope that it will be useful, but

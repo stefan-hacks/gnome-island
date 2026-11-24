@@ -1,5 +1,5 @@
 {
-  description = "Isle — a notch-style island for the GNOME Shell top bar";
+  description = "GNOME Island — a notch-style island for the GNOME Shell top bar";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -26,29 +26,29 @@
         version = self.shortRev or self.dirtyShortRev or "dev";
       in {
         packages = {
-          isle = pkgs.callPackage ./packaging/nix/package.nix {
+          gnome-island = pkgs.callPackage ./packaging/nix/package.nix {
             inherit version;
             src = self;
           };
-          default = config.packages.isle;
+          default = config.packages.gnome-island;
         };
 
         checks = {
-          isle = config.packages.isle;
+          gnome-island = config.packages.gnome-island;
         };
       };
 
       flake = {
         homeManagerModules = rec {
-          isle = import ./packaging/nix/home-manager.nix self;
-          default = isle;
+          gnome-island = import ./packaging/nix/home-manager.nix self;
+          default = gnome-island;
         };
 
         overlays = rec {
-          isle = final: prev: {
-            isle = self.packages.${prev.system}.isle;
+          gnome-island = final: prev: {
+            gnome-island = self.packages.${prev.system}.gnome-island;
           };
-          default = isle;
+          default = gnome-island;
         };
       };
     };

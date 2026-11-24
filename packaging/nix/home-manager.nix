@@ -1,26 +1,26 @@
-# Home Manager module for Isle
+# Home Manager module for GNOME Island
 #
 # Usage in your home-configuration.nix:
-#   imports = [ inputs.isle.homeManagerModules.isle ];
-#   programs.isle.enable = true;
+#   imports = [ inputs.gnome-island.homeManagerModules.gnome-island ];
+#   programs.gnome-island.enable = true;
 #
 { self }:
 
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.programs.isle;
-  pkg = self.packages.${pkgs.system}.isle or (pkgs.callPackage ./package.nix { });
+  cfg = config.programs.gnome-island;
+  pkg = self.packages.${pkgs.system}.gnome-island or (pkgs.callPackage ./package.nix { });
 in
 
 {
-  options.programs.isle = {
-    enable = lib.mkEnableOption "Isle GNOME Shell extension";
+  options.programs.gnome-island = {
+    enable = lib.mkEnableOption "GNOME Island Shell extension";
 
     package = lib.mkOption {
       type = lib.types.package;
       default = pkg;
-      description = "The Isle package to install.";
+      description = "The GNOME Island package to install.";
     };
 
     settings = lib.mkOption {
@@ -40,7 +40,7 @@ in
         }
       '';
       description = ''
-        GSettings overrides for Isle, keyed by schema id.
+        GSettings overrides for GNOME Island, keyed by schema id.
         Each value is an attribute set of key-value pairs written via gsettings.
       '';
     };
@@ -67,7 +67,7 @@ in
     # Enable the user service if requested.
     systemd.user.services.isled = lib.mkIf cfg.enableUserService {
       Unit = {
-        Description = "Isle daemon";
+        Description = "GNOME Island daemon";
         PartOf = [ "graphical-session.target" ];
       };
       Service = {
