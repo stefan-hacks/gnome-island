@@ -68,21 +68,22 @@ rustPlatform.buildRustPackage {
   installPhase = ''
     runHook preInstall
 
-    local extDir="$out/share/gnome-shell/extensions/${metadata.uuid}"
-    mkdir -p "$extDir"
-    cp -r ${src}/gnome-extension/. "$extDir/"
+    # Install extension files to a writable temp dir first, compile schemas,
+    # then move to $out. This avoids permission issues from cp -r preserving
+    # read-only Nix store permissions.
+    local tmpExt=$(mktemp -d)
+    cp -r ${src}/gnome-extension/. "$tmpExt/"
+    chmod -R +w "$tmpExt"
 
     # Compile the gsettings schema so the extension can read its keys immediately.
-    # glib-compile-schemas writes a temp file in the same directory, so we must
-    # compile in a writable location and then copy the compiled result back.
-    local schemasDir="$extDir/schemas"
-    if [ -d "$schemasDir" ]; then
-      local tmpSchemas=$(mktemp -d)
-      cp -r "$schemasDir/"*.xml "$tmpSchemas/"
-      glib-compile-schemas "$tmpSchemas"
-      cp "$tmpSchemas/gschemas.compiled" "$schemasDir/"
-      rm -rf "$tmpSchemas"
+    if [ -d "$tmpExt/schemas" ]; then
+      glib-compile-schemas "$tmpExt/schemas"
     fi
+
+    local extDir="$out/share/gnome-shell/extensions/${metadata.uuid}"
+    mkdir -p "$extDir"
+    cp -r "$tmpExt/." "$extDir/"
+    rm -rf "$tmpExt"
 
     # Install fonts
     mkdir -p "$out/share/fonts/isle"
