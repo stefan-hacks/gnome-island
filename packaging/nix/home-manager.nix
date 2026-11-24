@@ -55,7 +55,7 @@ in
     home.packages = [ cfg.package ];
 
     # Install the GNOME Shell extension into the user's extensions directory.
-    home.file."$XDG_DATA_HOME/gnome-shell/extensions/isle@zickrian.github.io".source =
+    xdg.dataFile."gnome-shell/extensions/isle@zickrian.github.io".source =
       "${cfg.package}/share/gnome-shell/extensions/isle@zickrian.github.io";
 
     # Enable the extension via dconf.
