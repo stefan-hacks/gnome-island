@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Looks a song's lyrics up with the providers Settings turn on, in the order Settings give, going on to the next
 // provider whenever one has none (or cannot be reached). LRCLIB is still looked up by isled (the daemon): the

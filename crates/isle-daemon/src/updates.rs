@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! A newer Isle: GitHub's latest release, looked up at most once a day while the extension wants it
 //! (Settings), so the island can say an update is out. Nothing is sent but the request itself.

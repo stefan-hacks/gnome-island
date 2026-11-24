@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The island's look: Isle's own black, or glass over what is behind it. What Cairo paints in the island's
 // colour asks here; CSS does the rest. Settings loads it too: no shell imports.

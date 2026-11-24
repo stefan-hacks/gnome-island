@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Changing another program's config file with care: a backup before Isle first changes it, then the
 //! whole new file put in place at once, with the old one's permissions.

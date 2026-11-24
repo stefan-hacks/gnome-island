@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Pi (`pi`) in JSON print mode, with the user's own sign-ins and providers: one run per turn, resumed, with no
 //! tools, extensions, skills or context files of the user's, its conversations in a folder of Isle's own so they

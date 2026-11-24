@@ -1,7 +1,7 @@
 {
   "uuid": "gnome-island@stefan-hacks.github.com",
   "name": "GNOME Island",
-  "description": "A notch-style island for the top bar: music with synced lyrics, calls, a focus timer beside your reminders, a calendar, a file shelf, app usage, charging and system alerts, and a voice assistant that works with Claude Code, Codex, Grok, opencode, Antigravity or Pi.",
+  "description": "A notch-style island for the top bar: music with synced lyrics, calls, a focus timer beside your reminders, a calendar, a file shelf, app usage, charging and system alerts.",
   "shell-version": [
     "46",
     "47",

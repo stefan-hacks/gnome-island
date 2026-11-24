@@ -16,7 +16,7 @@ Please do not report security problems in public issues.
 
 Report them privately instead, through **Security → Report a vulnerability**
 on this repository, or by contacting the maintainer,
-[@zickrian](https://github.com/zickrian), through the contact details on that
+[@stefan-hacks](https://github.com/stefan-hacks), through the contact details on that
 GitHub profile.
 
 Include what you found, how to reproduce it, and what an attacker could do
@@ -30,7 +30,7 @@ the tagged source and carry a build provenance attestation. With the
 [GitHub CLI](https://cli.github.com):
 
 ```sh
-gh attestation verify isle-<version>-x86_64-linux.tar.gz --repo zickrian/isle
+gh attestation verify gnome-island-<version>-x86_64-linux.tar.gz --repo stefan-hacks/gnome-island
 ```
 
 `get.sh` also checks each download against the release's `.sha256`, and the

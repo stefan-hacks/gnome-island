@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! The agent loop: tools isled runs (find_files, check…) and desktop actions the extension runs go back to the AI
 //! step by step until it is done; its last step runs before it answers too, so a failure is never answered as done.

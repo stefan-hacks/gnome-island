@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! The voice assistant: turns a request into text and lets the AI the user picked (agy, Claude Code, Codex,
 //! Grok or opencode) answer it step by step, also once the island closes. Nothing runs between requests.

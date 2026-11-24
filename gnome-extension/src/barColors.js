@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Colours for music's bars, from the cover's: the closed island's little bars (brighter, to read on its black) and
 // cava's (the same hue as the cover's wash behind them, so they show against it and never clash with it).

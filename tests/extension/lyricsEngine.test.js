@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Asking the lyrics providers in Settings' order, against stand-ins for isled, Settings and the web:
 // `node --experimental-default-type=module --test tests/extension/*.test.js`.

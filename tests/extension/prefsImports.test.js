@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Settings runs outside GNOME Shell: nothing it imports may import the shell's own modules or libraries.
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Drives `isle-shelf`, the GTK window over the Files tab that does drag and drop
 // (shell actors cannot); started as a drag begins, shown once the island covers it.

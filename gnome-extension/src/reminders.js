@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Shows isled's reminders when they are due. isled keeps them until shown, so one that fell due
 // while the screen was locked (and Isle was off) shows as soon as Isle is back.

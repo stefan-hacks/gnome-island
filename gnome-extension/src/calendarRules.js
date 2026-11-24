@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The Calendar page's rules that need nothing of GNOME, kept apart so tests run them anywhere (tests/).
 

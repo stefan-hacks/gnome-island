@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Client for isled, the Rust service that does the actual work. Each interface's state comes as
 // JSON string properties, parsed here into plain objects on `Daemon.state`.

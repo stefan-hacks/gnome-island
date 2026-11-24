@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The order of the open island's tabs (Settings → Island → Pages), needing nothing of GNOME, kept apart so tests
 // run it anywhere (tests/). The Call tab is not among them: it comes first, and only during a call.

@@ -1,4 +1,4 @@
-# Maintainer: zickrian <espejodaniel50@gmail.com>
+# Maintainer: stefan-hacks <stefanmrobertson@gmail.com>
 # Isle from its release tarball, with the programs GitHub Actions built. After a release,
 # `./update.sh <version>` sets the version and checksum here and in .SRCINFO.
 

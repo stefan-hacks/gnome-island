@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Effects that run a GLSL fragment snippet over what an actor paints, their uniforms set from JS: Shell's GLSL effect
 // up to GNOME 50, Clutter's shader effect from 51.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Super+V into Settings' shortcut sheet. GNOME Shell takes Super+V (its calendar shortcut) before any window sees it,
 // and Isle answers it there (shell.js); so while the sheet waits for a shortcut it owns this name on the session bus,

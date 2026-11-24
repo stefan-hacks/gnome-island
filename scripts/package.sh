@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 zickrian
+# Copyright (C) 2026 stefan-hacks
 # Packs dist/isle-<version>-<arch>-linux.tar.gz (+ .sha256) with ready-built programs; arg: version (default Cargo.toml).
 # Needs libgtk-4-dev for isle-shelf, and cmake g++ libclang-dev libvulkan-dev glslc for isle-whisper.
 set -euo pipefail

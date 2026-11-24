@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Saving a Shelf file into Downloads, against a scratch HOME: `gjs -m tests/extension/downloads.gjs.js`.
 

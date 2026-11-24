@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! One sharing session: its secret token, the phones that asked and the answers they got, what was
 //! received, and when it ends. The server (server.rs) asks it everything; the island sees it as JSON.

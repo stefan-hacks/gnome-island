@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Cava's config and its output: `node --experimental-default-type=module --test tests/extension/*.test.js`.
 

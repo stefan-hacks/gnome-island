@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 
 import Adw from 'gi://Adw';
@@ -67,8 +67,8 @@ export default class IslePreferences extends ExtensionPreferences {
     // The version, where to get help, a bug report to paste, and a way back to the defaults.
     _aboutPage(settings, window) {
         const page = new Adw.PreferencesPage({title: 'About', name: 'about', icon_name: 'help-about-symbolic'});
-        const about = new Adw.PreferencesGroup({title: `Isle ${this.metadata['version-name'] ?? ''}`.trim(),
-            description: 'A notch-style island for GNOME. © 2026 zickrian, free software under the GPL.'});
+        const about = new Adw.PreferencesGroup({title: `GNOME Island ${this.metadata['version-name'] ?? ''}`.trim(),
+            description: 'A notch-style island for GNOME. © 2026 stefan-hacks, free software under the GPL.'});
         const link = (title, subtitle, url) => {
             const row = new Adw.ActionRow({title, subtitle, activatable: true});
             row.add_suffix(new Gtk.Image({icon_name: 'adw-external-link-symbolic'}));
@@ -108,7 +108,7 @@ export default class IslePreferences extends ExtensionPreferences {
         return page;
     }
 
-    // AI plan usage: only the providers signed in on this computer are listed.
+    // AI features removed in this fork.
 
 
     // History on or off, clearing it, and the apps whose copies are never kept.
@@ -1380,7 +1380,7 @@ function nvmBins(home) {
     return versions.map(name => GLib.build_filenamev([root, name, 'bin']));
 }
 
-// Where isled reads them (usage.rs): Claude Code's config dir, the user's Codex home and Isle's own.
+// AI plan usage data removed in this fork.
 
 /** Items of a drop-down's list that wrap a long name rather than cutting it. */
 function wrappingItems() {

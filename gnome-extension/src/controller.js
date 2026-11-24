@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Decides what the island shows and when (compact, peek or expanded); see docs/product-spec.md.
 // Alerts show one at a time; "instant" ones (volume, brightness, critical...) replace what is showing.
@@ -744,9 +744,7 @@ export class Controller {
         });
         // isled forgets the settings when it restarts; they are sent again whenever it appears.
         daemon.connect('appeared', (_daemon, name) => {
-            if (name === 'usage')
-                // this._syncUsage(); // Voice assistant removed
-            else if (name === 'updates')
+            if (name === 'updates')
                 this._syncUpdates();
             else if (name === 'media')
                 this._syncLyrics();

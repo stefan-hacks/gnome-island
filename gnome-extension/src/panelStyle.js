@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Isle's declarations in the top bar's inline style, needing nothing of GNOME, kept apart so tests run it
 // anywhere (tests/). Other extensions write that style too: only Isle's own declarations are ever touched.

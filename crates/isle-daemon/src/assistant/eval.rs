@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Asks the real AI many requests as isled would, checking each answer: `cargo test -p isle-daemon --release eval
 //! -- --ignored --nocapture`. ISLE_EVAL_PROVIDER/_MODEL pick the AI; _QUICK=1 runs a dozen, _ONLY=text matching ones.

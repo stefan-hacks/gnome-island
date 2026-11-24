@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // A small copy of the assistant (see bot.js) for alerts and the closed island, with a status badge on its
 // corner. It holds still, moving only for a moment when told to (a hop, a shake), so it costs no frames.

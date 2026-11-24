@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // System vitals: CPU, memory, load, network, storage and temperature sensors.
 // Reads from /proc and /sys; no dependencies beyond GLib/Gio.

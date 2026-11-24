@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 zickrian
+# Copyright (C) 2026 stefan-hacks
 # Builds Isle (or takes a release package's ready-built programs from bin/) and installs it for the user,
 # no root: programs in ~/.local/bin, the extension, D-Bus and systemd user files, and the Inter font.
 set -euo pipefail

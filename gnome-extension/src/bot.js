@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The assistant's character, drawn with Cairo alone so Settings can draw it too: its body, its eyes, its glow.
 // Shapes and expressions after bloub (MIT, © 2026 Jérémy Perret, github.com/jeremy-prt/bloub).

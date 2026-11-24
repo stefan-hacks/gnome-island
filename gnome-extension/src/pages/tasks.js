@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Reminders, the right half of the Focus page (focus.js), in dark mode: an orange title and
 // count, a ring and a hairline per reminder, and a last row to add one; a ticked one is struck, then goes.

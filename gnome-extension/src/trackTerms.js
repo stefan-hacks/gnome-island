@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Cleaning up a track's title and artist so a lyrics search finds it, e.g. YouTube's "Artist - Song (Official Video)"
 // by "ArtistVEVO" becomes "Song" by "Artist". The same cleaning as isled's (isle-core's track.rs).

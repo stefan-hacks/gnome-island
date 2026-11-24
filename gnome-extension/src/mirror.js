@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // With the island on every display (Settings: Display), each display has a copy of it: the closed island
 // and the alerts, as the island shows them. Only the island itself opens; pointing at a copy brings it

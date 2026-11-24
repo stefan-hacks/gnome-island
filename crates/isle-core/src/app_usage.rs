@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! App usage: how long each application was in front, kept day by day.
 //! The extension times focus changes and reports stretches; the rules live here.

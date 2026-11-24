@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Phone sharing's web server, only while sharing: the page, the shelf's files by id, and files sent in.
 //! Everything under `/<token>/`; anything else, a wrong token included, is a plain 404.

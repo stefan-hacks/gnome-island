@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Isle: a notch-style island for the GNOME top bar. The extension only draws;
 // isled (the Rust daemon) tracks media, timers and system state over D-Bus.

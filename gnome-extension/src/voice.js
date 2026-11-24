@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The voice assistant's view: a little character with lively eyes that listens, thinks and answers,
 // beside what was heard and the answer. isled listens and asks the AI; the actions it answers with run here.

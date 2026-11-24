@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // What the island shows while a setting is being changed (Controller._previewSetting), for every key of Isle's settings.
 // A target is {page, mode?}: the island opens on that page (null: where it opens by itself) and, for the music page,

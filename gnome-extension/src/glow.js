@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The assistant's light: light rising from a shape's edge, brightest along the bottom and gone by the top of the
 // sides, its colours flowing round. Cairo draws it for Settings; on the island a shader draws the same per frame.

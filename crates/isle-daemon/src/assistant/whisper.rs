@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Speech to text: `isle-whisper` (whisper.cpp, on the GPU through Vulkan or on the processor).
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Where phone sharing listens: one address on the local network (never every interface), how far
 //! that network looks to be trusted, and whether ufw may block it.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // GNOME's notifications via the island, which replaces the clock where GNOME shows them. Hides GNOME's
 // banners and emits `banner` by GNOME's rules; Do Not Disturb is GNOME's own "show banners" setting.

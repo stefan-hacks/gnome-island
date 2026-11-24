@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The resting island: the clock, a moon before it in Do Not Disturb, between one sign on each side. Left: the first
 // live activity (recording, call, music, timer). Right: a warning, a call's muted microphone, the next activity's

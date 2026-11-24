@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! When a battery is low enough to say so: the laptop's once per level until it is plugged in, and each
 //! connected Bluetooth device's once per level on the way down, until it charges back above that level.

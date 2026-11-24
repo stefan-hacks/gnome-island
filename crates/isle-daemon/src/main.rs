@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! `isled`: the Isle background service, on the session bus as `io.github.stefanhacks.gnomeisland.Daemon`.
 //! See `docs/dbus-api.md` for the interfaces.

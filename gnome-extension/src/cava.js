@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Cava's bars at the bottom of the lyrics. Cava (https://github.com/karlstav/cava) listens to what the computer plays
 // and prints how high each bar should be; Isle runs it only while the lyrics are on show, reads its lines and moves

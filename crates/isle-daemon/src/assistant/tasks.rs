@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Commands the AI asks to run, once the user pressed Run. Each is a systemd unit GNOME Shell starts (its
 //! password dialog for root), so it outlives the island and isled, which follows its log, even after a restart.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Damped springs drive every island animation: unlike fixed-duration easing, a spring can be
 // retargeted mid-flight and keeps its velocity, so the island never jolts.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! The assistant's "brain": whichever AI CLI the user has and picked (agy, Claude Code, Codex, Grok, opencode
 //! or Pi), behind one face. Each runs with the user's own sign-in, kept to answering; isled runs the tools and actions itself.

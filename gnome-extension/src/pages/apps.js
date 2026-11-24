@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // App usage: time in each application today, or over the last seven or 30 days, most used first.
 // The extension times focus changes and isled keeps the days (see appUsage.js and AppUsage1).

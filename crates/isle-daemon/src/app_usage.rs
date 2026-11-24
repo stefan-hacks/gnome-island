@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! App usage: the extension times the app in front and reports its stretches here. Kept day by day
 //! for a month, in `~/.local/share/isle/app-usage.json`, and shown on the Apps page.

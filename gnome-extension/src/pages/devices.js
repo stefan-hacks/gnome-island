@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The connected Bluetooth devices, a card each and every card alike: the device's icon on a tile, its name and
 // "Connected" (or "Low battery"), then its battery filled to the level, and the level. However many there are, the

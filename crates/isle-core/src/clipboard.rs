@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Clipboard history, newest first: re-copies move to the top, pins stay, the rest is pruned.
 //! Images go by content hash; anything that drops items returns the hashes left unused.

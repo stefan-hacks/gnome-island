@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Pomodoro timer: focus sessions, short breaks, and a long break every few sessions.
 //! Times are epoch milliseconds passed in by the caller, so the logic stays deterministic.

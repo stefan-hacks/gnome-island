@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The System page: CPU, memory, network, storage, temperature, fan, voltage,
 // battery and GPU sensors.

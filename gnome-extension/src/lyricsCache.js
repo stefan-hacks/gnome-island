@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Lyrics found by the providers Isle asks itself, kept on disk so that a song is asked about once (isled keeps
 // LRCLIB's own). Only lyrics that were found: a song without any is asked about again.

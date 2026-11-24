@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Writes what the voice assistant was asked to write into the window in front: short text typed key by
 // key through a virtual keyboard, longer text pasted through the clipboard, which is then put back.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Where lyrics come from. LRCLIB is looked up by isled, Isle's service, as it always was; Musixmatch and NetEase are
 // looked up here, one after the other in the order Settings give (see lyricsEngine.js). A provider's `fetch(query,

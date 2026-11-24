@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // One line of text for the closed island: as wide as it is, up to a limit; past it, it scrolls round and round.
 

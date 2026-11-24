@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The default sound output: its volume, mute state and the outputs to choose from.
 // Uses the same mixer as GNOME's Quick Settings, so both always agree.

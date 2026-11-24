@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! Sharing the shelf with a phone: a QR code on the island opens a page in the phone's browser that
 //! lists the shelf's files and sends files to it. A small web server runs only while sharing, on the

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Cleaning a track's title and artist for a lyrics search: `node --experimental-default-type=module --test tests/extension/*.test.js`.
 

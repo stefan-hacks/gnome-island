@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Web requests for the lyrics providers (see lyricsProviders.js), over libsoup, off the shell's main loop.
 

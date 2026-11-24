@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! The voice assistant's speech models: whisper.cpp's files, which `isle-setup-voice` downloads
 //! to [`MODELS_DIR`] in the user's data folder and `isle-whisper` reads.

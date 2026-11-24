@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! What the login shell sets that isled, started by systemd, lacks: the PATH of nvm or Homebrew, and
 //! the AI CLIs' keys, config folders and proxies. Asked once at start; what systemd sets wins.

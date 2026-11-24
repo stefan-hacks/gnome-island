@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The open island: a header row inside the top bar (tabs to the pages on the
 // left; live activity and the clock on the right) above one page at a time. See docs/product-spec.md, section 5.

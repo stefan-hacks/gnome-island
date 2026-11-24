@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 zickrian
+# Copyright (C) 2026 stefan-hacks
 # Installs the latest ready-built GNOME Island release into the user's home folder, usually piped from curl.
 # GNOME_ISLAND_VERSION=1.0.5 picks a release, GNOME_ISLAND_PACKAGE=<tarball> installs a downloaded one, GNOME_ISLAND_FORCE=1 any GNOME.
 set -euo pipefail

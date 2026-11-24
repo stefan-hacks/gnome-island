@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // The shelf's Files tab. The `isle-shelf` helper draws it over this view for drag and
 // drop; both look the same tile for tile, so the hand-over cannot be seen. The names are only ever drawn here.

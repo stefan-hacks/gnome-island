@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // When a focus session silences notifications, needing nothing of GNOME, kept apart so tests run it anywhere (tests/).
 

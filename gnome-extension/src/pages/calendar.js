@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 // Calendar as a widget shows it: the month, and the chosen day's events from the desktop's
 // calendars (GNOME Shell's event source) and Isle's own (isled, removable).

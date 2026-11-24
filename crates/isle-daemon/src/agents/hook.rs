@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 zickrian
+// Copyright (C) 2026 stefan-hacks
 
 //! `isled --agent-hook claude|codex`: run by the AI, it passes its hook events to isled and asks the island
 //! about permissions. With no answer (no isled, no reply in time) it prints nothing: the AI asks in its terminal.
