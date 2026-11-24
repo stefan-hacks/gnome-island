@@ -63,6 +63,9 @@ const VoiceView = GObject.registerClass(
 class VoiceView extends St.Widget {
     _init() {
         super._init({width: 0, height: 0});
+        this._pointerOn = false;
+        this._micWaiting = false;
+        this._followUp = null;
     }
     setState() {}
     setActive() {}
@@ -71,24 +74,27 @@ class VoiceView extends St.Widget {
     showUndo() {}
     openChat() {}
     closeChat() {}
-    followUp() {}
     startTyping() {}
     exchange() {}
     fit() { return 0; }
     decideCard() {}
     destroy() {}
     get cardWaiting() { return false; }
-    get micWaiting() { return false; }
     get typing() { return false; }
     get phase() { return 'idle'; }
     get chatOpen() { return false; }
-    get pointerOn() { return false; }
     get preferredWidth() { return 0; }
+    get pointerOn() { return this._pointerOn; }
+    set pointerOn(v) { this._pointerOn = v; }
+    get micWaiting() { return this._micWaiting; }
+    set micWaiting(v) { this._micWaiting = v; }
+    get followUp() { return this._followUp; }
+    set followUp(v) { this._followUp = v; }
     set greeting(v) {}
     set look(v) {}
     set chatLook(v) {}
     set shortcut(v) {}
-    set withShortcut(v) {}
+    withShortcut(hint) { return hint; }
 });
 const stopUnit = () => {};
 const actionTypes = () => ({});
