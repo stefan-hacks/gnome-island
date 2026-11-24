@@ -109,7 +109,7 @@ Add the flake to your system or Home Manager inputs:
             programs.gnome-island.enable = true;
             programs.gnome-island.enableUserService = true;
             programs.gnome-island.settings = {
-              "org/gnome/shell/extensions/gnome-island" = {
+              "org/gnome/shell/extensions/isle" = {
                 island-theme = "gnome";
                 top-bar-color = true;
               };
@@ -167,7 +167,7 @@ You can try GNOME Island in a NixOS VM without touching your running system:
             programs.gnome-island.enable = true;
             programs.gnome-island.enableUserService = true;
             programs.gnome-island.settings = {
-              "org/gnome/shell/extensions/gnome-island" = {
+              "org/gnome/shell/extensions/isle" = {
                 island-theme = "gnome";
                 top-bar-color = true;
               };

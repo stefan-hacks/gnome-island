@@ -4,6 +4,24 @@ All notable changes to Isle are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [1.7.4] - 2026-11-24
+
+Fork from upstream with full rebrand and system monitoring.
+
+### Added
+
+- **System monitoring page** — CPU usage, frequency (average and per-core), memory, swap, load average, network upload/download speed, storage, temperatures, fans, voltages, battery, and GPU (NVIDIA via `nvidia-smi` and AMD via sysfs) with color-coded warning and critical thresholds.
+- **GNOME text scaling support** — respects GNOME's text-scaling-factor across the UI.
+- **NixOS flake and Home Manager module** — declarative installation with `programs.gnome-island.enable = true`.
+- **Pre-built release packages** — tarballs, `.deb`, and `.rpm` attached to every GitHub release.
+
+### Changed
+
+- Fully rebranded from `isle@zickrian.github.io` to `gnome-island@stefan-hacks.github.com`.
+- All D-Bus names moved from `io.github.zickrian.isle` to `io.github.stefanhacks.gnomeisland`.
+- All GitHub URLs updated to `github.com/stefan-hacks/gnome-island`.
+- Removed AI/voice assistant features from the default build.
+
 ## [Unreleased]
 
 ### Added
