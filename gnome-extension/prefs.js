@@ -164,6 +164,8 @@ export default class IslePreferences extends ExtensionPreferences {
             ['gnome', 'GNOME'],
             ['glass', 'Glass'],
         ]));
+        look.add(switchRow(settings, 'preview-settings', 'Preview changes',
+            'While a setting changes here, the island opens on what it changes for a few seconds, then closes'));
         look.add(glassRow(settings, window));
         look.add(choiceRow(settings, 'island-shape', 'Shape', 'Joined to the top of the screen, or floating free', [
             ['notch', 'Notch'],
