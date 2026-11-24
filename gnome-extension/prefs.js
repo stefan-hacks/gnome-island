@@ -1128,9 +1128,8 @@ function pagesGroup(settings, window) {
         'Connected Bluetooth devices and their battery; its tab shows while one is connected');
     devices.add_prefix(new Gtk.Image({icon_name: 'bluetooth-active-symbolic'}));
     // Only its switch goes grey: its tab can still be moved meanwhile.
-    }
 
-    const byName = new Map([...rows, ['apps', apps], ['devices', devices], ['usage', usage]]);
+    const byName = new Map([...rows, ['apps', apps], ['devices', devices]]);
     const order = () => pageOrder(settings.get_strv('page-order'));
     const arrows = new Map();
     for (const [name, row] of byName) {
