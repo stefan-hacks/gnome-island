@@ -7,6 +7,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -58,8 +59,11 @@ import * as Theme from './theme.js';
 const GREETING = null;
 const InstalledApps = class { destroy() {} };
 const UNDO_MS = 5000;
-const VoiceView = class {
-    constructor() {}
+const VoiceView = GObject.registerClass(
+class VoiceView extends St.Widget {
+    _init() {
+        super._init({width: 0, height: 0});
+    }
     setState() {}
     setActive() {}
     setLevel() {}
@@ -72,7 +76,6 @@ const VoiceView = class {
     exchange() {}
     fit() { return 0; }
     decideCard() {}
-    connect() { return 0; }
     destroy() {}
     get cardWaiting() { return false; }
     get micWaiting() { return false; }
@@ -86,7 +89,7 @@ const VoiceView = class {
     set chatLook(v) {}
     set shortcut(v) {}
     set withShortcut(v) {}
-};
+});
 const stopUnit = () => {};
 const actionTypes = () => ({});
 const aiSettings = () => ({});
