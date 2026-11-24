@@ -5,7 +5,7 @@
 # Usage: scripts/package-system.sh <tarball> [deb] [rpm]; the .deb needs dpkg-dev, the .rpm rpmbuild and file.
 set -euo pipefail
 
-[ -f "${1:-}" ] || { echo "Usage: $0 <isle-…-linux.tar.gz> [deb] [rpm]" >&2; exit 2; }
+[ -f "${1:-}" ] || { echo "Usage: $0 <gnome-island-…-linux.tar.gz> [deb] [rpm]" >&2; exit 2; }
 TARBALL="$(readlink -f "$1")"
 shift
 FORMATS=("$@")
@@ -14,7 +14,7 @@ FORMATS=("$@")
 cd "$(dirname "$0")/.."
 umask 022
 UUID="gnome-island@stefan-hacks.github.com"
-MAINTAINER="zickrian <espejodaniel50@gmail.com>"
+MAINTAINER="stefan-hacks <stefanmrobertson@gmail.com>"
 SUMMARY="A notch-style island for the GNOME Shell top bar"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -61,7 +61,7 @@ build_deb() {
     install -Dm644 "$SRC/LICENSE" "$root/usr/share/doc/isle/LICENSE"
     cat > "$root/usr/share/doc/isle/copyright" <<EOF
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Isle
+Upstream-Name: GNOME Island
 Source: https://github.com/stefan-hacks/gnome-island
 
 Files: *
@@ -99,8 +99,8 @@ Description: $SUMMARY
  .
  Each user logs out and back in, then turns the extension on once: gnome-extensions enable $UUID
 EOF
-    dpkg-deb --root-owner-group -Zxz --build "$root" "dist/isle_${VERSION}_amd64.deb" >/dev/null
-    echo "dist/isle_${VERSION}_amd64.deb"
+    dpkg-deb --root-owner-group -Zxz --build "$root" "dist/gnome-island_${VERSION}_amd64.deb" >/dev/null
+    echo "dist/gnome-island_${VERSION}_amd64.deb"
 }
 
 # The .rpm, from a spec wrapped around the staged files.
@@ -110,7 +110,7 @@ build_rpm() {
     install -Dm644 "$SRC/LICENSE" "$stage/usr/share/licenses/isle/LICENSE"
     mkdir -p "$top/SPECS"
     cat > "$top/SPECS/isle.spec" <<EOF
-Name: isle
+Name: gnome-island
 Version: ${VERSION//-/\~}
 Release: 1
 Summary: $SUMMARY

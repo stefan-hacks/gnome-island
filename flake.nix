@@ -1,6 +1,13 @@
 {
   description = "GNOME Island — a notch-style island for the GNOME Shell top bar";
 
+  nixConfig = {
+    extra-substituters = ["https://gnome-island.cachix.org"];
+    extra-trusted-public-keys = [
+      "gnome-island.cachix.org-1:0000000000000000000000000000000000000000000="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";

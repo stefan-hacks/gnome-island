@@ -7,7 +7,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 VERSION="${1:-$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)}"
-NAME="isle-$VERSION-$(uname -m)-linux"
+NAME="gnome-island-$VERSION-$(uname -m)-linux"
 OUT="dist/$NAME"
 
 cargo build --release --locked -p isle-daemon -p isle-shelf -p isle-whisper

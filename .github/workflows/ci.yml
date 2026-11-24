@@ -188,8 +188,8 @@ jobs:
           KIND: ${{ matrix.package }}
         run: |
           case "$KIND" in
-            tarball) package="$(ls dist/isle-*-linux.tar.gz)" ;;
-            deb) package="$(ls dist/isle_*.deb)" ;;
-            rpm) package="$(ls dist/isle-*.rpm)" ;;
+            tarball) package="$(ls dist/gnome-island-*-linux.tar.gz)" ;;
+            deb) package="$(ls dist/gnome-island_*.deb)" ;;
+            rpm) package="$(ls dist/gnome-island-*.rpm)" ;;
           esac
           docker run --rm -v "$PWD:/src:ro" "$IMAGE" /src/scripts/ci/smoke-test.sh "/src/$package"
