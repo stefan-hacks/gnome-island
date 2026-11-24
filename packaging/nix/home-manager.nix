@@ -55,8 +55,22 @@ in
     home.packages = [ cfg.package ];
 
     # Install the GNOME Shell extension into the user's extensions directory.
-    xdg.dataFile."gnome-shell/extensions/gnome-island@stefan-hacks.github.com".source =
-      "${cfg.package}/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com";
+    # We copy rather than symlink because GNOME Shell and the Extensions app
+    # sometimes need to write into the extension directory (e.g. removing old
+    # licence files), and a symlink to the read-only Nix store breaks that.
+    home.activation.gnome-island-extension = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      extSrc="${cfg.package}/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com"
+      extDst="${config.home.homeDirectory}/.local/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com"
+      if [ -L "$extDst" ] || [ -e "$extDst" ]; then
+        rm -rf "$extDst"
+      fi
+      mkdir -p "$extDst"
+      cp -r "$extSrc/"* "$extDst/"
+      chmod -R +w "$extDst"
+    '';
+
+    # Prevent home-manager from also creating a symlink here.
+    # (The activation script above handles the copy.)
 
     # Enable the extension via dconf.
     dconf.settings = {
