@@ -59,8 +59,24 @@ import * as Theme from './theme.js';
 const GREETING = null;
 const InstalledApps = class { destroy() {} };
 const UNDO_MS = 5000;
-const VoiceView = GObject.registerClass(
-class VoiceView extends St.Widget {
+const VoiceView = GObject.registerClass({
+    Signals: {
+        'orb-clicked': {},
+        'close-requested': {},
+        'type-requested': {},
+        'typed': {param_types: [GObject.TYPE_STRING]},
+        'speak': {},
+        'new-chat': {},
+        'undo-new-chat': {},
+        'card-decided': {param_types: [GObject.TYPE_BOOLEAN]},
+        'card-stop': {},
+        'stop': {},
+        'sign-in': {},
+        'set-up': {},
+        'frame': {param_types: [GObject.TYPE_DOUBLE, GObject.TYPE_DOUBLE, GObject.TYPE_BOOLEAN]},
+        'size-changed': {},
+    }
+}, class VoiceView extends St.Widget {
     _init() {
         super._init({width: 0, height: 0});
         this._pointerOn = false;
@@ -78,7 +94,6 @@ class VoiceView extends St.Widget {
     exchange() {}
     fit() { return 0; }
     decideCard() {}
-    destroy() {}
     get cardWaiting() { return false; }
     get typing() { return false; }
     get phase() { return 'idle'; }
