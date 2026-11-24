@@ -1,8 +1,17 @@
 # Changelog
 
-All notable changes to Isle are listed here. The format follows
+All notable changes to GNOME Island are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
+
+## [1.7.5] - 2026-11-24
+
+### Fixed
+
+- **Syntax errors** in `prefs.js` and `controller.js` caused by incomplete removal of upstream voice-assistant and AI-plan features.
+- **Copyright headers** updated from upstream author to `stefan-hacks` across all source files.
+- **Extension metadata** description no longer references removed AI/voice features.
+- **SECURITY.md** and **PKGBUILD** maintainer references updated.
 
 ## [1.7.4] - 2026-11-24
 
