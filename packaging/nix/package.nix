@@ -73,7 +73,16 @@ rustPlatform.buildRustPackage {
     cp -r ${src}/gnome-extension/. "$extDir/"
 
     # Compile the gsettings schema so the extension can read its keys immediately.
-    glib-compile-schemas "$extDir/schemas"
+    # glib-compile-schemas writes a temp file in the same directory, so we must
+    # compile in a writable location and then copy the compiled result back.
+    local schemasDir="$extDir/schemas"
+    if [ -d "$schemasDir" ]; then
+      local tmpSchemas=$(mktemp -d)
+      cp -r "$schemasDir/"*.xml "$tmpSchemas/"
+      glib-compile-schemas "$tmpSchemas"
+      cp "$tmpSchemas/gschemas.compiled" "$schemasDir/"
+      rm -rf "$tmpSchemas"
+    fi
 
     # Install fonts
     mkdir -p "$out/share/fonts/isle"
