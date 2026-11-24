@@ -59,8 +59,8 @@ import * as Theme from './theme.js';
 const GREETING = null;
 const InstalledApps = class { destroy() {} };
 const UNDO_MS = 5000;
-const VoiceView = class extends St.Widget {
-    constructor() { super(); }
+const VoiceView = class {
+    constructor() {}
     setState() {}
     setActive() {}
     setLevel() {}
@@ -71,7 +71,7 @@ const VoiceView = class extends St.Widget {
     followUp() {}
     startTyping() {}
     exchange() {}
-    fit() {}
+    fit() { return 0; }
     decideCard() {}
     connect() { return 0; }
     destroy() {}
