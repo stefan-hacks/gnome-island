@@ -26,7 +26,7 @@ const SERVICE_GRACE_US = 15 * 1000 * 1000;
 /** A call outlasts the microphone closing this long, as apps reopen it to switch devices. */
 const END_DELAY_MS = 4000;
 /** Isle's own recordings: the voice assistant listening. */
-const OWN_APP_ID = 'io.github.zickrian.isle';
+const OWN_APP_ID = 'io.github.stefanhacks.gnomeisland';
 /** Apps that record rather than call, matched in their names. */
 const RECORDERS = ['obs', 'audacity', 'tenacity', 'recorder', 'kooha', 'kdenlive', 'ardour'];
 /** The icon Gvc gives a stream that names none. */

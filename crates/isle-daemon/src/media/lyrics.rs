@@ -24,7 +24,7 @@ const TIMEOUT: Duration = Duration::from_secs(10);
 const USER_AGENT: &str = concat!(
     "Isle/",
     env!("CARGO_PKG_VERSION"),
-    " (https://github.com/zickrian/isle)"
+    " (https://github.com/stefan-hacks/gnome-island)"
 );
 /// How far a search result's length may differ from the track's, in seconds.
 const DURATION_TOLERANCE: f64 = 3.0;

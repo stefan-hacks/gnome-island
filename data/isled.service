@@ -8,7 +8,7 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=dbus
-BusName=io.github.zickrian.isle.Daemon
+BusName=io.github.stefanhacks.gnomeisland.Daemon
 ExecStart=@BINDIR@/isled
 Restart=on-failure
 # 2 s after a crash at first, growing to one try a minute while it keeps crashing.

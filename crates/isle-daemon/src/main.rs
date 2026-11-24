@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 zickrian
 
-//! `isled`: the Isle background service, on the session bus as `io.github.zickrian.isle.Daemon`.
+//! `isled`: the Isle background service, on the session bus as `io.github.stefanhacks.gnomeisland.Daemon`.
 //! See `docs/dbus-api.md` for the interfaces.
 
 mod agents;
@@ -49,8 +49,8 @@ use crate::todo::TodoService;
 use crate::updates::UpdatesService;
 use crate::usage::UsageService;
 
-const BUS_NAME: &str = "io.github.zickrian.isle.Daemon";
-const OBJECT_PATH: &str = "/io/github/zickrian/isle/Daemon";
+const BUS_NAME: &str = "io.github.stefanhacks.gnomeisland.Daemon";
+const OBJECT_PATH: &str = "/io/github/stefanhacks/gnomeisland/Daemon";
 /// Songs whose cover and lyrics stay cached.
 const CACHED_SONGS: usize = 500;
 
@@ -327,7 +327,7 @@ async fn report() {
     );
     println!(
         "\n### Extension\n\n```\n{}\n```",
-        run("gnome-extensions", &["info", "isle@zickrian.github.io"])
+        run("gnome-extensions", &["info", "gnome-island@stefan-hacks.github.com"])
     );
     println!("\n### Doctor\n\n```");
     doctor().await;
@@ -362,7 +362,7 @@ async fn report() {
     );
     let isle_lines: Vec<&str> = shell_log
         .lines()
-        .filter(|line| line.contains("Isle") || line.contains("isle@zickrian"))
+        .filter(|line| line.contains("Isle") || line.contains("gnome-island@stefan-hacks"))
         .collect();
     let recent = &isle_lines[isle_lines.len().saturating_sub(40)..];
     println!(

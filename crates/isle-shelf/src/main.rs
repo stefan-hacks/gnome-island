@@ -16,7 +16,7 @@ use gtk4 as gtk;
 
 use crate::shelf::ShelfWindow;
 
-const APP_ID: &str = "io.github.zickrian.isle.ShelfWindow";
+const APP_ID: &str = "io.github.stefanhacks.gnomeisland.ShelfWindow";
 
 /// Starts the GTK app on X11 and the CPU renderer, then waits for D-Bus calls.
 fn main() -> glib::ExitCode {

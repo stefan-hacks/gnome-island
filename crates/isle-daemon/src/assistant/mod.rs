@@ -378,7 +378,7 @@ fn context(json: &str) -> fdo::Result<Context> {
 }
 
 // Every method answers GNOME Shell only: the assistant types, opens and closes things on the user's behalf.
-#[interface(name = "io.github.zickrian.isle.Assistant1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Assistant1")]
 impl AssistantService {
     /// Records a request and answers it; `context` is JSON
     /// `{apps, provider, agy_model, claude_model, codex_model, grok_model, opencode_model, pi_model, whisper_model, language,

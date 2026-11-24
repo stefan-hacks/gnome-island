@@ -16,7 +16,7 @@ use zbus::{fdo, interface};
 use crate::clock::{now_ms, wait_until};
 use crate::store::Store;
 
-const LATEST: &str = "https://api.github.com/repos/zickrian/isle/releases/latest";
+const LATEST: &str = "https://api.github.com/repos/stefan-hacks/gnome-island/releases/latest";
 const EVERY_MS: i64 = 24 * 3600 * 1000;
 /// After a failed look (offline), the next is this much sooner.
 const RETRY_MS: i64 = 3600 * 1000;
@@ -49,7 +49,7 @@ impl UpdatesService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Updates1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Updates1")]
 impl UpdatesService {
     /// Whether to look (Settings); off until the extension says so.
     fn set_enabled(&mut self, enabled: bool) -> fdo::Result<()> {

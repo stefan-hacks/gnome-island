@@ -20,10 +20,10 @@ import {movePage, pageOrder, storedOrder} from './src/pageOrder.js';
 import {listenForSuperV} from './src/shortcutRecorder.js';
 import * as WorldClocks from './src/worldClocks.js';
 
-const DAEMON = 'io.github.zickrian.isle.Daemon';
-const DAEMON_PATH = '/io/github/zickrian/isle/Daemon';
-const POMODORO_INTERFACE = 'io.github.zickrian.isle.Pomodoro1';
-const CLIPBOARD_INTERFACE = 'io.github.zickrian.isle.Clipboard1';
+const DAEMON = 'io.github.stefanhacks.gnomeisland.Daemon';
+const DAEMON_PATH = '/io/github/stefanhacks/gnomeisland/Daemon';
+const POMODORO_INTERFACE = 'io.github.stefanhacks.gnomeisland.Pomodoro1';
+const CLIPBOARD_INTERFACE = 'io.github.stefanhacks.gnomeisland.Clipboard1';
 /** Edits to the timer are sent once typing pauses for this long. */
 const SAVE_DELAY_MS = 400;
 
@@ -78,8 +78,8 @@ export default class IslePreferences extends ExtensionPreferences {
         // Whether a newer Isle is out, as isled last found, and the switch for asking.
         for (const row of updateRows(settings, window, this.metadata['version-name'] ?? '', this.path))
             about.add(row);
-        about.add(link('Website', 'Features, installing and updating', 'https://github.com/zickrian/isle'));
-        about.add(link('Report a problem', 'On GitHub; paste the report below in it', 'https://github.com/zickrian/isle/issues/new/choose'));
+        about.add(link('Website', 'Features, installing and updating', 'https://github.com/stefan-hacks/gnome-island'));
+        about.add(link('Report a problem', 'On GitHub; paste the report below in it', 'https://github.com/stefan-hacks/gnome-island/issues/new/choose'));
         const report = new Adw.ActionRow({title: 'Copy a bug report', subtitle: 'What’s installed, what works, and recent activity, ready to paste into a report',
             activatable: true});
         report.add_suffix(new Gtk.Image({icon_name: 'edit-copy-symbolic'}));
@@ -1609,14 +1609,14 @@ function confirm(window, {heading, body, action}, onYes) {
 }
 
 /** Where updating is explained, and the command that updates a one-line install. */
-const UPDATE_HELP = 'https://github.com/zickrian/isle/blob/main/docs/install.md#updating';
-const INSTALL_COMMAND = 'curl -fsSL https://raw.githubusercontent.com/zickrian/isle/main/get.sh | bash';
-const RELEASES = 'https://github.com/zickrian/isle/releases/latest';
+const UPDATE_HELP = 'https://github.com/stefan-hacks/gnome-island/blob/main/docs/install.md#updating';
+const INSTALL_COMMAND = 'curl -fsSL https://raw.githubusercontent.com/stefan-hacks/gnome-island/main/get.sh | bash';
+const RELEASES = 'https://github.com/stefan-hacks/gnome-island/releases/latest';
 /** Installs version `$1` with that release's own get.sh (no sudo), appending to the log `$2`: first who runs
  * it ("isle-update-pid <pid> <boot id>"), last "isle-update-done <exit status>". */
 const UPDATE_SCRIPT = 'exec >>"$2" 2>&1 </dev/null; ' +
     'echo "isle-update-pid $$ $(cat /proc/sys/kernel/random/boot_id 2>/dev/null)"; set -o pipefail; ' +
-    'curl -fsSL --retry 2 "https://raw.githubusercontent.com/zickrian/isle/v$1/get.sh" | ISLE_VERSION="$1" bash; ' +
+    'curl -fsSL --retry 2 "https://raw.githubusercontent.com/stefan-hacks/gnome-island/v$1/get.sh" | ISLE_VERSION="$1" bash; ' +
     'echo "isle-update-done $?"';
 /** The update's log; its first line names the version ("isle-update 1.5.0"). */
 const UPDATE_LOG = GLib.build_filenamev([GLib.get_user_cache_dir(), 'isle', 'update.log']);

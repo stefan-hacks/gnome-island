@@ -2348,7 +2348,7 @@ mod bus_tests {
     use super::watch;
 
     const PATH: &str = "/org/mpris/MediaPlayer2";
-    const ISLED_PATH: &str = "/io/github/zickrian/isle";
+    const ISLED_PATH: &str = "/io/github/stefanhacks/gnomeisland";
 
     /// A session bus of its own, stopped with the test.
     struct Bus {
@@ -2505,7 +2505,7 @@ mod bus_tests {
             .call_method(
                 Some(isled),
                 ISLED_PATH,
-                Some("io.github.zickrian.isle.Media1"),
+                Some("io.github.stefanhacks.gnomeisland.Media1"),
                 "SetWatching",
                 &(watching,),
             )

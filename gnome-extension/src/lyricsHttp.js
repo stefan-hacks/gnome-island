@@ -10,7 +10,7 @@ import Soup from 'gi://Soup?version=3.0';
 import {LyricsFailure} from './lyricsProviders.js';
 
 const TIMEOUT_S = 10;
-const USER_AGENT = 'Isle (https://github.com/zickrian/isle)';
+const USER_AGENT = 'Isle (https://github.com/stefan-hacks/gnome-island)';
 
 /** A session for GETs: `getText(url, {headers})` answers {status, text}, or throws a LyricsFailure('network').
  * `destroy()` ends what is in flight. */

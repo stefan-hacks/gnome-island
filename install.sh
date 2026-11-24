@@ -6,7 +6,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-UUID="isle@zickrian.github.io"
+UUID="gnome-island@stefan-hacks.github.com"
 # The extension's id before 0.1.0; an install under it is replaced.
 OLD_UUID="isle@isle.github.io"
 BINDIR="$HOME/.local/bin"
@@ -106,10 +106,10 @@ step "Installing services"
 # The D-Bus names before 0.1.0.
 rm -f "$DATA/dbus-1/services/io.github.isle.Daemon.service" \
       "$DATA/dbus-1/services/io.github.isle.ShelfWindow.service"
-install_service io.github.zickrian.isle.Daemon.service "$DATA/dbus-1/services"
+install_service io.github.stefanhacks.gnomeisland.Daemon.service "$DATA/dbus-1/services"
 # Also for a helper from an earlier install, when it was not rebuilt now.
 if [ "$SHELF" = 1 ] || [ -x "$BINDIR/isle-shelf" ]; then
-    install_service io.github.zickrian.isle.ShelfWindow.service "$DATA/dbus-1/services"
+    install_service io.github.stefanhacks.gnomeisland.ShelfWindow.service "$DATA/dbus-1/services"
 fi
 install_service isled.service "$CONFIG/systemd/user"
 install -Dm644 README.md "$DATA/doc/isle/README.md"

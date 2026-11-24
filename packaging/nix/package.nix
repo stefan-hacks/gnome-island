@@ -100,7 +100,7 @@ rustPlatform.buildRustPackage {
 
     # Services
     mkdir -p "$out/share/dbus-1/services"
-    for svc in io.github.zickrian.isle.Daemon.service io.github.zickrian.isle.ShelfWindow.service; do
+    for svc in io.github.stefanhacks.gnomeisland.Daemon.service io.github.stefanhacks.gnomeisland.ShelfWindow.service; do
       sed \
         -e "s|@BINDIR@|$out/bin|" \
         -e "s|file://%h/.local/share/doc/isle|file://$out/share/doc/isle|" \

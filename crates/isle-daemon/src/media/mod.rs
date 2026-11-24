@@ -163,7 +163,7 @@ impl MediaService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Media1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Media1")]
 impl MediaService {
     /// Toggles play and pause.
     fn play_pause(&self) -> fdo::Result<()> {

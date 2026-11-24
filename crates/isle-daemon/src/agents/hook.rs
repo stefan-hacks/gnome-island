@@ -133,7 +133,7 @@ async fn decide(request: &Request) -> zbus::Result<String> {
     let proxy: zbus::Proxy = zbus::proxy::Builder::new(&bus)
         .destination(crate::BUS_NAME)?
         .path(crate::OBJECT_PATH)?
-        .interface("io.github.zickrian.isle.Agents1")?
+        .interface("io.github.stefanhacks.gnomeisland.Agents1")?
         .cache_properties(CacheProperties::No)
         .build()
         .await?;
@@ -285,7 +285,7 @@ async fn send(event: &Event) -> zbus::Result<()> {
     let proxy: zbus::Proxy = zbus::proxy::Builder::new(&bus)
         .destination(crate::BUS_NAME)?
         .path(crate::OBJECT_PATH)?
-        .interface("io.github.zickrian.isle.Agents1")?
+        .interface("io.github.stefanhacks.gnomeisland.Agents1")?
         .cache_properties(CacheProperties::No)
         .build()
         .await?;
@@ -474,10 +474,10 @@ mod tests {
 
     #[test]
     fn shows_a_tools_input_readably() {
-        let input = json!({"owner": "zickrian", "repo": "isle", "draft": false});
+        let input = json!({"owner": "stefan-hacks", "repo": "gnome-island", "draft": false});
         assert_eq!(
             readable(&input),
-            "owner: zickrian, repo: isle, draft: false"
+            "owner: stefan-hacks, repo: gnome-island, draft: false"
         );
         assert_eq!(readable(&Value::Null), "");
     }

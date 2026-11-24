@@ -1,7 +1,7 @@
 # isled D-Bus API
 
-`isled` owns `io.github.zickrian.isle.Daemon` on the session bus and serves every
-interface at `/io/github/zickrian/isle/Daemon`. State is exposed as read-only string
+`isled` owns `io.github.stefanhacks.gnomeisland.Daemon` on the session bus and serves every
+interface at `/io/github/stefanhacks/gnomeisland/Daemon`. State is exposed as read-only string
 properties holding JSON, with `PropertiesChanged` emitted on every change.
 Timestamps are milliseconds since the Unix epoch; durations are
 milliseconds unless the name says `_us` (microseconds).
@@ -20,7 +20,7 @@ and Codex's settings (`uninstall.sh` runs it), one line per AI. A second
 `isled` started by hand exits at once ("already running") and leaves the
 running one alone.
 
-## io.github.zickrian.isle.Media1
+## io.github.stefanhacks.gnomeisland.Media1
 
 The active MPRIS player: the one picked with `Choose` while it runs, else the one playing, else the one
 that played last, a paused song before a browser's media that rests. Another player starting to play ends
@@ -62,7 +62,7 @@ The control methods only fail when no player is running. They return
 without waiting for the player, so a slow player cannot hold the daemon up;
 if the player then rejects the command, isled only logs it.
 
-## io.github.zickrian.isle.Pomodoro1
+## io.github.stefanhacks.gnomeisland.Pomodoro1
 
 | Member | Signature | |
 |---|---|---|
@@ -74,7 +74,7 @@ if the player then rejects the command, isled only logs it.
 | `Config` | `s` | `{focus_minutes, short_break_minutes, long_break_minutes, sessions_before_long_break, auto_start_breaks, auto_start_focus}` |
 | `PhaseFinished(s finished, s next)` | signal | A phase ran out (not emitted for `Skip` or `Stop`). |
 
-## io.github.zickrian.isle.Todo1
+## io.github.stefanhacks.gnomeisland.Todo1
 
 | Member | Signature | |
 |---|---|---|
@@ -82,7 +82,7 @@ if the player then rejects the command, isled only logs it.
 | `SetDone(t id, b done)`, `Rename(t id, s title)`, `Remove(t id)`, `ClearDone()` | | Finished tasks are cleared at midnight. |
 | `Items` | `s` | `[{id, title, done, done_at_ms}]`; `done_at_ms` is when the task was ticked off, or null. |
 
-## io.github.zickrian.isle.Calendar1
+## io.github.stefanhacks.gnomeisland.Calendar1
 
 Isle's own calendar events, kept in `~/.local/share/isle/calendar.json`.
 Times are local wall-clock times. (Events of the desktop's calendars come
@@ -124,7 +124,7 @@ most 256 events). Without EDS (not installed, masked or not answering within
 five seconds) it is `""`; empty or over-long ids are refused with
 `InvalidArgs`.
 
-## io.github.zickrian.isle.Shelf1
+## io.github.stefanhacks.gnomeisland.Shelf1
 
 | Member | Signature | |
 |---|---|---|
@@ -137,7 +137,7 @@ Files a phone sends (see `Share1`) are kept in the shelf's own folder,
 `~/.local/share/isle/shelf`, as copied clipboard images are; taking one off
 the shelf deletes it.
 
-## io.github.zickrian.isle.Share1
+## io.github.stefanhacks.gnomeisland.Share1
 
 Sharing the shelf with a phone (see SECURITY.md). While it runs, isled serves
 one web page and the shelf's files over plain HTTP on the local network; off,
@@ -181,7 +181,7 @@ a `Content-Length`, answered `201 {name}` or `400 incomplete`, `403
 not-allowed`, `409 shelf-full`, `411 length`, `413 too-big` or
 `session-full`, `507 disk`. Every other request is `404 Not found`.
 
-## io.github.zickrian.isle.Clipboard1
+## io.github.stefanhacks.gnomeisland.Clipboard1
 
 Clipboard history. The extension watches the clipboard and reports each
 copy; isled keeps the list in `~/.local/share/isle/clipboard.json` and
@@ -211,7 +211,7 @@ it was. Beyond 20 unpinned items the oldest are
 dropped; pinned items are only removed by hand. Unknown ids and invalid
 content are rejected with `InvalidArgs`.
 
-## io.github.zickrian.isle.Reminders1
+## io.github.stefanhacks.gnomeisland.Reminders1
 
 Reminders the voice assistant sets ("remind me in ten minutes to…"), kept in
 `~/.local/share/isle/reminders.json`. The extension shows each as an alert
@@ -223,7 +223,7 @@ when it is due, then dismisses it.
 | `Dismiss(t id)` | | Forgets one, once shown (or cancelled). |
 | `Items` | `s` | `[{id, text, due_ms}]`, soonest first. |
 
-## io.github.zickrian.isle.AppUsage1
+## io.github.stefanhacks.gnomeisland.AppUsage1
 
 Time spent in each application, timed by the extension as GNOME's focus
 changes and kept in `~/.local/share/isle/app-usage.json` for 30 days. Only
@@ -243,7 +243,7 @@ Every method is GNOME Shell's: the history names every app the user ran.
 | `GetStats() → s` | | `{today: [{id, name, ms}], week: [{id, name, ms}], month: [{id, name, ms}]}`, most used first; `week` is the last seven days including today, and `month` the last 30 (all that is kept). |
 | `Clear()` | | Forgets every day. |
 
-## io.github.zickrian.isle.Assistant1
+## io.github.stefanhacks.gnomeisland.Assistant1
 
 The voice assistant. isled records the microphone, turns speech into text
 (whisper.cpp, through `isle-whisper`), asks the AI picked in Settings
@@ -286,7 +286,7 @@ starts it; isled follows the log to the end (its last line is
 | `Notice` (signal) | `sb` | `(text, ok)`: a command ended while no request watched it (isled had restarted). |
 | `Level` (signal) | `d` | The microphone's level (0..1) while listening, 20 times a second. |
 
-## io.github.zickrian.isle.Usage1
+## io.github.stefanhacks.gnomeisland.Usage1
 
 How much of the user's AI plans is used. Claude's numbers come from
 `api.anthropic.com/api/oauth/usage` with Claude Code's sign-in (asked every
@@ -303,7 +303,7 @@ nothing runs.
 | `Usage` | `s` | `{providers: [{id, name, plan, windows: [{label, percent, resets_at_ms}], updated_ms, note}]}`; a provider not signed in is left out. |
 | `Alert` (signal) | `ssdx` | `(provider, window, percent, resets_at_ms)`: a limit passed the warning or the critical share, once per window. |
 
-## io.github.zickrian.isle.Agents1
+## io.github.stefanhacks.gnomeisland.Agents1
 
 AI coding agents on the island: Claude Code and Codex ask their permissions
 there (`Decide`), and say when they are waiting or done (`Report`). The
@@ -359,7 +359,7 @@ its last argument, is `done`, with the first line of
 `last-assistant-message`. It calls `Report` with a one-second limit and
 without starting isled, prints nothing and always exits 0.
 
-## io.github.zickrian.isle.Updates1
+## io.github.stefanhacks.gnomeisland.Updates1
 
 Whether a newer Isle is out: GitHub's latest release, looked up at most once a day while enabled.
 
@@ -368,17 +368,17 @@ Whether a newer Isle is out: GitHub's latest release, looked up at most once a d
 | `SetEnabled(b enabled)` | | Look, or not (Settings → New versions); off until set. |
 | `Latest` | `s` | The latest release's version (`0.8.0`) when it is newer than this isled; empty otherwise. |
 
-## io.github.zickrian.isle.System1
+## io.github.stefanhacks.gnomeisland.System1
 
 | Member | Signature | |
 |---|---|---|
 | `State` | `s` | `{battery: {percent (a whole number), plugged, charging} or null, network: {connected, connection, name}, bluetooth: [{path, name, icon, battery}], camera_in_use}` |
 | `Event(s json)` | signal | One of `{kind: "power", plugged, percent}`, `{kind: "battery_low", percent}`, `{kind: "battery_full"}`, `{kind: "network", connected, connection, name}`, `{kind: "bluetooth", connected, device}`, `{kind: "bluetooth_low", device}` (a connected device's battery went under 20, 10 or 5%, `device.battery` its level now: once per level on the way down, again once it has charged more than 5 points above it). |
 
-## io.github.zickrian.isle.ShelfWindow1
+## io.github.stefanhacks.gnomeisland.ShelfWindow1
 
-Served by `isle-shelf` (not `isled`) as `io.github.zickrian.isle.ShelfWindow` at
-`/io/github/zickrian/isle/ShelfWindow`.
+Served by `isle-shelf` (not `isled`) as `io.github.stefanhacks.gnomeisland.ShelfWindow` at
+`/io/github/stefanhacks/gnomeisland/ShelfWindow`.
 
 | Member | | |
 |---|---|---|

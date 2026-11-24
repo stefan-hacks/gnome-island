@@ -31,7 +31,7 @@ impl RemindersService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Reminders1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Reminders1")]
 impl RemindersService {
     /// Adds a reminder due `delay_ms` from now and returns its id.
     async fn add(

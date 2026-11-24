@@ -9,7 +9,7 @@ set -euo pipefail
 
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}/isle"
 MODELS="$DATA/models"
-SCHEMAS="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/isle@zickrian.github.io/schemas"
+SCHEMAS="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/gnome-island@stefan-hacks.github.com/schemas"
 WHISPER_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main"
 VAD_URL="https://huggingface.co/ggml-org/whisper-vad/resolve/main"
 # What an older Isle's faster-whisper setup left.

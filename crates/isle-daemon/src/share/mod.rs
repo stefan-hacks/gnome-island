@@ -47,7 +47,7 @@ pub struct ShareService {
     count: u64,
 }
 
-#[interface(name = "io.github.zickrian.isle.Share1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Share1")]
 impl ShareService {
     /// Starts sharing (or keeps the session already running). GNOME Shell only.
     async fn start(

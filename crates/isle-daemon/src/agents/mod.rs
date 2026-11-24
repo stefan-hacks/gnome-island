@@ -428,7 +428,7 @@ impl AgentsService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Agents1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Agents1")]
 impl AgentsService {
     /// Puts Isle's hook in `provider`'s config, or takes it out. GNOME Shell's to ask, no other program's.
     async fn set_hooked(

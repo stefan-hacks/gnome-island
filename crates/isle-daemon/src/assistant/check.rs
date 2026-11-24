@@ -1002,7 +1002,7 @@ mod tests {
             "bluetoothctl power off",
             "gsettings set org.gnome.desktop.interface color-scheme default",
             "gsettings reset-recursively org.gnome.shell",
-            "gnome-extensions disable isle@zickrian.github.io",
+            "gnome-extensions disable gnome-island@stefan-hacks.github.com",
             "journalctl --vacuum-size=1M",
             "journalctl -f",
             "journalctl --file=/home/ana/.ssh/x",

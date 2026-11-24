@@ -1,6 +1,6 @@
 post_install() {
   echo 'Log out and back in, then turn Isle on once as each user (in the Extensions app, or):'
-  echo '  gnome-extensions enable isle@zickrian.github.io'
+  echo '  gnome-extensions enable gnome-island@stefan-hacks.github.com'
   echo 'For the voice assistant, each user also runs isle-setup-voice once.'
 }
 

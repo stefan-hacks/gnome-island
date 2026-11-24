@@ -55,12 +55,12 @@ in
     home.packages = [ cfg.package ];
 
     # Install the GNOME Shell extension into the user's extensions directory.
-    xdg.dataFile."gnome-shell/extensions/isle@zickrian.github.io".source =
-      "${cfg.package}/share/gnome-shell/extensions/isle@zickrian.github.io";
+    xdg.dataFile."gnome-shell/extensions/gnome-island@stefan-hacks.github.com".source =
+      "${cfg.package}/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com";
 
     # Enable the extension via dconf.
     dconf.settings = {
-      "org/gnome/shell".enabled-extensions = lib.mkAfter [ "isle@zickrian.github.io" ];
+      "org/gnome/shell".enabled-extensions = lib.mkAfter [ "gnome-island@stefan-hacks.github.com" ];
     } // lib.optionalAttrs (cfg.settings != { }) cfg.settings;
 
     # Enable the user service if requested.

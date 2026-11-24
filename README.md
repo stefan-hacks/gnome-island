@@ -14,7 +14,7 @@ and Cava visualizer bars, living in a notch at the top of your screen.
 
 </div>
 
-> **Note:** This is a fork of [Isle by zickrian](https://github.com/zickrian/isle) with additional features:
+> **Note:** This is a fork of [Isle by zickrian](https://github.com/stefan-hacks/gnome-island) with additional features:
 > - **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
 > - **Lyrics from more providers** — LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key)
 > - **Cava visualizer** — audio bars behind the player and lyrics
@@ -342,7 +342,7 @@ sent where.
 
 **The island does not appear after installing.** Log out and back in (on
 Wayland this is required once). Then check that it is enabled:
-`gnome-extensions info isle@zickrian.github.io`.
+`gnome-extensions info gnome-island@stefan-hacks.github.com`.
 
 **Music or lyrics do not show.** Check that the background service runs:
 `systemctl --user status isled`, and read its log with
@@ -425,7 +425,7 @@ and [CHANGELOG.md](CHANGELOG.md) for what changed. Everyone taking part
 follows the [Code of Conduct](CODE_OF_CONDUCT.md); please report security
 problems privately as described in [SECURITY.md](SECURITY.md).
 
-This fork diverges from the upstream [Isle](https://github.com/zickrian/isle) project.
+This fork diverges from the upstream [Isle](https://github.com/stefan-hacks/gnome-island) project.
 Changes here are not expected to be upstreamed and the project evolves independently.
 
 ## License

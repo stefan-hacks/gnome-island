@@ -61,7 +61,7 @@ impl Mic {
             // Tagged as Isle's own, so the island does not take it for a call.
             .args([
                 "-P",
-                "{ application.id = \"io.github.zickrian.isle\" }",
+                "{ application.id = \"io.github.stefanhacks.gnomeisland\" }",
                 "-",
             ])
             .stdin(Stdio::null())

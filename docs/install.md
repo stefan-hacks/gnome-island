@@ -117,7 +117,7 @@ curl -fsSL https://raw.githubusercontent.com/zickrian/isle/main/get.sh | bash
 ```
 
 **Installed from a package?** Update it the way you installed it: download
-the new `.deb` or `.rpm` from [Releases](https://github.com/zickrian/isle/releases/latest)
+the new `.deb` or `.rpm` from [Releases](https://github.com/stefan-hacks/gnome-island/releases/latest)
 and open it, or on Arch run `git pull` and `makepkg -si` again in
 `packaging/aur`. Then log out and back in. Don't also run the command above: it would add a second copy (see
 [below](#both-a-package-and-the-one-line-install)).
@@ -146,7 +146,7 @@ A system-wide package is removed as [below](#both-a-package-and-the-one-line-ins
 ## Without internet on the computer
 
 Download `isle-<version>-x86_64-linux.tar.gz` from
-[Releases](https://github.com/zickrian/isle/releases) on another computer,
+[Releases](https://github.com/stefan-hacks/gnome-island/releases) on another computer,
 copy it over, then:
 
 ```sh
@@ -159,7 +159,7 @@ cd isle-*-x86_64-linux
 
 ### Ubuntu and Debian (.deb), Fedora (.rpm)
 
-Each [release](https://github.com/zickrian/isle/releases) also has
+Each [release](https://github.com/stefan-hacks/gnome-island/releases) also has
 system-wide packages, installed for every user of the computer with the
 system's package manager (so they update and uninstall with it):
 
@@ -175,7 +175,7 @@ on per user: so each user logs out and back in, then turns Isle on once, in
 the Extensions app or with:
 
 ```sh
-gnome-extensions enable isle@zickrian.github.io
+gnome-extensions enable gnome-island@stefan-hacks.github.com
 ```
 
 `isled` starts on its own when the extension first calls it. The voice
@@ -189,11 +189,11 @@ the one-line install (step 2), or build the `isle-bin` package from the `PKGBUIL
 
 ```sh
 sudo pacman -S --needed base-devel git
-git clone --depth 1 https://github.com/zickrian/isle.git
+git clone --depth 1 https://github.com/stefan-hacks/gnome-island.git
 cd isle/packaging/aur
 makepkg -si
 # Log out and back in, then:
-gnome-extensions enable isle@zickrian.github.io
+gnome-extensions enable gnome-island@stefan-hacks.github.com
 ```
 
 To update, run `git pull` in that folder and `makepkg -si` again.
@@ -233,7 +233,7 @@ Everything goes in your home folder:
 
 | Where | What |
 |---|---|
-| `~/.local/share/gnome-shell/extensions/isle@zickrian.github.io` | The GNOME Shell extension |
+| `~/.local/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com` | The GNOME Shell extension |
 | `~/.local/bin` | `isled` (the background service), `isle-shelf` (drag and drop), `isle-whisper` (speech recognition), `isle-uninstall`, `isle-setup-voice`, `isle-charge-limit` |
 | `~/.config/systemd/user`, `~/.local/share/dbus-1/services` | Starting `isled` with your session |
 | `~/.local/share/fonts/isle` | Inter, the island's typeface |
@@ -260,12 +260,12 @@ switch), it switches them on.
 **The island does not appear.** Log out and back in once more, then check:
 
 ```sh
-gnome-extensions info isle@zickrian.github.io   # State: ACTIVE (or ENABLED)
+gnome-extensions info gnome-island@stefan-hacks.github.com   # State: ACTIVE (or ENABLED)
 ```
 
 If it says `OUT OF DATE`, your GNOME Shell version is outside 46 to 51. If
 it says `ERROR`, that is most likely a bug in Isle: please
-[open an issue](https://github.com/zickrian/isle/issues) with GNOME Shell's
+[open an issue](https://github.com/stefan-hacks/gnome-island/issues) with GNOME Shell's
 log (see **Anything else** below).
 
 **A phone can't open the Shelf.** It must be on the same Wi-Fi as the
@@ -281,5 +281,5 @@ sign-in) and what to run.
 
 **Anything else.** GNOME Shell's log shows extension errors:
 `journalctl -b -o cat /usr/bin/gnome-shell | grep -i isle`. Please
-[open an issue](https://github.com/zickrian/isle/issues) with what it says
+[open an issue](https://github.com/stefan-hacks/gnome-island/issues) with what it says
 and the output of `gnome-shell --version`.

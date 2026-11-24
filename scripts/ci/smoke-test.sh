@@ -5,8 +5,8 @@
 # GNOME Shell as "tester", failing on any "JS ERROR", the extension not loading, or isled never on the bus.
 set -euo pipefail
 
-UUID="isle@zickrian.github.io"
-DAEMON="io.github.zickrian.isle.Daemon"
+UUID="gnome-island@stefan-hacks.github.com"
+DAEMON="io.github.stefanhacks.gnomeisland.Daemon"
 # Seconds to wait for isled, then to keep the shell running and watch its log.
 WAIT=60
 SETTLE=10

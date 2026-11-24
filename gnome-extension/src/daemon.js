@@ -9,12 +9,12 @@ import GLib from 'gi://GLib';
 
 import * as Signals from 'resource:///org/gnome/shell/misc/signals.js';
 
-const BUS_NAME = 'io.github.zickrian.isle.Daemon';
-const OBJECT_PATH = '/io/github/zickrian/isle/Daemon';
+const BUS_NAME = 'io.github.stefanhacks.gnomeisland.Daemon';
+const OBJECT_PATH = '/io/github/stefanhacks/gnomeisland/Daemon';
 
 // One isled interface's introspection XML.
 const node = (name, body) =>
-    `<node><interface name="io.github.zickrian.isle.${name}">${body}</interface></node>`;
+    `<node><interface name="io.github.stefanhacks.gnomeisland.${name}">${body}</interface></node>`;
 
 // Each interface, its JSON properties and the `state` keys they map to.
 const INTERFACES = {

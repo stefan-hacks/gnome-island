@@ -91,7 +91,7 @@ impl ShelfService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Shelf1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Shelf1")]
 impl ShelfService {
     /// Adds local files by `file://` URI. Other URIs are rejected without stopping the rest;
     /// the call then fails as invalid, naming the rejected URIs.

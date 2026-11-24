@@ -7,7 +7,7 @@ pkgver=1.7.3
 pkgrel=1
 pkgdesc='A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, app usage and a voice assistant'
 arch=('x86_64')
-url='https://github.com/zickrian/isle'
+url='https://github.com/stefan-hacks/gnome-island'
 license=('GPL-3.0-or-later' 'OFL-1.1')
 depends=('gnome-shell>=1:46' 'dconf' 'gtk4' 'glib2' 'pango' 'gdk-pixbuf2' 'gcc-libs' 'glibc' 'bash')
 optdepends=('vulkan-icd-loader: speech recognition on the graphics card, else on the processor')
@@ -15,12 +15,12 @@ provides=('isle')
 conflicts=('isle')
 options=('!strip' '!debug')
 install=isle-bin.install
-source_x86_64=("https://github.com/zickrian/isle/releases/download/v$pkgver/isle-$pkgver-$CARCH-linux.tar.gz")
+source_x86_64=("https://github.com/stefan-hacks/gnome-island/releases/download/v$pkgver/isle-$pkgver-$CARCH-linux.tar.gz")
 sha256sums_x86_64=('0a9cf4d631f70656ebb9f65e3452aa25ae024e4beb209794a2a5c077b273754b')
 
 package() {
   cd "isle-$pkgver-$CARCH-linux"
-  local uuid=isle@zickrian.github.io
+  local uuid=gnome-island@stefan-hacks.github.com
 
   install -Dm755 -t "$pkgdir/usr/bin" bin/isled bin/isle-shelf bin/isle-whisper scripts/isle-charge-limit
   install -Dm755 scripts/setup-voice.sh "$pkgdir/usr/bin/isle-setup-voice"
@@ -34,12 +34,12 @@ package() {
   chmod -R u=rwX,go=rX "$ext"
 
   local service
-  for service in io.github.zickrian.isle.Daemon.service io.github.zickrian.isle.ShelfWindow.service isled.service; do
+  for service in io.github.stefanhacks.gnomeisland.Daemon.service io.github.stefanhacks.gnomeisland.ShelfWindow.service isled.service; do
     sed -e 's|@BINDIR@|/usr/bin|' -e 's|file://%h/.local/share/doc/isle|file:///usr/share/doc/isle|' \
       "data/$service" > "$srcdir/$service"
   done
   install -Dm644 -t "$pkgdir/usr/share/dbus-1/services" \
-    "$srcdir/io.github.zickrian.isle.Daemon.service" "$srcdir/io.github.zickrian.isle.ShelfWindow.service"
+    "$srcdir/io.github.stefanhacks.gnomeisland.Daemon.service" "$srcdir/io.github.stefanhacks.gnomeisland.ShelfWindow.service"
   install -Dm644 -t "$pkgdir/usr/lib/systemd/user" "$srcdir/isled.service"
 
   install -Dm644 -t "$pkgdir/usr/share/fonts/isle" data/fonts/InterVariable.ttf

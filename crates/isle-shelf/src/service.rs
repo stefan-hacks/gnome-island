@@ -10,7 +10,7 @@ use crate::shelf::ShelfWindow;
 
 const INTERFACE: &str = r#"
 <node>
-  <interface name="io.github.zickrian.isle.ShelfWindow1">
+  <interface name="io.github.stefanhacks.gnomeisland.ShelfWindow1">
     <!-- Places are in logical pixels, as GTK's: the extension divides the stage's by its scale. -->
     <method name="Show">
       <arg name="x" type="i" direction="in"/>
@@ -82,8 +82,8 @@ const INTERFACE: &str = r#"
 
 /// The largest scale `SetScale` takes.
 const MAX_SCALE: i32 = 4;
-const OBJECT_PATH: &str = "/io/github/zickrian/isle/ShelfWindow";
-const INTERFACE_NAME: &str = "io.github.zickrian.isle.ShelfWindow1";
+const OBJECT_PATH: &str = "/io/github/stefanhacks/gnomeisland/ShelfWindow";
+const INTERFACE_NAME: &str = "io.github.stefanhacks.gnomeisland.ShelfWindow1";
 
 /// Exports the interface on `connection`.
 pub fn register(connection: &gio::DBusConnection, window: ShelfWindow) -> Result<(), glib::Error> {

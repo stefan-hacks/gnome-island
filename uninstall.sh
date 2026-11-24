@@ -5,7 +5,7 @@
 # tasks, timer settings and app usage in ~/.local/share/isle are kept; delete that folder to remove them.
 set -uo pipefail
 
-UUID="isle@zickrian.github.io"
+UUID="gnome-island@stefan-hacks.github.com"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
 # A system-wide package (.deb, .rpm, AUR) stays in use: it keeps the extension on and the voice set-up.
@@ -52,8 +52,8 @@ fi
 [ -x "$HOME/.local/bin/isled" ] && "$HOME/.local/bin/isled" --unhook-all 2>/dev/null
 rm -f "$HOME/.local/bin/isled" "$HOME/.local/bin/isle-shelf" "$HOME/.local/bin/isle-whisper" "$HOME/.local/bin/isle-charge-limit" \
       "$HOME/.local/bin/isle-setup-voice" "$HOME/.local/bin/isle-uninstall" \
-      "$DATA/dbus-1/services/io.github.zickrian.isle.Daemon.service" \
-      "$DATA/dbus-1/services/io.github.zickrian.isle.ShelfWindow.service" \
+      "$DATA/dbus-1/services/io.github.stefanhacks.gnomeisland.Daemon.service" \
+      "$DATA/dbus-1/services/io.github.stefanhacks.gnomeisland.ShelfWindow.service" \
       "$DATA/dbus-1/services/io.github.isle.Daemon.service" \
       "$DATA/dbus-1/services/io.github.isle.ShelfWindow.service" \
       "$CONFIG/systemd/user/isled.service"

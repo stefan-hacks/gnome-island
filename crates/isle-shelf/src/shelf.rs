@@ -14,9 +14,9 @@ use serde::Deserialize;
 
 use crate::{service, tile, x11};
 
-const DAEMON: &str = "io.github.zickrian.isle.Daemon";
-const DAEMON_PATH: &str = "/io/github/zickrian/isle/Daemon";
-const SHELF_INTERFACE: &str = "io.github.zickrian.isle.Shelf1";
+const DAEMON: &str = "io.github.stefanhacks.gnomeisland.Daemon";
+const DAEMON_PATH: &str = "/io/github/stefanhacks/gnomeisland/Daemon";
+const SHELF_INTERFACE: &str = "io.github.stefanhacks.gnomeisland.Shelf1";
 /// The island's own shelf icon, so the empty shelf looks the same in both, whatever the icon theme.
 const SHELF_ICON: &[u8] = include_bytes!("../../../gnome-extension/icons/isle-shelf.svg");
 /// isled keeps this many files; a full shelf turns drops away.

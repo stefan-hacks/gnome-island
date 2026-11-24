@@ -66,7 +66,7 @@ impl AppUsageService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.AppUsage1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.AppUsage1")]
 impl AppUsageService {
     /// Adds stretches the extension timed; a stretch past midnight is split between the two days.
     /// GNOME Shell's to report, no other program's.

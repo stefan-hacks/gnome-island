@@ -7,9 +7,9 @@
 
 import Gio from 'gi://Gio';
 
-export const RECORDER_NAME = 'io.github.zickrian.isle.ShortcutRecorder';
-export const RECORDER_PATH = '/io/github/zickrian/isle/ShortcutRecorder';
-const RECORDER_INTERFACE = 'io.github.zickrian.isle.ShortcutRecorder';
+export const RECORDER_NAME = 'io.github.stefanhacks.gnomeisland.ShortcutRecorder';
+export const RECORDER_PATH = '/io/github/stefanhacks/gnomeisland/ShortcutRecorder';
+const RECORDER_INTERFACE = 'io.github.stefanhacks.gnomeisland.ShortcutRecorder';
 const RECORDER_XML = `<node><interface name="${RECORDER_INTERFACE}"><method name="SuperV"/></interface></node>`;
 
 /** Takes the name for as long as a sheet waits; `onSuperV` runs on Super+V. Returns what lets it go. */

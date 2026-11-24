@@ -94,7 +94,7 @@ impl CalendarService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Calendar1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Calendar1")]
 impl CalendarService {
     /// Adds an event on `date` ("YYYY-MM-DD") from a line of text such as
     /// "Lunch 12:30" or "Standup 9:00-9:15"; returns its id.

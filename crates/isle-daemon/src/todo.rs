@@ -52,7 +52,7 @@ fn not_found(id: u64) -> fdo::Error {
     fdo::Error::InvalidArgs(format!("no task with id {id}"))
 }
 
-#[interface(name = "io.github.zickrian.isle.Todo1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Todo1")]
 impl TodoService {
     /// Adds a task and returns its id.
     async fn add(

@@ -137,7 +137,7 @@ impl UsageService {
     }
 }
 
-#[interface(name = "io.github.zickrian.isle.Usage1")]
+#[interface(name = "io.github.stefanhacks.gnomeisland.Usage1")]
 impl UsageService {
     /// JSON `{enabled, claude, codex, grok, assistant, warn, critical}`, from Settings.
     fn set_config(&mut self, config: &str) -> fdo::Result<()> {
