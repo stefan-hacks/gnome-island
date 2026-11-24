@@ -37,7 +37,7 @@ export const Page = GObject.registerClass({
         super._init(params);
         this._pageHeight = height;
         if (height !== undefined)
-            onUiScale(this, scale => (this.height = this._pageHeight * scale));
+            onUiScale(this, scale => (this.height = this.pageHeight * scale));
         this.daemon = daemon;
         this._active = false;
         this._timeouts = new Map();
@@ -58,7 +58,7 @@ export const Page = GObject.registerClass({
         if (height === this._pageHeight)
             return;
         this._pageHeight = height;
-        this.height = height * uiScale();
+        this.height = this.pageHeight * uiScale();
         this.onPageHeight(height);
     }
 
