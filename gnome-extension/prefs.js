@@ -13,7 +13,6 @@ import PangoCairo from 'gi://PangoCairo';
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 import {DesktopAppInfo} from './src/appInfo.js';
-import {Bot, COLORS, SHAPES, paletteFor} from './src/bot.js';
 import {paintRim} from './src/glow.js';
 import {DEFAULT_ORDER, PROVIDERS} from './src/lyricsProviders.js';
 import {movePage, pageOrder, storedOrder} from './src/pageOrder.js';

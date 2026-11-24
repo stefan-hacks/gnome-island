@@ -17,7 +17,6 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {namesProject} from './actionRules.js';
 import * as Alerts from './alerts.js';
 import {AppUsage} from './appUsage.js';
-import {paletteFor} from './bot.js';
 import {ClipboardHistory} from './clipboard.js';
 import {CompactView} from './compact.js';
 import {HAS_ACCENT, grabsKeyboard, inhibitScanout, isWayland, onUiScale, px, uiScale} from './compat.js';
@@ -1758,10 +1757,9 @@ export class Controller {
         this._later('warm', Math.max(WARM_AFTER_CLOSE_MS, WARM_GAP_MS - sinceLast), () => this._warmUp(false));
     }
 
-    /** The assistant's shape and colours, from Settings (see bot.js). */
+    /** Bot/AI features removed in this fork. */
     _readBotLook() {
-        return {shape: 'circle',
-            palette: paletteFor('blue', 'medium')};
+        return {shape: 'circle', palette: {glow: null, body: null, eyes: null}};
     }
 
     /** Settings changed the bot: the voice view and the island's glow follow. */
