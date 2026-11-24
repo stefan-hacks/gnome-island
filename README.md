@@ -6,9 +6,7 @@
 
 Music with synced lyrics, calls, notifications, a focus timer, reminders, a
 calendar that tells you when to join a meeting, a clipboard shelf, app usage,
-Claude Code and Codex asking you right there, and an assistant that installs and
-fixes things with the AI you already use, living in a notch at the top of
-your screen.
+and Cava visualizer bars, living in a notch at the top of your screen.
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 ![GNOME Shell 46–51](https://img.shields.io/badge/GNOME%20Shell-46%E2%80%9351-4a86cf.svg)
@@ -18,11 +16,18 @@ your screen.
 
 > **Note:** This is a fork of [Isle by zickrian](https://github.com/zickrian/isle) with additional features:
 > - **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
-> - **Hermes agent support** — use Hermes Agent as your voice assistant provider
+> - **Lyrics from more providers** — LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key)
+> - **Cava visualizer** — audio bars behind the player and lyrics
+> - **Richer closed island** — song title and artist scroll in the closed island; timer shows beside music
+> - **Settings previews** — the island opens briefly to show what a setting changes
+> - **Keep GNOME's clock** — option to leave GNOME's own clock in the top bar
+> - **Vertical clipboard with columns** — 1, 2, or 3 columns in vertical clipboard layout
+> - **GNOME text scaling** — respects GNOME's text-scaling-factor across the UI
 > - **NixOS flake & Home Manager** — install declaratively on NixOS
+> - This fork removes all AI and voice assistant features.
 > - This fork is not synced with upstream and evolves independently.
 
-GNOME Island turns the centre of the top bar into a black notch.
+GNOME Island turns the centre of the top bar into a notch.
 At rest it shows the time and what is going on (a song, a timer, a
 recording, or two of them at once). Rest the pointer on it and it opens with spring physics into a
 small panel with tabs for each page; passing over it on the way elsewhere
@@ -36,9 +41,6 @@ appear in the same place instead of in the middle of the screen.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Settings](#settings)
-- [Voice assistant](#voice-assistant)
-  - [The conversation](#the-conversation)
-- [AI usage](#ai-usage)
 - [Resource usage](#resource-usage)
 - [Data & network](#data--network)
 - [Troubleshooting](#troubleshooting)
@@ -53,10 +55,6 @@ appear in the same place instead of in the middle of the screen.
 <tr>
 <td width="50%" align="center"><img src="docs/images/music.webp" alt="The Music page in glass: cover art, the song, a scrubber and controls" width="100%"><br><sub>Music</sub></td>
 <td width="50%" align="center"><img src="docs/images/lyrics.webp" alt="Synced lyrics, the glass tinted in the cover's colour" width="100%"><br><sub>Lyrics</sub></td>
-</tr>
-<tr>
-<td width="50%" align="center"><img src="docs/images/assistant.webp" alt="The assistant's card for sudo apt install -y vlc, with Deny and Run" width="100%"><br><sub>Assistant</sub></td>
-<td width="50%" align="center"><img src="docs/images/usage.webp" alt="AI plan usage: a bar for the session and one for the week, with when each resets" width="100%"><br><sub>AI usage</sub></td>
 </tr>
 <tr>
 <td width="50%" align="center"><img src="docs/images/notifications.webp" alt="The Notifications page: two messages, with Clear and Do Not Disturb" width="100%"><br><sub>Notifications</sub></td>
@@ -87,10 +85,6 @@ appear in the same place instead of in the middle of the screen.
   `gnome-shell --version`.
 - `curl`, which most systems have (if not: `sudo apt install curl`). Install
   GNOME Island as yourself, not with `sudo`.
-- For the voice assistant (optional): a microphone and
-  one of Claude Code, Codex, Grok, opencode, Pi, Antigravity or **Hermes** signed in (Codex, Pi and the npm
-  install of Claude Code need Node.js 18 or newer); see
-  [Voice assistant](#voice-assistant).
 
 ## Installation
 
@@ -231,13 +225,11 @@ Inside the VM, log in as `test` / `test`. The extension is already enabled and t
 
 For development or other architectures. You need Rust 1.92
 or newer (1.88 without the shelf helper) ([rustup](https://rustup.rs); Ubuntu 24.04's own `cargo` is too
-old), for the shelf's drag and drop the GTK 4 development files, and for the
-voice assistant's speech recognition (whisper.cpp) cmake, libclang, and for
-the GPU the Vulkan headers and glslc:
+old), and for the shelf's drag and drop the GTK 4 development files:
 
 ```sh
-sudo apt install git build-essential pkg-config libgtk-4-dev cmake libclang-dev libvulkan-dev glslc
-# Fedora: git gcc-c++ pkgconf gtk4-devel cmake clang-devel vulkan-loader-devel glslc
+sudo apt install git build-essential pkg-config libgtk-4-dev
+# Fedora: git gcc-c++ pkgconf gtk4-devel
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 git clone https://github.com/stefan-hacks/gnome-island.git
 cd gnome-island
@@ -260,8 +252,6 @@ cd gnome-island
 | Ctrl+Tab, Ctrl+1–9 | In the island opened from the keyboard: the next page, or the first to ninth tab |
 | Your own shortcut for a page | Open the island on that page from anywhere (Settings → Island → Shortcuts) |
 | Drag a file towards the notch | Open the files tray to drop it |
-| Super+I | Ask the voice assistant; press again to finish speaking, or after an answer to ask more. Start typing (or click the keyboard) to type the request instead |
-| Enter or Esc on the assistant's card | Run or Deny the command it shows |
 
 The island reopens on the page you picked last (for five minutes), or on
 what is live: a call, unseen notifications, music, a running timer. With two
@@ -285,207 +275,26 @@ Click the gear right of the clock in the open island (or GNOME Island's gear in 
   is behind it (windows and wallpaper) blurred, with a slider from clear to dark smoked glass; the top bar on a slider from glass (default) to black, and black anyway while a window reaches it (off by default);
   the island's shape, a notch joined to the top or a pill floating free;
   a little space below the island inside the bar (on by default); auto-hide (always, with a top bar that hides, or beside maximized windows; off by default); a 24- or 12-hour clock (or as GNOME's), and the date beside it; a standard or large open island; privacy dots; which pages the open island has (Music,
-  Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices, AI Usage) and whether it
-  has the AI assistant at all; a shortcut of your own for each page (none at first); world clocks, and their cities;
+  Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices, Usage) and whether it
+  has the Usage page at all; a shortcut of your own for each page (none at first); world clocks, and their cities;
   the closed island inside the bar or hanging below it; with more than one
   display, on the main one, the one you are using, or all of them; opening when the
   pointer rests on it (and for how long) or only on a click; how long auto-hide waits.
+- **Music player:** lyrics from LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key), each with a switch and order you choose; Cava visualizer bars behind the player and lyrics, with height, opacity, zoom, position, sensitivity, number of bars, smoothness, and audio source settings.
 - **Alerts:** apps' notifications in the island (or GNOME's own banners
   instead); over full-screen apps too (off by default); volume and brightness; charging, network, Bluetooth, a Bluetooth
   device's low battery (off by default) and Caps Lock, each on its own; new songs, sounds; lyrics online;
   a reminder before calendar events, and how many minutes before.
   Alerts other than a low battery are not shown while Do Not Disturb is on.
 - **Calls:** show calls in the island, and the live preview of the call.
-- **Clipboard:** turn the history on or off, clear it, and choose apps whose copies
-  are never kept (password managers are on the list from the start). What Super+V
+- **Clipboard:** turn the history on or off, clear it, choose apps whose copies
+  are never kept (password managers are on the list from the start), layout (horizontal or vertical), columns (1–3), width and height. What Super+V
   opens (the calendar or the clipboard history) is set with the other shortcuts, in
   Island → Shortcuts.
 - **Timer:** session and break lengths, Do Not Disturb while focusing.
-- **Assistant:** the bot's look (shape, colour, glow, with a live
-  preview); the assistant on or off, its shortcut, which AI answers and with
-  which model (only those your plan includes, with your plan's name), speech recognition, language, and whether it may use the text
-  you selected (off by default) or read your notifications; how long a quiet
-  conversation is kept, and clearing it now.
-- **AI Usage:** on or off, which plans to show, and when to warn; and
-  under **AI Agents**, a switch for each of Claude Code, Codex and Hermes that is
-  installed (on by default; none listed when neither is).
 - **About:** the version and whether it is up to date (with how to update,
   and the switch for asking GitHub once a day), help, a bug report to copy
   (`isled --report`), and resetting every setting.
-
-## Voice assistant
-
-Press **Super+I** (or the mic in the open island) and speak. The island
-listens until you pause, turns your words into text **on this computer**,
-then asks the AI you picked; it shows each step ("Searching ~/Downloads for
-"signature"…") and does what the answer asks.
-
-It works as an **agent**: a request with several steps ("open Firefox, then
-put it on the left", "find my CV and open it", "open Spotify, play some
-jazz and turn the volume down to 30") is done one step after another, each
-step seeing what the last one did (whether the app opened, which windows
-are there). You can **close the island while it works**: it carries on in the
-background, with a small mic in the closed island, and the answer comes
-as an alert; click the island or press Super+I to watch it, and **Stop** to
-end it. Its answer's own actions run before it answers, so it never
-says "done" when a step failed: it tries another way, or says what did not
-work.
-
-**What it does:** music (play, pause, a given song on Spotify), apps and
-windows (open, switch to, close, minimize, fullscreen, put side by side or
-in a 2×2 grid: "split Chrome and VS Code 50/50"), files and folders
-(find, open, show in Files), reminders, to-dos and calendar events (add,
-change, remove), Wi-Fi, Bluetooth, Do Not Disturb, volume, brightness, dark
-mode, Night Light, settings panels, screenshots, writing text where your
-cursor is, answering questions (with a web search when it needs fresh
-facts), telling you what makes the computer slow, and installing, removing
-or fixing software with a command you approve. Ask a follow-up while the
-answer shows, or later the same day: it remembers the conversation (see
-[the conversation](#the-conversation)).
-
-**Installing and fixing things.** Ask "install LibreOffice" and it looks
-first: which Linux this is, which ways to install it has (apt, dnf, pacman,
-zypper, Flatpak, Snap, npm), whether the app is already there, and when
-unsure, the vendor's own instructions on the web. Then the island shows a
-card with the one command it proposes, why, and what to know about it:
-**Needs your password** (it runs as root), **Runs a script from the web**,
-or **Removes files or apps**. Press **Run** (Enter) or **Deny** (Esc); with
-the island closed, the card comes as an alert. A command runs in the
-background as a systemd unit of its own, so you can close the island or
-lock the screen, and GNOME Island follows it to its end, even after `isled` restarts
-(a command still running when you log out ends with your session); the card
-shows how long it has run and its last lines, and **Stop** ends it (for a
-package manager, press it twice: stopping one halfway can leave things half
-done). When it ends, the assistant checks that it worked (`libreoffice
---version`) before saying so; denied, it does not try again. One command
-runs at a time, and nothing waits forever: an unanswered card is denied
-after 10 minutes, and a command is stopped after 30.
-
-**Set up:**
-
-1. Install and sign in to one AI command-line app (it uses your own plan):
-
-   | AI | Install | Sign in | Notes |
-   |---|---|---|---|
-   | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (or `npm i -g @anthropic-ai/claude-code`) | run `claude` | Uses your Claude plan; Sonnet by default; Haiku is the fastest but follows the request's language and tools less reliably |
-   | [Codex](https://github.com/openai/codex) (ChatGPT) | `npm i -g @openai/codex` | `codex login` | How GNOME Island uses ChatGPT: your ChatGPT plan (Free works too, with lower limits), with the model your Codex uses |
-   | [Grok](https://x.ai/build) | `curl -fsSL https://x.ai/cli/install.sh \| bash` | `grok login` | Uses your Grok plan (Free works too); GNOME Island runs it in its own folder, kept to answering |
-   | [opencode](https://opencode.ai) | `curl -fsSL https://opencode.ai/install \| bash` | `opencode auth login` | Uses the providers you signed in to in opencode (your own API keys or subscriptions), with the model your opencode uses; GNOME Island runs it in its own folders with every tool but web search turned off. No usage page: the providers bill you directly |
-   | [Pi](https://pi.dev) | `npm i -g @earendil-works/pi-coding-agent` | run `pi`, then `/login` (or an API key such as `ANTHROPIC_API_KEY`) | Uses the providers you signed in to in Pi, with the model your Pi uses; GNOME Island runs it with no tools, extensions, skills or context files of yours, its conversations in a folder of its own. It does not search the web. Signed in to ChatGPT in Pi, only the models that account can use are offered (as Codex lists them). No usage page: the providers bill you directly |
-   | [Antigravity](https://antigravity.google) | its installer | run `agy` | Its terms bar third-party tools from the service; GNOME Island only runs the official `agy`, at your own risk |
-   | **Hermes** | Hermes Agent desktop app | Set `OLLAMA_CLOUD_API_KEY` or `HERMES_API_KEY` env var, or add key to `~/.config/hermes/config.json` | Uses your Ollama Cloud API key; GNOME Island runs it with the model you pick in Settings |
-
-   Settings → Assistant lists only the models your plan includes, by their full names, with your plan's
-   name. If your plan stops including the one you picked (a subscription that lapsed), GNOME Island answers with
-   the plan's default and says so once, then goes back to your pick when the plan includes it again.
-
-2. Set up speech recognition, once: press **Set up** when the assistant asks
-   for it, or run `~/.local/bin/isle-setup-voice` in a terminal (`isle-setup-voice` with a
-   package; from the source folder: `scripts/setup-voice.sh`). It downloads the speech
-   model chosen in Settings, `small` by default (265 MB; `tiny` 44 MB, `base`
-   82 MB, `medium` 823 MB; `isle-setup-voice base` names one and picks it in
-   Settings), which `isle-whisper` runs with
-   [whisper.cpp](https://github.com/ggml-org/whisper.cpp): nothing else to
-   install. On a computer with a graphics card (NVIDIA, AMD or Intel Arc,
-   through Vulkan) it runs there, in about a second; otherwise on the
-   processor, in several seconds (it needs AVX2: Intel since 2013, AMD since
-   2015).
-3. Pick the AI in **Settings → Assistant**, or leave it on Automatic, which
-   uses the first one you are signed in to: Claude Code, then Codex, then
-   Grok, then opencode, then Pi, then Antigravity, then Hermes. An AI installed later is found by itself.
-4. Check with `~/.local/bin/isled --doctor` (`isled --doctor` with a
-   package): it lists speech recognition (the models
-   downloaded, and the GPU or processor it runs on) and each AI, where it is
-   installed and whether you are signed in, as GNOME Island itself sees them.
-   GNOME Island finds AIs installed with npm (also a prefix of your own), nvm,
-   volta, fnm, pnpm, bun, Homebrew, mise, asdf, Nix or their own installers,
-   and takes what your login shell sets for them (`CLAUDE_CONFIG_DIR`,
-   `CODEX_HOME`, an API key, a proxy), as code editors do.
-
-Without any of them, Super+I says what to install, and the rest of GNOME Island works
-as before.
-
-**Safety:** the AI only answers. It cannot run commands or change files
-itself: GNOME Island runs its actions, which are limited to the ones above. Each AI
-is started with only web search and reading pages: Claude Code with just its
-web tools, Codex with its shell, file, browser and computer-use tools off,
-and `agy` behind a hook that refuses anything else.
-
-- **Looking** runs at once, without asking, but only programs on a fixed
-  list that only read (`uname`, `cat /etc/os-release`, `apt-cache policy`,
-  `dpkg -s`, `rpm -q`, `dnf info`, `pacman -Qi`, `flatpak list`, `snap
-  info`, `npm view`, `which`, `<program> --version`, `df`, `free`…), each run
-  directly with its arguments, never through a shell, and never with an
-  option that would install, remove or change anything.
-- **Changing** anything is a command you see in full and run yourself with
-  **Run**. GNOME Island starts exactly the command on the card and nothing else
-  (GNOME Shell checks this before starting it); one that needs root asks
-  with GNOME's password dialog, gets only the system's own folders on its
-  `PATH`, and its output is written to its log as you, not as root. Commands
-  that would wipe the system (`rm -rf /` or your home folder, `mkfs`, `dd`
-  onto a disk, a fork bomb) are refused before you are even asked.
-- **Files:** GNOME Island searches your files by name for it, reads small text
-  files you ask about, opens documents and media but never programs, and
-  never looks in hidden folders that hold keys or passwords (`.ssh`,
-  `.gnupg`, keyrings), even through a link. Secrets in a command's output
-  (keys, tokens, passwords) are blanked before the AI sees it.
-- Text from other apps (your selection, notifications, window titles, a
-  command's output, web pages) is passed as data, never as instructions.
-
-**Resources:** the speech model runs only while you speak (on at most half
-the processor's cores) and quits once your words are text. The AI starts as
-you open the assistant, so it answers sooner, and quits 3 minutes after
-your last request, taking anything it started with it. Both run at a lower
-priority than your apps, so the desktop stays smooth while they work.
-
-### The conversation
-
-What you said and what it answered show as a conversation: scroll up on
-the assistant, or click the line above the field. Select text to copy it,
-click a command to copy that. **+** starts a new conversation; **Undo**
-brings the last one back for 5 seconds. A conversation is kept until
-midnight at the latest, or until it has been quiet for 30 minutes or 2
-hours if you choose so in Settings; then it is deleted, with the AI's own
-copy of it. **Settings → Assistant → Clear the conversation now** deletes it
-at once. Your voice is never kept: the recording lives in memory only until
-it is text. The conversation is kept in `~/.local/share/isle/chat.json`,
-readable by you alone, and the AI's copy apart from your own chats with it.
-
-## AI usage
-
-GNOME Island finds your plans from the apps you are signed in to: **Claude** with
-Claude Code's sign-in, and **ChatGPT** with Codex's.
-It shows each limit your plan has (a 5-hour window, the week, a model's
-week), when it resets, and warns at 80% and 95% (set in Settings). A plan
-you are not signed in to does not show at all.
-
-Claude's numbers come from the same page Claude Code's `/usage` reads, and
-ChatGPT's from the one Codex's `/status` reads; neither is a documented API,
-so they may change. GNOME Island asks each every ten minutes (at
-most every two while the Usage page is open), and not while the screen is
-locked. Offline, as at login before the
-network is up, it tries again within a minute; when Claude's server fails it
-waits longer each time. It never signs in or refreshes a sign-in itself, and
-with usage turned off it asks nothing at all. When ChatGPT can't be asked
-(offline, or Codex's sign-in ran out), its numbers come from Codex's own
-logs, as of your last use of Codex.
-
-**AI agents.** GNOME Island connects to Claude Code, Codex and Hermes when it finds them,
-also when you install one later, and says so once. It adds its hooks to
-`~/.claude/settings.json` (PermissionRequest, Notification and Stop) and to
-`~/.codex/hooks.json` (PermissionRequest and Stop); Codex asks once, at its
-next start, whether to trust them (or trust them in `/hooks`), and a Codex
-older than 0.124 gets `notify` in its `config.toml` instead, for done
-alerts only. Each hook runs `isled --agent-hook`, which asks the island and
-waits for your answer. With no answer (the alert put away, the agent's
-window in front, Do Not Disturb, `isled` not running) it says nothing, and the
-agent asks in its terminal as it would without GNOME Island; answering in Claude
-Code's terminal first takes the alert away. **Always** keeps the rule
-Claude Code itself suggests, where it suggests it (usually the project's
-`.claude/settings.local.json`). Your own hooks and settings are kept as they
-are; turning a switch off in **Settings → AI Usage → AI Agents**, or
-uninstalling GNOME Island, takes out GNOME Island's entries only. Nothing leaves the
-computer.
 
 ## Resource usage
 
@@ -497,15 +306,6 @@ GNOME 46 (version 1.0.0):
 | `isled` (background service) | about 10 MB resident, of which under 1 MB its own | 0% (no polling: it wakes for real events and deadlines only) |
 | Extension, inside GNOME Shell | about 10 MB more for the shell, flat over hours of use | 0% when nothing moves |
 | `isle-shelf` (drag and drop) | about 43 MB (GTK 4, drawn on the CPU, no GPU driver loaded); only while the files tray is open, and 20 seconds after | 0% |
-| Voice assistant | the AI only while it works and for 3 minutes after, so a follow-up starts at once (Claude Code about 290 MB, Codex about 160 MB); speech recognition only while the island listens | 0% between requests |
-
-| On disk | Size |
-|---|---|
-| Programs (`isled` 6.8 MB, `isle-shelf` 0.7 MB) | 7.5 MB |
-| Speech recognition (`isle-whisper` 29 MB, most of it GPU code; the `small` model 265 MB), only once set up | 294 MB |
-| Extension | 0.8 MB |
-| Inter typeface | 0.9 MB |
-| Cache (`~/.cache/isle`) | about 100 KB per song's cover and 6 KB per lyrics |
 
 Animations run on the display's frame clock only while a spring moves and
 stop when it settles: closed and idle, GNOME Island draws no frames at all, and over 40
@@ -519,17 +319,13 @@ camera or the microphone itself.
 ## Data & network
 
 GNOME Island has no server and no telemetry; your clipboard history, reminders,
-events, timer, app usage and the assistant's chats stay in
-`~/.local/share/isle`, and speech is recognised on this computer. It goes
+events, timer, and app usage stay in
+`~/.local/share/isle`. It goes
 online only for synced lyrics ([LRCLIB](https://lrclib.net), then NetEase and,
 with your own key, Musixmatch, in the order Settings → Music player gives) and
 cover art, once per song (lyrics, and each provider, can be turned off in
-Settings); your Claude plan's
-usage (`api.anthropic.com`, with
-Claude Code's own sign-in); a look for a newer GNOME Island on GitHub at most once a
-day (also in Settings); the speech model, downloaded once from Hugging Face
-when you set up voice; and the voice assistant, whose requests go to the AI
-you picked and may include a web search by it. A meeting's link is read
+Settings); a look for a newer GNOME Island on GitHub at most once a
+day (also in Settings). A meeting's link is read
 from the event on this computer, and only opened when you click Join.
 Sharing the Shelf with your phone runs a small web server on your local
 network only while you share: a secret address in the QR code, your Allow on
@@ -537,11 +333,10 @@ the island for each phone (matching the code it shows), the Shelf's files and no
 after 10 idle minutes, on Stop, or when the screen locks
 ([how it is kept safe](SECURITY.md#sharing-the-shelf-with-a-phone)).
 Copies from password managers
-are never kept, and only GNOME Shell may read the clipboard history from
-GNOME Island's service or steer its assistant. The call preview is drawn by GNOME
+are never kept. The call preview is drawn by GNOME
 Shell from what is on screen and never recorded.
 [SECURITY.md](SECURITY.md#what-leaves-your-computer) lists exactly what is
-sent where, and the assistant's safety rules.
+sent where.
 
 ## Troubleshooting
 
@@ -571,9 +366,6 @@ GNOME Island never changes the firewall itself, and listens only while you share
 top bar (Dash to Panel, Hide Top Bar, other islands) can get in the way;
 turn them off in the Extensions app.
 
-**The voice assistant does not answer.** Run `~/.local/bin/isled --doctor`: it says what
-is missing (speech recognition, an AI, or its sign-in) and what to run.
-
 **Something else.** Run `~/.local/bin/isled --report` (or Settings → About → Copy a bug
 report): it gathers the versions, what works and recent logs, without your
 data. Please [open an issue](../../issues) and paste it there.
@@ -588,22 +380,19 @@ them by name alone (`isled --doctor`, `isled --report`).
 ```
 
 (or `./uninstall.sh` from the release package or the source folder). This
-removes the extension, the programs, the service, the font, the voice
-assistant's speech recognition and GNOME Island's caches, and lifts a battery charge
-limit GNOME Island set; it also takes GNOME Island's hooks out of Claude Code's and Codex's
-settings. Your tasks, calendar events, clipboard history, shelf and
+removes the extension, the programs, the service, the font, and GNOME Island's caches; it also lifts a battery charge
+limit GNOME Island set. Your tasks, calendar events, clipboard history, shelf and
 timer settings stay in `~/.local/share/isle` until you delete them.
 
 Remove GNOME Island this way, not with the Extensions app's Remove button, which
-deletes only the extension and leaves `isled` and its hooks behind.
+deletes only the extension and leaves `isled` behind.
 
 ## How it works
 
 ```
 ┌────────────────── isled (Rust) ──────────────────┐
 │ MPRIS · lyrics · timer · tasks · calendar · shelf│
-│ UPower · NetworkManager · BlueZ                  │
-│ voice assistant · AI usage · AI agents · meetings│
+│ UPower · NetworkManager · BlueZ · meetings       │
 │            exposed on D-Bus (zbus)               │
 └────────────────────────┬─────────────────────────┘
            ┌─────────────┴──────────────┐
@@ -619,13 +408,12 @@ else lives in Rust behind a D-Bus API.
 | Path | Contents |
 |---|---|
 | `crates/isle-core` | Platform-independent logic: LRC parsing, track-title clean-up, Pomodoro, tasks, calendar, shelf, clipboard history. Unit tested. |
-| `crates/isle-daemon` | `isled`, the D-Bus service; `src/assistant` is the voice assistant (speech, the AIs, the agent loop, its tools), `src/usage.rs` the AI usage, `src/agents` the AI agents' hooks, `src/meeting.rs` meeting links, `src/updates.rs` the look for new versions, and `src/caller.rs` who may call what. |
+| `crates/isle-daemon` | `isled`, the D-Bus service; `src/meeting.rs` meeting links, `src/updates.rs` the look for new versions, and `src/caller.rs` who may call what. |
 | `crates/isle-shelf` | `isle-shelf`, the files tray's drag-and-drop window. |
-| `crates/isle-whisper` | `isle-whisper`, the voice assistant's speech recognition: whisper.cpp, on the GPU through Vulkan or on the processor. |
-| `gnome-extension` | The GNOME Shell extension; `src/actionRules.js` holds the assistant's rules that need no GNOME, so they are tested anywhere. |
+| `gnome-extension` | The GNOME Shell extension. |
 | `tests/extension` | Tests of the extension's GNOME-free parts (`node --test`, and `gjs -m` for those that use GLib). |
 | `data` | systemd and D-Bus activation files, and the Inter typeface. |
-| `scripts` | `setup-voice.sh` (installed as `isle-setup-voice`), `isle-charge-limit`, and `package.sh`, which makes a release. |
+| `scripts` | `isle-charge-limit` and `package.sh`, which makes a release. |
 | `docs/product-spec.md` | How the island looks and behaves: sizes, motion, pages, alerts. |
 | `docs/dbus-api.md` | The D-Bus interfaces of `isled` and `isle-shelf`. |
 
@@ -654,12 +442,8 @@ for more details.
 
 The bundled [Inter](https://rsms.me/inter/) typeface (`data/fonts`) is under
 the [SIL Open Font License 1.1](data/fonts/Inter-LICENSE.txt). Lyrics come
-from [LRCLIB](https://lrclib.net). The Claude and OpenAI logos on the AI usage page
-come from [Simple Icons](https://simpleicons.org) (CC0); they are trademarks of
-Anthropic and OpenAI, shown only to name their plans. The assistant's face
-takes its expressions from [bloub](https://github.com/jeremy-prt/bloub) by
-Jérémy Perret, under the MIT License
-([notice](gnome-extension/NOTICE-bloub.txt)). The calendar icon takes its shape
+from [LRCLIB](https://lrclib.net).
+The calendar icon takes its shape
 from [Lucide](https://lucide.dev)'s "calendar-days", under the ISC License
 ([notice](gnome-extension/NOTICE-lucide.txt)).
 

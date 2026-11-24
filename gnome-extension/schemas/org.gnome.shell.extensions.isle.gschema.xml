@@ -503,45 +503,8 @@
     </key>
     <key name="shortcut-usage" type="as">
       <default>[]</default>
-      <summary>Shortcut to the AI Usage page</summary>
-      <description>Opens the island on the AI Usage page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
-    </key>
-    <key name="bot-color" type="s">
-      <default>'cloud'</default>
-      <summary>The assistant's colour</summary>
-      <description>One of Isle's colours (cloud, ink, peach, coral, amber, mint, teal, sky, lavender, rose, graphite) or a colour as #rrggbb.</description>
-    </key>
-    <key name="voice-keep-chat" type="s">
-      <choices>
-        <choice value="idle-30m"/>
-        <choice value="idle-2h"/>
-        <choice value="day"/>
-      </choices>
-      <default>'day'</default>
-      <summary>How long the assistant keeps a conversation</summary>
-      <description>Until midnight (never more than a day), or after 30 minutes or 2 hours without a word: then it starts a new one and deletes the old, here and in the AI's own history.</description>
-    </key>
-    <key name="voice-use-selection" type="b">
-      <default>false</default>
-      <summary>Send the selected text to the voice assistant</summary>
-      <description>So it can work on it ("make this shorter"). Never from terminals or apps kept out of the clipboard history.</description>
-    </key>
-    <key name="voice-read-notifications" type="b">
-      <default>false</default>
-      <summary>Let the voice assistant read notifications</summary>
-      <description>Send the last few notifications with each request, so the AI (Claude Code, Codex, Grok, opencode, Pi or Antigravity) can read them out or summarise them.</description>
-    </key>
-    <key name="usage-claude" type="b">
-      <default>true</default>
-      <summary>Show Claude's usage</summary>
-    </key>
-    <key name="usage-codex" type="b">
-      <default>true</default>
-      <summary>Show ChatGPT's usage</summary>
-    </key>
-    <key name="usage-grok" type="b">
-      <default>true</default>
-      <summary>Show Grok's usage</summary>
+      <summary>Shortcut to the Usage page</summary>
+      <description>Opens the island on the Usage page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
     </key>
     <key name="chimes" type="b">
       <default>true</default>
