@@ -8,7 +8,7 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-import {VERTICAL, px} from '../compat.js';
+import {VERTICAL} from '../compat.js';
 import {Vitals} from '../vitals.js';
 import {icon, label} from '../widgets.js';
 import {Page} from './page.js';

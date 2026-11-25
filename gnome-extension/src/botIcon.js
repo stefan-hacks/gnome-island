@@ -12,7 +12,7 @@ class BotIcon extends St.Widget {
     }
     set look(v) {}
     set form(v) {}
-    set badge(v) {}
-    play(v) {}
-    resize(art, bot) {}
+    set badge(_v) {}
+    play(_v) {}
+    resize(_art, _bot) {}
 });

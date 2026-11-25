@@ -327,7 +327,10 @@ async fn report() {
     );
     println!(
         "\n### Extension\n\n```\n{}\n```",
-        run("gnome-extensions", &["info", "gnome-island@stefan-hacks.github.com"])
+        run(
+            "gnome-extensions",
+            &["info", "gnome-island@stefan-hacks.github.com"]
+        )
     );
     println!("\n### Doctor\n\n```");
     doctor().await;

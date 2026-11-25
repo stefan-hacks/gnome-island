@@ -16,14 +16,14 @@ const LOOKS = {
 // Light GNOME: Adwaita light background for the panel and menus.
 const GNOME_LIGHT = {fill: [0.965, 0.965, 0.965, 1], solid: [0.965, 0.965, 0.965]};
 
-let current = 'gnome';
+let _current = 'gnome';
 let autoActive = false;
 /** Whether the GNOME scheme is dark ('prefer-dark') or light (anything else). */
 let gnomeScheme = 'prefer-dark';
 
 /** Sets the look by its Settings name (gnome or auto). */
 export function setTheme(name) {
-    current = name === 'gnome' ? 'gnome' : 'gnome';
+    _current = name === 'gnome' ? 'gnome' : 'gnome';
 }
 
 /** Enable or disable auto-theme override. When active, auto-theme colours take precedence. */

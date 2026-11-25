@@ -56,7 +56,7 @@ const SWITCH_OUT_MS = 150;
 const SWITCH_IN_DELAY_MS = 200;
 const SWITCH_IN_MS = 300;
 /** The focus timer's colour: the user's GNOME accent. */
-export function timerColor(phase) {
+export function timerColor(_phase) {
     return Palette.accent();
 }
 
