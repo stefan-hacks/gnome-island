@@ -13,6 +13,10 @@
   font-family: "Inter Variable";
 }
 
+#isleIsland.isle-light {
+  color: #1e1e1e;
+}
+
 /* Tabular figures for numbers that change or line up, so they hold still; prose keeps proportional
  * ones ("11:10" and "isle-0.9.1" would space out). */
 .isle-compact-clock, .isle-compact-date, .isle-compact-second-time, .isle-header-time, .isle-recording-time,

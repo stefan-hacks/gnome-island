@@ -89,11 +89,11 @@ class SystemPage extends Page {
 
     _buildSections() {
         // CPU
-        this._cpuRow = vitalsRow({iconName: 'processor-symbolic', title: 'CPU'});
+        this._cpuRow = vitalsRow({iconName: 'isle-processor-symbolic', title: 'CPU'});
         this._content.add_child(this._cpuRow.actor);
 
         // Memory
-        this._memRow = vitalsRow({iconName: 'media-memory-symbolic', title: 'Memory'});
+        this._memRow = vitalsRow({iconName: 'isle-memory-symbolic', title: 'Memory'});
         this._content.add_child(this._memRow.actor);
 
         // Swap
@@ -254,7 +254,7 @@ class SystemPage extends Page {
             const fmt = this._vitals.formatNetwork(net.name);
             let row = this._netRows.get(net.name);
             if (!row) {
-                row = vitalsRow({iconName: 'network-transmit-receive-symbolic', title: net.name});
+                row = vitalsRow({iconName: 'isle-network-symbolic', title: net.name});
                 this._netContainer.add_child(row.actor);
                 this._netRows.set(net.name, row);
             }
@@ -274,7 +274,7 @@ class SystemPage extends Page {
         for (const t of temps) {
             let row = this._tempRows.get(t.name);
             if (!row) {
-                row = vitalsRow({iconName: 'thermometer-symbolic', title: t.name});
+                row = vitalsRow({iconName: 'isle-thermometer-symbolic', title: t.name});
                 this._tempContainer.add_child(row.actor);
                 this._tempRows.set(t.name, row);
             }
@@ -296,7 +296,7 @@ class SystemPage extends Page {
         for (const f of fans) {
             let row = this._fanRows.get(f.name);
             if (!row) {
-                row = vitalsRow({iconName: 'fan-symbolic', title: f.name});
+                row = vitalsRow({iconName: 'isle-fan-symbolic', title: f.name});
                 this._fanContainer.add_child(row.actor);
                 this._fanRows.set(f.name, row);
             }
@@ -316,7 +316,7 @@ class SystemPage extends Page {
         for (const v of volts) {
             let row = this._voltRows.get(v.name);
             if (!row) {
-                row = vitalsRow({iconName: 'power-symbolic', title: v.name});
+                row = vitalsRow({iconName: 'isle-power-symbolic', title: v.name});
                 this._voltContainer.add_child(row.actor);
                 this._voltRows.set(v.name, row);
             }
