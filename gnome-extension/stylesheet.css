@@ -17,6 +17,319 @@
   color: #1e1e1e;
 }
 
+/* ── Light mode overrides ─────────────────────────────── */
+
+/* Tabs: dark text so they read on the light island. */
+#isleIsland.isle-light .isle-tab { color: rgba(30, 30, 30, 0.75); }
+#isleIsland.isle-light .isle-tab:hover,
+#isleIsland.isle-light .isle-tab:focus { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-tab:checked { color: #ffffff; }
+
+/* Buttons and pills: dark text, dark-themed backgrounds flipped. */
+#isleIsland.isle-light .isle-button { color: #1e1e1e; }
+#isleIsland.isle-light .isle-button:hover { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-button:active { background-color: rgba(0, 0, 0, 0.14); }
+#isleIsland.isle-light .isle-button-round { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-button-round:hover { background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-pill-small { color: #1e1e1e; background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-pill-small:hover { background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-pill-small:active { background-color: #c4c4c4; }
+
+/* Entry fields: light backgrounds, dark text. */
+#isleIsland.isle-light .isle-entry { color: #1e1e1e !important; background-color: #f0f0f0 !important; }
+#isleIsland.isle-light .isle-entry:focus { background-color: #e5e5e5 !important; }
+#isleIsland.isle-light .isle-entry StLabel.hint-text { color: rgba(30, 30, 30, 0.45) !important; }
+
+/* Empty states and hints. */
+#isleIsland.isle-light .isle-empty-icon { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-empty-hint { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-reminders-empty { color: rgba(30, 30, 30, 0.55); }
+
+/* Peek / alerts. */
+#isleIsland.isle-light .isle-peek-subtitle { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-peek-code { color: rgba(30, 30, 30, 0.9); background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-corner-close { color: rgba(30, 30, 30, 0.85); background-color: #d4d4d4; border-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-corner-close:hover { color: #1e1e1e; background-color: #c4c4c4; }
+
+/* Voice assistant stubs. */
+#isleIsland.isle-light .isle-voice-heard { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-voice-text-dim { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-voice-hint { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-voice-step-tick { color: rgba(30, 30, 30, 0.45); }
+#isleIsland.isle-light .isle-voice-step-text { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-voice-still { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-voice-undo-text { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-voice-idea { color: rgba(30, 30, 30, 0.8); background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-voice-idea:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.1); }
+
+/* Cards. */
+#isleIsland.isle-light .isle-card-subtitle { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-card-output { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-card-ghost { color: #1e1e1e; }
+#isleIsland.isle-light .isle-card-ghost .isle-card-key { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-card-denied { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-card-terminal { background-color: rgba(0, 0, 0, 0.04); }
+
+/* Chat. */
+#isleIsland.isle-light .isle-chat-title { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-chat-new { color: rgba(30, 30, 30, 0.75); background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-chat-new:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.12); }
+#isleIsland.isle-light .isle-chat-time { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-chat-command-text { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-chat-reply { color: rgba(30, 30, 30, 0.9); }
+
+/* Voice actions. */
+#isleIsland.isle-light .isle-voice-action { color: rgba(30, 30, 30, 0.7); background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-voice-action:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-voice-stop { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-voice-send-mic { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.08); }
+
+/* Header. */
+#isleIsland.isle-light .isle-header-settings { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-header-settings:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-header-mic { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-header-mic:hover { color: #1e1e1e; }
+#isleIsland.isle-light .isle-header-date { color: rgba(30, 30, 30, 0.9); }
+#isleIsland.isle-light .isle-header-meridiem { color: rgba(30, 30, 30, 0.72); }
+
+/* Music / player. */
+#isleIsland.isle-light .isle-track-subtitle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-time { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-player-modes .isle-button { color: rgba(30, 30, 30, 0.75); }
+#isleIsland.isle-light .isle-art-placeholder { color: rgba(30, 30, 30, 0.4); }
+#isleIsland.isle-light .isle-mode-toggle.on { background-color: rgba(0, 0, 0, 0.12); }
+
+/* Audio outputs. */
+#isleIsland.isle-light .isle-output-button { color: #1e1e1e; }
+#isleIsland.isle-light .isle-output-button:hover { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-output-button.active { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-output-detail { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-volume-text { color: rgba(30, 30, 30, 0.85); }
+
+/* Lyrics. */
+#isleIsland.isle-light .isle-lyrics-pin { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-lyrics-pin:hover,
+#isleIsland.isle-light .isle-lyrics-pin.on { color: #1e1e1e; }
+#isleIsland.isle-light .isle-side-artist { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-lyric-line { color: #1e1e1e; }
+#isleIsland.isle-light .isle-lyric-line.plain { color: rgba(30, 30, 30, 0.85); }
+#isleIsland.isle-light .isle-lyrics-state-icon { color: rgba(30, 30, 30, 0.4); }
+#isleIsland.isle-light .isle-lyrics-state-title { color: rgba(30, 30, 30, 0.85); }
+#isleIsland.isle-light .isle-lyrics-state-hint { color: rgba(30, 30, 30, 0.55); }
+
+/* Call. */
+#isleIsland.isle-light .isle-call-hint { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-call-kind { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-control-label { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-call-control { color: #1e1e1e; background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-call-control:hover { background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-call-control:checked { color: #1e1e1e; background-color: #ffffff; }
+
+/* Timer / focus. */
+#isleIsland.isle-light .isle-timer-phase { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-stepper { background-color: #f0f0f0; }
+#isleIsland.isle-light .isle-stepper-name { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-stepper-button { color: rgba(30, 30, 30, 0.8); }
+#isleIsland.isle-light .isle-stepper-button:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-start-pill { color: #1e1e1e; background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-start-pill:hover { background-color: #d4d4d4; }
+
+/* Stepper entries. */
+#isleIsland.isle-light .isle-stepper-entry { color: #1e1e1e !important; caret-color: #1e1e1e; }
+#isleIsland.isle-light .isle-stepper-entry:hover { background-color: rgba(0, 0, 0, 0.05) !important; }
+#isleIsland.isle-light .isle-stepper-entry:focus { background-color: rgba(0, 0, 0, 0.1) !important; }
+#isleIsland.isle-light .isle-stepper-locked .isle-stepper-entry { color: rgba(30, 30, 30, 0.6) !important; }
+
+/* Reminders. */
+#isleIsland.isle-light .isle-reminder-check { border-color: rgba(0, 0, 0, 0.2); }
+#isleIsland.isle-light .isle-reminder-check:hover { border-color: rgba(0, 0, 0, 0.4); }
+#isleIsland.isle-light .isle-reminder-check.faint { border-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-reminder-title { color: #1e1e1e; }
+#isleIsland.isle-light .isle-reminder-title.done { color: rgba(30, 30, 30, 0.38); }
+#isleIsland.isle-light .isle-reminder-strike { background-color: rgba(0, 0, 0, 0.3); }
+#isleIsland.isle-light .isle-reminder-line { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-reminder-remove { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-reminder-remove:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-task-add-icon { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-task-remove { color: rgba(30, 30, 30, 0.7); }
+
+/* Reminder field. */
+#isleIsland.isle-light .isle-reminder-field { color: #1e1e1e !important; caret-color: #1e1e1e; }
+#isleIsland.isle-light .isle-reminder-field StLabel.hint-text { color: rgba(30, 30, 30, 0.45); }
+
+/* Calendar. */
+#isleIsland.isle-light .isle-cal-year { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-cal-arrow { color: rgba(30, 30, 30, 0.75); }
+#isleIsland.isle-light .isle-cal-weekday { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-weekday.weekend { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-cal-day { color: #1e1e1e; }
+#isleIsland.isle-light .isle-cal-day.weekend { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-day:hover { background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-cal-day:focus { background-color: rgba(0, 0, 0, 0.05); color: #1e1e1e; }
+#isleIsland.isle-light .isle-cal-day.selected { background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-cal-dot { background-color: rgba(30, 30, 30, 0.4); }
+#isleIsland.isle-light .isle-cal-today { color: #1e1e1e; background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-cal-today:hover { background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-cal-preview { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-cal-target:hover,
+#isleIsland.isle-light .isle-cal-target:checked { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-cal-target-name { color: rgba(30, 30, 30, 0.8); }
+#isleIsland.isle-light .isle-cal-target-arrow { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target-row:hover { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-cal-target-row-account { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-cal-event { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-cal-event-time { color: rgba(30, 30, 30, 0.65); }
+#isleIsland.isle-light .isle-cal-world-toggle:hover { background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-cal-world-toggle:checked { background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-cal-world-row { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-cal-world-icon { color: rgba(30, 30, 30, 0.9); }
+#isleIsland.isle-light .isle-cal-world-meta { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-chip-city { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-empty { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-strip { border-top-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-cal-accounts { color: st-lighten(-st-accent-color, 15%); }
+#isleIsland.isle-light .isle-cal-accounts:hover { background-color: rgba(0, 0, 0, 0.04); }
+
+/* Notifications. */
+#isleIsland.isle-light .isle-notifications-heading { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-notifications-dnd-text { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-notification-row { background-color: rgba(0, 0, 0, 0.03); }
+#isleIsland.isle-light .isle-notification-row:hover { background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-notification-body { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-notification-time { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-notification-dismiss { color: rgba(30, 30, 30, 0.7); background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-notification-glyph { background-color: #e5e5e5; color: #1e1e1e; }
+#isleIsland.isle-light .isle-dnd-moon { color: rgba(30, 30, 30, 0.85); }
+
+/* Shelf / clips. */
+#isleIsland.isle-light .isle-segmented { background-color: #f0f0f0; }
+#isleIsland.isle-light .isle-segment { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-segment:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-segment:checked {
+  color: #1e1e1e;
+  background-gradient-start: #d4d4d4;
+  background-gradient-end: #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+#isleIsland.isle-light .isle-shelf-field { color: #1e1e1e; background-color: #f0f0f0; }
+#isleIsland.isle-light .isle-shelf-hint { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-shelf-hint.active { color: #1e1e1e; }
+#isleIsland.isle-light .isle-clip { background-color: #f5f5f5; color: #1e1e1e; }
+#isleIsland.isle-light .isle-clip:hover { background-color: #ececec; }
+#isleIsland.isle-light .isle-clip-age { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-clip-url { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-clip-subtle { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-clip-text { color: #1e1e1e; }
+#isleIsland.isle-light .isle-clip-header { color: #1e1e1e; }
+#isleIsland.isle-light .isle-clip-action { background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-clip-action:hover { background-color: #c4c4c4; }
+#isleIsland.isle-light .isle-clip-thumb,
+#isleIsland.isle-light .isle-clip-thumb-box { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-clip-feedback { background-color: rgba(240, 240, 240, 0.95); }
+#isleIsland.isle-light .isle-clip-feedback-label { color: #1e1e1e; }
+
+/* Shelf files. */
+#isleIsland.isle-light .isle-shelf-tile { color: #1e1e1e; }
+#isleIsland.isle-light .isle-shelf-tile:hover { background-color: #f0f0f0; }
+#isleIsland.isle-light .isle-shelf-tile:focus { background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-shelf-preview.thumbnail { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-shelf-remove { color: #1e1e1e; background-color: #d4d4d4; }
+#isleIsland.isle-light .isle-shelf-remove:hover { background-color: #b4b4b4; }
+
+/* Phone / sharing. */
+#isleIsland.isle-light .isle-phone-title { color: #1e1e1e; }
+#isleIsland.isle-light .isle-phone-step-text { color: rgba(30, 30, 30, 0.82); }
+#isleIsland.isle-light .isle-phone-step-number { background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-phone-hint,
+#isleIsland.isle-light .isle-phone-copy-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-status-text { color: #1e1e1e; }
+#isleIsland.isle-light .isle-phone-leaving .isle-phone-status-text,
+#isleIsland.isle-light .isle-phone-away .isle-phone-status-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-dot { background-color: rgba(0, 0, 0, 0.2); }
+#isleIsland.isle-light .isle-phone-code-text { color: #1e1e1e; }
+#isleIsland.isle-light .isle-phone-remove { background-color: #e5e5e5; }
+#isleIsland.isle-light .isle-phone-remove:hover { background-color: #d4d4d4; }
+
+/* Usage. */
+#isleIsland.isle-light .isle-usage-plan { color: rgba(30, 30, 30, 0.7); background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-usage-stamp { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-window { color: rgba(30, 30, 30, 0.9); }
+#isleIsland.isle-light .isle-usage-reset { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-empty { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-track { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-usage-dot { background-color: rgba(0, 0, 0, 0.15); }
+#isleIsland.isle-light .isle-usage-dot:hover { background-color: rgba(0, 0, 0, 0.35); }
+#isleIsland.isle-light .isle-usage-dot.shown { background-color: #1e1e1e; }
+
+/* Apps. */
+#isleIsland.isle-light .isle-apps-heading { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-apps-total { color: rgba(30, 30, 30, 0.46); }
+#isleIsland.isle-light .isle-apps-name { color: rgba(30, 30, 30, 0.92); }
+#isleIsland.isle-light .isle-apps-track { background-color: rgba(0, 0, 0, 0.06); }
+#isleIsland.isle-light .isle-apps-fill { background-color: rgba(0, 0, 0, 0.65); }
+#isleIsland.isle-light .isle-apps-time { color: rgba(30, 30, 30, 0.6); }
+
+/* Devices. */
+#isleIsland.isle-light .isle-device-card { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-device-tile { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-device-icon { color: #1e1e1e; }
+#isleIsland.isle-light .isle-device-name { color: #1e1e1e; }
+#isleIsland.isle-light .isle-device-status { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-connected { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-none { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-level { color: #1e1e1e; }
+#isleIsland.isle-light .isle-device-battery-body { border-color: rgba(0, 0, 0, 0.35); }
+#isleIsland.isle-light .isle-device-battery-nub { background-color: rgba(0, 0, 0, 0.35); }
+
+/* Compact (closed island). */
+#isleIsland.isle-light .isle-compact-meridiem { color: rgba(30, 30, 30, 0.72); }
+#isleIsland.isle-light .isle-compact-date { color: rgba(30, 30, 30, 0.7); }
+#isleIsland.isle-light .isle-unseen-dot { background-color: #1e1e1e; }
+
+/* Levels, sliders, bars. */
+#isleIsland.isle-light .isle-level { background-color: rgba(0, 0, 0, 0.12); }
+#isleIsland.isle-light .isle-level-fill { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-slider-track { background-color: rgba(0, 0, 0, 0.15); }
+#isleIsland.isle-light .isle-slider-fill { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-slider-knob { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-bar { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-cava-bar { background-color: #1e1e1e; }
+
+/* Peek badge and status. */
+#isleIsland.isle-light .isle-peek-status { color: #1e1e1e; }
+
+/* Recording. */
+#isleIsland.isle-light .isle-recording-time { color: #e02a37; }
+#isleIsland.isle-light .isle-recording-pill { background-color: rgba(224, 42, 55, 0.12); }
+#isleIsland.isle-light .isle-recording-pill:hover { background-color: rgba(224, 42, 55, 0.22); }
+
+/* App badge. */
+#isleIsland.isle-light .isle-app-badge { background-color: #ffffff; }
+
+/* Voice entry. */
+#isleIsland.isle-light .isle-voice-entry { color: #1e1e1e !important; background-color: rgba(0, 0, 0, 0.06) !important; }
+#isleIsland.isle-light .isle-voice-entry:focus { border-color: rgba(0, 0, 0, 0.15) !important; }
+#isleIsland.isle-light .isle-voice-entry StLabel.hint-text { color: rgba(30, 30, 30, 0.45) !important; }
+
+/* Notification action buttons. */
+#isleIsland.isle-light .isle-notification-action { color: #1e1e1e; }
+
+/* Focus ring for pills. */
+#isleIsland.isle-light .isle-pill:focus,
+#isleIsland.isle-light .isle-pill-small:focus,
+#isleIsland.isle-light .isle-notification-row:focus,
+#isleIsland.isle-light .isle-output-button:focus,
+#isleIsland.isle-light .isle-cal-today:focus,
+#isleIsland.isle-light .isle-cal-month-title:focus,
+#isleIsland.isle-light .isle-segment:focus,
+#isleIsland.isle-light .isle-usage-dot:focus,
+#isleIsland.isle-light .isle-recording-pill:focus { color: #1e1e1e; }
+
+/* Copy button hover. */
+#isleIsland.isle-light .isle-copy-button:hover .isle-card-command,
+#isleIsland.isle-light .isle-copy-button:hover .isle-chat-command-text { color: #1e1e1e; }
+
 /* Tabular figures for numbers that change or line up, so they hold still; prose keeps proportional
  * ones ("11:10" and "isle-0.9.1" would space out). */
 .isle-compact-clock, .isle-compact-date, .isle-compact-second-time, .isle-header-time, .isle-recording-time,
@@ -464,7 +777,8 @@
 /* The open tab sits on a dark grey pill; no outlines. */
 .isle-tab:hover,
 .isle-tab:focus { background-color: rgba(255, 255, 255, 0.05); color: #ffffff; }
-.isle-tab:checked { background-color: rgba(255, 255, 255, 0.09); }
+.isle-tab:checked { background-color: -st-accent-color; color: #ffffff; }
+.isle-tab:checked:hover { background-color: st-lighten(-st-accent-color, 5%); color: #ffffff; }
 .isle-tab-box { spacing: 0; min-height: 18px; }
 /* The gap from the icon is the name's own margin, so a closed name takes no room (expanded.js). Its 17 px
  * line plus 1: every tab an even 26 px, centred to the pixel in the bar, the name on the clock's line. */
