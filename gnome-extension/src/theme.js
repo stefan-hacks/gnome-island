@@ -4,6 +4,8 @@
 // The island's look: Isle's own black, or glass over what is behind it. What Cairo paints in the island's
 // colour asks here; CSS does the rest. Settings loads it too: no shell imports.
 
+import {autoThemeColors} from './autoTheme.js';
+
 // What is behind is blurred and toned in one pass (glass.js): its lightness mapped to lo + span × l^gamma, its
 // colour kept × saturation (`small` on a closed island or an alert, `large` open), a sheen and a glow added.
 const LOOKS = {
@@ -15,12 +17,18 @@ const LOOKS = {
 const GNOME_LIGHT = {fill: [0.965, 0.965, 0.965, 1], solid: [0.965, 0.965, 0.965]};
 
 let current = 'gnome';
+let autoActive = false;
 /** Whether the GNOME scheme is dark ('prefer-dark') or light (anything else). */
 let gnomeScheme = 'prefer-dark';
 
-/** Sets the look by its Settings name (gnome only). */
+/** Sets the look by its Settings name (gnome or auto). */
 export function setTheme(name) {
     current = name === 'gnome' ? 'gnome' : 'gnome';
+}
+
+/** Enable or disable auto-theme override. When active, auto-theme colours take precedence. */
+export function setAutoTheme(active) {
+    autoActive = active;
 }
 
 /** Sets the GNOME colour scheme so the 'gnome' theme adapts: 'prefer-dark' or anything else for light. */
@@ -37,7 +45,14 @@ export function gnomeDark() {
 }
 
 /** The look in use. */
-const look = () => LOOKS.gnome;
+const look = () => {
+    if (autoActive) {
+        const auto = autoThemeColors();
+        if (auto)
+            return {fill: auto.fill, solid: auto.solid, edge: null, blur: null};
+    }
+    return LOOKS.gnome;
+};
 
 /** Whether the island shows what is behind it (always false now). */
 export function translucent() {

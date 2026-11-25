@@ -513,5 +513,40 @@
       <default>true</default>
       <summary>Play a sound when a focus session or break ends, and for reminders</summary>
     </key>
+    <key name="auto-theme-enabled" type="b">
+      <default>false</default>
+      <summary>Auto-theme the island and desktop from the wallpaper</summary>
+      <description>When enabled, the island's colours, GNOME accent, GTK apps, Flatpak apps and kitty terminal theme are chosen to match the current wallpaper.</description>
+    </key>
+    <key name="auto-theme-shell" type="b">
+      <default>true</default>
+      <summary>Apply auto-theme to GNOME Shell and the island</summary>
+      <description>Changes the island fill colour and GNOME accent colour to match the matched theme.</description>
+    </key>
+    <key name="auto-theme-gtk" type="b">
+      <default>true</default>
+      <summary>Apply auto-theme to GTK3 and GTK4 apps</summary>
+      <description>Writes a CSS file into ~/.config/gtk-3.0 and ~/.config/gtk-4.0 that overrides the default colours.</description>
+    </key>
+    <key name="auto-theme-flatpak" type="b">
+      <default>true</default>
+      <summary>Apply auto-theme to Flatpak apps</summary>
+      <description>Sets a global Flatpak override so sandboxed apps can read the GTK CSS.</description>
+    </key>
+    <key name="auto-theme-kitty" type="b">
+      <default>true</default>
+      <summary>Apply auto-theme to kitty terminal</summary>
+      <description>Selects the closest matching kitty theme in kitty.conf.</description>
+    </key>
+    <key name="auto-theme-refresh" type="b">
+      <default>true</default>
+      <summary>Refresh theme when wallpaper changes</summary>
+      <description>Re-extracts colours and re-applies the theme automatically when the desktop wallpaper changes.</description>
+    </key>
+    <key name="auto-theme-current-bundle" type="s">
+      <default>''</default>
+      <summary>The currently matched theme bundle name</summary>
+      <description>Internal: remembers which bundle was last applied so it can be restored on restart.</description>
+    </key>
   </schema>
 </schemalist>
