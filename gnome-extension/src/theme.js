@@ -4,7 +4,10 @@
 // The island's look: Isle's own black, or glass over what is behind it. What Cairo paints in the island's
 // colour asks here; CSS does the rest. Settings loads it too: no shell imports.
 
-import {autoThemeColors} from './autoTheme.js';
+let _autoThemeColors = null;
+export function setAutoThemeColors(fn) {
+    _autoThemeColors = fn;
+}
 
 // What is behind is blurred and toned in one pass (glass.js): its lightness mapped to lo + span × l^gamma, its
 // colour kept × saturation (`small` on a closed island or an alert, `large` open), a sheen and a glow added.
@@ -47,7 +50,7 @@ export function gnomeDark() {
 /** The look in use. */
 const look = () => {
     if (autoActive) {
-        const auto = autoThemeColors();
+        const auto = _autoThemeColors ? _autoThemeColors() : null;
         if (auto)
             return {fill: auto.fill, solid: auto.solid, edge: null, blur: null};
     }
