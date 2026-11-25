@@ -4,6 +4,20 @@ All notable changes to GNOME Island are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] - 2026-11-25
+
+### Added
+
+- **Curated-palette auto-theming from wallpaper** — extracts dominant, secondary, and accent colours from the current wallpaper and matches them to the closest of 30 curated theme bundles (Rose Pine, Catppuccin, Gruvbox, Nord, Solarized, Tokyo Night, Kanagawa, Everforest, Dracula, One Dark, and more).
+- **Auto-theme targets** — matched theme is applied to island fill, GNOME accent colour, GTK3/4 CSS injection, Flatpak override, and kitty terminal theme.
+- **Auto-theme preferences page** — per-target toggles (Island, GNOME accent, GTK, Flatpak, kitty) and a manual "Apply now" button.
+- **NixOS-compatible kitty theming** — kitty themes sourced from the `kitty-themes` nixpkg; dynamic config applied via `gnome-island-theme.conf` instead of rewriting a read-only `kitty.conf`.
+- **New gsettings keys** — `auto-theme`, `auto-theme-island`, `auto-theme-accent`, `auto-theme-gtk`, `auto-theme-flatpak`, `auto-theme-kitty`.
+
+### Changed
+
+- NixOS home-manager kitty theme settings removed from the user's NixOS repo so the extension can manage kitty theming dynamically.
+
 ## [1.7.5] - 2026-11-24
 
 ### Fixed
