@@ -690,7 +690,7 @@ export class Controller {
             if (this._presentation === 'expanded')
                 this._render();
         }));
-        for (const key of ['island-theme', 'glass-tint'])
+        for (const key of ['island-theme'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncTheme()));
         // While Settings change something that is seen on the open island, it opens on it (see `_previewSetting`).
         for (const key of PREVIEWED_KEYS)
@@ -1300,9 +1300,9 @@ export class Controller {
         this._expanded.large = this._settings.get_string('open-size') === 'large';
     }
 
-    /** The island in Isle's black or in glass, the glass with GNOME's accent (see theme.js). */
+    /** The island in GNOME's colour, switching dark or light with the system's appearance setting. */
     _syncTheme() {
-        Theme.setTheme(this._settings.get_string('island-theme'), this._settings.get_int('glass-tint'));
+        Theme.setTheme(this._settings.get_string('island-theme'));
         for (const island of [this._island, ...this._mirrors.map(mirror => mirror.island)])
             this._styleIsland(island);
         // An agent's alert glows in the new theme's colours on the copies too.
@@ -1317,14 +1317,9 @@ export class Controller {
 
     /** The theme on `island` (the island, or a copy of it on another display): its style, shape and parts. */
     _styleIsland(island) {
-        const see = Theme.translucent();
-        // The controls follow the tint in three steps (CSS can't blend): clear, middle, and dark like GNOME's menus.
-        const tint = see ? this._settings.get_int('glass-tint') : 0;
         const themeName = this._settings.get_string('island-theme');
         const light = themeName === 'gnome' && !Theme.gnomeDark();
-        for (const [name, on] of [['isle-translucent', see], ['isle-accent-system', see && HAS_ACCENT],
-            ['isle-glass-mid', see && tint >= 34 && tint < 67], ['isle-glass-dark', see && tint >= 67],
-            ['isle-light', light]]) {
+        for (const [name, on] of [['isle-light', light]]) {
             if (on)
                 island.add_style_class_name(name);
             else

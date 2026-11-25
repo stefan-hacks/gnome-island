@@ -216,14 +216,8 @@ export default class IslePreferences extends ExtensionPreferences {
         const page = new Adw.PreferencesPage({title: 'Island', icon_name: 'preferences-desktop-appearance-symbolic'});
 
         const look = new Adw.PreferencesGroup({title: 'Appearance'});
-        look.add(choiceRow(settings, 'island-theme', 'Island', 'Black, GNOME dark grey, or clear glass that shows what is behind it, blurred', [
-            ['black', 'Black'],
-            ['gnome', 'GNOME'],
-            ['glass', 'Glass'],
-        ]));
         look.add(switchRow(settings, 'preview-settings', 'Preview changes',
             'While a setting changes here, the island opens on what it changes for a few seconds, then closes'));
-        look.add(glassRow(settings, window));
         look.add(choiceRow(settings, 'island-shape', 'Shape', 'Joined to the top of the screen, or floating free', [
             ['notch', 'Notch'],
             ['pill', 'Pill'],

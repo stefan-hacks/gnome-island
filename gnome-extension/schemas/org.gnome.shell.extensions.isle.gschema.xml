@@ -12,13 +12,11 @@
     </key>
     <key name="island-theme" type="s">
       <choices>
-        <choice value="black"/>
         <choice value="gnome"/>
-        <choice value="glass"/>
       </choices>
       <default>'gnome'</default>
       <summary>The island's look</summary>
-      <description>black: Isle's own black island. gnome: GNOME's default dark grey, blending with the top bar and menus. glass: clear glass over what is behind it, blurred, its edge catching the light.</description>
+      <description>GNOME's default colour, blending with the top bar and menus, switching between dark and light with the system's appearance setting.</description>
     </key>
     <key name="open-size" type="s">
       <choices>
