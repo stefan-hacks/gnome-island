@@ -55,9 +55,9 @@ const RING_REFRESH_S = 5;
 const SWITCH_OUT_MS = 150;
 const SWITCH_IN_DELAY_MS = 200;
 const SWITCH_IN_MS = 300;
-/** The focus timer's colour: white while focusing, green on a break. */
+/** The focus timer's colour: the user's GNOME accent. */
 export function timerColor(phase) {
-    return phase === 'focus' || phase === 'idle' ? Palette.WHITE : Palette.GREEN;
+    return Palette.accent();
 }
 
 /** Lays each child at its own size, centred, even past its box: a time fading out as a narrower one fades in

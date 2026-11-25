@@ -59,8 +59,8 @@ const TONE_COLORS = {
     grok: [0.93, 0.94, 0.96],
     agy: [0.3, 0.55, 1],
     warn: Palette.ORANGE,
-    break: Palette.BLUE,
-    calendar: Palette.BLUE,
+    break: Palette.accent(),
+    calendar: Palette.accent(),
 };
 
 /** An [r, g, b] colour, each 0 to 1, as CSS rgba(). */
