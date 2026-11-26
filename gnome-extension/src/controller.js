@@ -251,6 +251,8 @@ function waitsWhileAway(alert) {
     return alert.sticky || alert.kind === 'notification';
 }
 
+Theme.setAutoThemeColors(AutoTheme.autoThemeColors);
+
 /** Builds the island a part at a time, then decides what it shows until `destroy`. */
 export class Controller {
     /** Starts building on idle; nothing shows until `_buildIsland`. */
