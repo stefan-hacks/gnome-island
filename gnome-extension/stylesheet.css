@@ -330,6 +330,152 @@
 #isleIsland.isle-light .isle-copy-button:hover .isle-card-command,
 #isleIsland.isle-light .isle-copy-button:hover .isle-chat-command-text { color: #1e1e1e; }
 
+/* Missing light-mode overrides for voice, chat, lyrics and calendar. */
+#isleIsland.isle-light .isle-voice-text-long { color: rgba(30, 30, 30, 0.92); }
+#isleIsland.isle-light .isle-voice-earlier { color: rgba(30, 30, 30, 0.5); }
+#isleIsland.isle-light .isle-chat-user { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-lyric-dot { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-lyrics-state-dots .isle-lyric-dot { background-color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-cal-target-tick { color: #1e1e1e; }
+
+/* Additional light-mode overrides for buttons, bars, cards and chat. */
+#isleIsland.isle-light .isle-button:hover { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-button:active { background-color: rgba(0, 0, 0, 0.14); }
+#isleIsland.isle-light .isle-level-fill { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-cava-bar { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-bar { background-color: #1e1e1e; }
+#isleIsland.isle-light .isle-card-terminal { background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-card-ended .isle-card-terminal { background-color: rgba(0, 0, 0, 0.03); }
+#isleIsland.isle-light .isle-chat-new { color: rgba(30, 30, 30, 0.75); background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-chat-new:hover { color: #1e1e1e; background-color: rgba(0, 0, 0, 0.1); }
+#isleIsland.isle-light .isle-chat-command-text { background-color: rgba(0, 0, 0, 0.04); }
+#isleIsland.isle-light .isle-voice-action { color: rgba(30, 30, 30, 0.7); background-color: rgba(0, 0, 0, 0.05); }
+
+/* Comprehensive light-mode overrides for all remaining elements with explicit light colours. */
+#isleIsland.isle-light .isle-button { color: #1e1e1e; }
+#isleIsland.isle-light .isle-empty-icon { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-empty-hint { color: rgba(30, 30, 30, 0.45); }
+#isleIsland.isle-light .isle-entry { color: #1e1e1e; }
+#isleIsland.isle-light .isle-entry:insensitive { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-entry StLabel { color: rgba(30, 30, 30, 0.45); }
+#isleIsland.isle-light .isle-art-placeholder { color: rgba(30, 30, 30, 0.3); }
+#isleIsland.isle-light .isle-compact-meridiem { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-compact-date { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-peek-subtitle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-heard { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-text-dim { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-hint { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-step-tick { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-voice-step-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-still { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-idea { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-undo-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-card-subtitle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-card-terminal { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-card-terminal StLabel { color: rgba(30, 30, 30, 0.45); }
+#isleIsland.isle-light .isle-card-output { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-card-ghost { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-card-key { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-chat-title { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-chat-reply { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-chat-time { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-voice-stop { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-send { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-send-mic { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-voice-entry { color: #1e1e1e; }
+#isleIsland.isle-light .isle-header-mic { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-tab { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-header-date { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-header-meridiem { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-header-settings { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-recording-pill { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-track-subtitle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-slider-track { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-mode-toggle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-volume-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-output-detail { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-lyrics-pin { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-side-artist { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-lyrics-state-icon { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-lyrics-state-title { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-lyrics-state-hint { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-preview-button { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-hint { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-kind { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-control { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-call-control-label { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-timer-phase { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-stepper-name { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-stepper-entry { color: #1e1e1e; }
+#isleIsland.isle-light .isle-stepper-button { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-start-pill { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-task-add-icon { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-task-remove { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-reminder-check { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-reminder-line { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-reminder-title { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-reminder-strike { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-reminder-remove { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-reminders-empty { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-reminder-field { color: #1e1e1e; }
+#isleIsland.isle-light .isle-cal-month-title { color: #1e1e1e; }
+#isleIsland.isle-light .isle-cal-year { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-arrow { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-weekday { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-day { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-dot { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-preview { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target-name { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target-arrow { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target-row { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-target-row-account { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-event-time { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-toggle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-icon { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-meta { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-world-chip-city { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-cal-empty { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-cal-accounts { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-notifications-heading { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-dnd-toggle { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-notifications-dnd-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-notification-row { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-notification-dismiss { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-notification-time { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-dnd-moon { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-segment { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-shelf-hint { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-clip { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-clip-age { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-clip-url { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-clip-subtle { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-shelf-tile { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-step-number { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-step-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-copy-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-dot { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-phone-status-text { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-stamp { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-window { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-reset { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-track { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-usage-empty { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-usage-dot { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-heading { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-total { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-name { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-track { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-fill { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-apps-time { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-card { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-tile { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-icon { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-name { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-none { color: rgba(30, 30, 30, 0.35); }
+#isleIsland.isle-light .isle-device-battery-nub { color: rgba(30, 30, 30, 0.55); }
+#isleIsland.isle-light .isle-device-level { color: rgba(30, 30, 30, 0.55); }
+
 /* Tabular figures for numbers that change or line up, so they hold still; prose keeps proportional
  * ones ("11:10" and "isle-0.9.1" would space out). */
 .isle-compact-clock, .isle-compact-date, .isle-compact-second-time, .isle-header-time, .isle-recording-time,

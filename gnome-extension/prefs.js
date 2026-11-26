@@ -16,7 +16,6 @@ import {DEFAULT_ORDER, PROVIDERS} from './src/lyricsProviders.js';
 import {movePage, pageOrder, storedOrder} from './src/pageOrder.js';
 import {listenForSuperV} from './src/shortcutRecorder.js';
 import * as WorldClocks from './src/worldClocks.js';
-import {getBundleNames} from './src/themeBundles.js';
 
 const DAEMON = 'io.github.stefanhacks.gnomeisland.Daemon';
 const DAEMON_PATH = '/io/github/stefanhacks/gnomeisland/Daemon';
@@ -34,7 +33,6 @@ export default class IslePreferences extends ExtensionPreferences {
         window.add(this._musicPlayerPage(settings, window));
         window.add(this._clipboardPage(settings, window));
         window.add(this._timerPage(settings, window));
-        window.add(this._autoThemePage(settings, window));
         window.add(this._aboutPage(settings, window));
         // A page asked for by the island (its Update button: About), once, also while open.
         const showAsked = () => {
@@ -470,78 +468,6 @@ export default class IslePreferences extends ExtensionPreferences {
         group.add(number('sessions_before_long_break', 'Sessions before a long break', 1, 12));
         group.add(toggle('auto_start_breaks', 'Start breaks automatically', null));
         group.add(toggle('auto_start_focus', 'Start focus automatically', 'After a break ends'));
-        return page;
-    }
-
-    _autoThemePage(settings, window) {
-        const page = new Adw.PreferencesPage({title: 'Auto-theme', name: 'auto-theme', icon_name: 'preferences-color-symbolic'});
-
-        const main = new Adw.PreferencesGroup({
-            title: 'Wallpaper-based theming',
-            description: 'Extract colours from the desktop wallpaper and match them to a curated theme that works across GNOME Shell, GTK, Flatpak and kitty.',
-        });
-        const enabled = switchRow(settings, 'auto-theme-enabled', 'Enable auto-theme',
-            'Match the island and desktop to the wallpaper');
-        main.add(enabled);
-
-        const shell = switchRow(settings, 'auto-theme-shell', 'GNOME Shell & island',
-            'Change the island fill colour and GNOME accent');
-        settings.bind('auto-theme-enabled', shell, 'sensitive', Gio.SettingsBindFlags.GET);
-        main.add(shell);
-
-        const gtk = switchRow(settings, 'auto-theme-gtk', 'GTK3 / GTK4 apps',
-            'Write a CSS override into ~/.config/gtk-3.0 and ~/.config/gtk-4.0');
-        settings.bind('auto-theme-enabled', gtk, 'sensitive', Gio.SettingsBindFlags.GET);
-        main.add(gtk);
-
-        const flatpak = switchRow(settings, 'auto-theme-flatpak', 'Flatpak apps',
-            'Allow sandboxed apps to read the GTK CSS via a global override');
-        settings.bind('auto-theme-enabled', flatpak, 'sensitive', Gio.SettingsBindFlags.GET);
-        main.add(flatpak);
-
-        const kitty = switchRow(settings, 'auto-theme-kitty', 'kitty terminal',
-            'Select the closest matching kitty theme in kitty.conf');
-        settings.bind('auto-theme-enabled', kitty, 'sensitive', Gio.SettingsBindFlags.GET);
-        main.add(kitty);
-
-        const refresh = switchRow(settings, 'auto-theme-refresh', 'Refresh on wallpaper change',
-            'Re-match automatically when the desktop wallpaper changes');
-        settings.bind('auto-theme-enabled', refresh, 'sensitive', Gio.SettingsBindFlags.GET);
-        main.add(refresh);
-        page.add(main);
-
-        const info = new Adw.PreferencesGroup({
-            title: 'Current theme',
-        });
-        const currentRow = new Adw.ActionRow({title: 'Matched bundle'});
-        const currentLabel = new Gtk.Label({
-            label: settings.get_string('auto-theme-current-bundle') || 'None',
-            css_classes: ['dim-label'],
-        });
-        currentLabel.set_valign(Gtk.Align.CENTER);
-        currentRow.add_suffix(currentLabel);
-        const syncCurrent = () => {
-            currentLabel.label = settings.get_string('auto-theme-current-bundle') || 'None';
-        };
-        const currentChanged = settings.connect('changed::auto-theme-current-bundle', syncCurrent);
-        window.connect('close-request', () => {
-            settings.disconnect(currentChanged);
-            return false;
-        });
-        info.add(currentRow);
-        page.add(info);
-
-        const curated = new Adw.PreferencesGroup({
-            title: 'Curated themes',
-            description: 'The themes the wallpaper can be matched to. Install the matching kitty themes for the terminal to follow.',
-        });
-        const names = getBundleNames();
-        for (const name of names) {
-            const row = new Adw.ActionRow({title: name, activatable: false});
-            curated.add(row);
-        }
-        page.add(curated);
-
         return page;
     }
 }

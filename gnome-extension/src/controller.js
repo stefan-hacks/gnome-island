@@ -28,7 +28,6 @@ import {PREVIEWED_KEYS, previewTarget} from './previewMap.js';
 import {LyricsEngine} from './lyricsEngine.js';
 import {createLyricsCache} from './lyricsCache.js';
 import {createHttp} from './lyricsHttp.js';
-import * as AutoTheme from './autoTheme.js';
 import {MirrorIsland} from './mirror.js';
 import {AudioOutputs} from './audio.js';
 import {CallMonitor} from './call.js';
@@ -251,8 +250,6 @@ const AGENT_PROVIDERS = [];
 function waitsWhileAway(alert) {
     return alert.sticky || alert.kind === 'notification';
 }
-
-Theme.setAutoThemeColors(AutoTheme.autoThemeColors);
 
 /** Builds the island a part at a time, then decides what it shows until `destroy`. */
 export class Controller {
@@ -493,7 +490,6 @@ export class Controller {
         this._keepAbovePanel();
         this._connectSignals();
         this._keyboard = new KeyboardWatcher();
-        AutoTheme.init(this._settings);
         this._keyboard.connect('caps-lock', (_watcher, on) => this._postSystemAlert(Alerts.capsLock(on), 'caps-lock'));
         this._osd = new OsdHook((icon, label, level, maxLevel, displays) => this._showOsd(icon, label, level, maxLevel, displays));
         this._watchIdle();
@@ -695,8 +691,6 @@ export class Controller {
                 this._render();
         }));
         for (const key of ['island-theme'])
-            this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncTheme()));
-        for (const key of ['auto-theme-enabled', 'auto-theme-shell', 'auto-theme-gtk', 'auto-theme-flatpak', 'auto-theme-kitty', 'auto-theme-refresh', 'auto-theme-current-bundle'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncTheme()));
         // While Settings change something that is seen on the open island, it opens on it (see `_previewSetting`).
         for (const key of PREVIEWED_KEYS)
@@ -1308,18 +1302,7 @@ export class Controller {
 
     /** The island in GNOME's colour, switching dark or light with the system's appearance setting. */
     _syncTheme() {
-        const autoEnabled = this._settings.get_boolean('auto-theme-enabled');
-        Theme.setAutoTheme(autoEnabled);
         Theme.setTheme(this._settings.get_string('island-theme'));
-        if (autoEnabled) {
-            const bundle = AutoTheme.currentBundle();
-            if (bundle?.colors?.lightness >= 0.5)
-                this._island.add_style_class_name('isle-light');
-            else
-                this._island.remove_style_class_name('isle-light');
-        } else {
-            this._island.remove_style_class_name('isle-light');
-        }
         for (const island of [this._island, ...this._mirrors.map(mirror => mirror.island)])
             this._styleIsland(island);
         // An agent's alert glows in the new theme's colours on the copies too.
@@ -3487,7 +3470,6 @@ export class Controller {
         this._audio.destroy();
         this._notifications.destroy();
         this._topBar.destroy();
-        AutoTheme.destroy();
         this._lyrics?.destroy();
         this._lyricsHttp?.destroy();
         this._daemon.destroy();
@@ -3559,7 +3541,6 @@ export class Controller {
         for (const service of [this._topBar, this._writer, this._appUsage, this._clipboard, this._focusMode, this._call,
             this._privacy, this._audio, this._notifications, this._daemon])
             service?.destroy();
-        AutoTheme.destroy();
         this._settings = null;
         Format.release();
     }

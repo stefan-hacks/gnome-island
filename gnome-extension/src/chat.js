@@ -13,6 +13,10 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import {BotIcon} from './botIcon.js';
+import * as Palette from './palette.js';
+
+/** Convert [r,g,b] in 0..1 to "rrggbb" hex. */
+const toHex = ([r, g, b]) => [r, g, b].map(c => Math.round(c * 255).toString(16).padStart(2, '0')).join('');
 import {VERTICAL, onUiScale, px} from './compat.js';
 import * as Format from './format.js';
 import {icon, iconButton, playMotion, slideBy, wrapLines} from './widgets.js';
@@ -49,7 +53,7 @@ const STOP_ARMED_MS = 4000;
 const INSTALLER = /(^|[\s;&|(])(apt|apt-get|aptitude|dpkg|dnf|yum|rpm|pacman|zypper|flatpak|snap)\s/;
 /** A selection's colours: blue under white text. GNOME 47 moved colours from Clutter to Cogl. */
 const Color = Clutter.Color ?? Cogl.Color;
-const SELECTION = Color.from_string('#0a84ffb3')[1];
+const SELECTION = Color.from_string(`#${toHex(Palette.accent())}b3`)[1];
 const SELECTED_TEXT = Color.from_string('#ffffff')[1];
 /** A selection is copied once it has been still this long (ms) with the button up. */
 const SELECT_SETTLE_MS = 150;
