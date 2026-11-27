@@ -209,7 +209,7 @@ class WindowPreview extends St.Widget {
             cr.fill();
         }
         roundedRect(cr, edge, edge, width - 2 * edge, height - 2 * edge, radius - edge);
-        cr.setSourceRGBA(1, 1, 1, 0.1);
+        cr.setSourceRGBA(...Theme.ink(), 0.1);
         cr.setLineWidth(scale);
         cr.stroke();
         cr.$dispose();

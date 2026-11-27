@@ -256,7 +256,7 @@
       </choices>
       <default>'off'</default>
       <summary>Auto-hide the closed island</summary>
-      <description>off: always shown. always: hides once the pointer has been off it a while. top-bar: hides and comes back with a top bar another extension hides. windows: hides while an app's window reaches the top (maximized, tiled or moved up there). Hidden, alerts, the open island and the assistant still show; pointing at its place in the top bar brings it back.</description>
+      <description>off: always shown. always: hides once the pointer has been off it a while. top-bar: hides and comes back with a top bar another extension hides. windows: hides while an app's window reaches the top (maximized, tiled or moved up there). Hidden, alerts and the open island still show; pointing at its place in the top bar brings it back.</description>
     </key>
     <key name="auto-hide-delay" type="i">
       <range min="1" max="60"/>
@@ -332,7 +332,7 @@
     <key name="event-calendar" type="s">
       <default>''</default>
       <summary>Where new events go</summary>
-      <description>The desktop calendar (an Evolution Data Server source uid, such as an Online Accounts calendar) the Calendar page and the assistant add events to; "isle" for Isle's own calendar on this computer; empty for the first account's calendar, or Isle's own without one.</description>
+      <description>The desktop calendar (an Evolution Data Server source uid, such as an Online Accounts calendar) the Calendar page adds events to; "isle" for Isle's own calendar on this computer; empty for the first account's calendar, or Isle's own without one.</description>
     </key>
     <key name="world-clocks" type="b">
       <default>true</default>
@@ -347,7 +347,7 @@
     <key name="page-order" type="as">
       <default>[]</default>
       <summary>The order of the open island’s tabs</summary>
-      <description>Page names, left to right: music, notifications, focus, reminders, shelf, calendar, apps, devices, system, usage. Empty for Isle’s own order (as listed); a page left out goes after the one it follows there. The Call tab always comes first, during a call.</description>
+      <description>Page names, left to right: music, notifications, focus, reminders, shelf, calendar, apps, devices, system. Empty for Isle’s own order (as listed); a page left out goes after the one it follows there. The Call tab always comes first, during a call.</description>
     </key>
     <key name="app-usage" type="b">
       <default>false</default>
@@ -498,11 +498,6 @@
       <default>[]</default>
       <summary>Shortcut to the Devices page</summary>
       <description>Opens the island on the Devices page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
-    </key>
-    <key name="shortcut-usage" type="as">
-      <default>[]</default>
-      <summary>Shortcut to the Usage page</summary>
-      <description>Opens the island on the Usage page from anywhere, holding the keyboard; pressed again, it closes. None at first.</description>
     </key>
     <key name="shortcut-system" type="as">
       <default>[]</default>

@@ -1079,7 +1079,7 @@ export const CalendarPage = GObject.registerClass({
         const day = this._selected;
         const target = this._targetCalendar;
         // No account at all: Isle's own at once, not asked of Evolution again. The list not in yet (isled
-        // starting, EDS slow): the setting as it is, as the assistant sends it.
+        // starting, EDS slow): the setting as it is, as it is sent.
         const calendar = this._calendars.length ? target?.uid ?? 'isle'
             : this._calendarsKnown ? 'isle' : this._settings.get_string('event-calendar');
         // Cleared and shown at once, while the calendar's server takes its time: Enter again adds nothing twice.

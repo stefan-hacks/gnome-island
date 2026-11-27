@@ -47,13 +47,11 @@ install_service() {
 }
 
 SHELF=0
-WHISPER=0
 # -f, not -x: unpacked where files cannot run (a /tmp mounted noexec), they still install.
 if [ -f bin/isled ]; then
     # A release package: the programs come built.
     BUILT=bin
     [ -f bin/isle-shelf ] && SHELF=1
-    [ -f bin/isle-whisper ] && WHISPER=1
 else
     BUILT=target/release
     step "Building isled"
@@ -70,25 +68,6 @@ else
         echo "GTK 4 development files not found: skipping isle-shelf (drag and drop on the shelf)."
         echo "Install them with 'sudo apt install libgtk-4-dev' and run this script again."
     fi
-    # The voice assistant's speech recognition: whisper.cpp, built with cmake; Vulkan for the GPU.
-    if command -v cmake >/dev/null && command -v c++ >/dev/null; then
-        step "Building isle-whisper"
-        if command -v glslc >/dev/null && pkg-config --exists vulkan; then
-            FEATURES=()
-        else
-            echo "Vulkan headers or glslc not found: speech recognition will use the processor only."
-            echo "For the GPU: 'sudo apt install libvulkan-dev glslc', then run this script again."
-            FEATURES=(--no-default-features)
-        fi
-        if cargo build --release -p isle-whisper "${FEATURES[@]}"; then
-            WHISPER=1
-        else
-            echo "isle-whisper did not build (it needs libclang too: 'sudo apt install libclang-dev'); the voice assistant needs it."
-        fi
-    else
-        echo "cmake or a C++ compiler not found: skipping isle-whisper (the voice assistant's speech recognition)."
-        echo "Install them with 'sudo apt install cmake g++ libclang-dev' and run this script again."
-    fi
 fi
 
 step "Installing binaries to $BINDIR"
@@ -97,9 +76,6 @@ if [ "$SHELF" = 1 ]; then
     put "$BUILT/isle-shelf" "$BINDIR/isle-shelf"
     # A running helper is the old version; it starts again, updated, when needed.
     pkill -x isle-shelf 2>/dev/null || true
-fi
-if [ "$WHISPER" = 1 ]; then
-    put "$BUILT/isle-whisper" "$BINDIR/isle-whisper"
 fi
 
 step "Installing services"
@@ -113,9 +89,7 @@ if [ "$SHELF" = 1 ] || [ -x "$BINDIR/isle-shelf" ]; then
 fi
 install_service isled.service "$CONFIG/systemd/user"
 install -Dm644 README.md "$DATA/doc/isle/README.md"
-# The voice assistant: `isle-setup-voice` downloads the speech model once.
-install -Dm755 scripts/setup-voice.sh "$BINDIR/isle-setup-voice"
-# Sets a lasting battery charge limit; the assistant types it into a terminal when asked.
+# Sets a lasting battery charge limit.
 install -Dm755 scripts/isle-charge-limit "$BINDIR/isle-charge-limit"
 
 step "Installing the Inter font"
@@ -162,14 +136,6 @@ else
     # An isled started by D-Bus would go on running the old version from its replaced file: stopped, it
     # starts anew as the island calls it again (within seconds; see the extension's service check).
     pkill -u "$(id -u)" -x isled 2>/dev/null || true
-fi
-
-# The voice assistant set up with an older Isle used Python (up to 3 GB): moved to isle-whisper,
-# with the model chosen then, and the old setup deleted. Offline, it stays for isle-setup-voice.
-if [ "$WHISPER" = 1 ] && { [ -d "$DATA/isle/voice-venv" ] || [ -f "$DATA/isle/isle-whisper.py" ]; }; then
-    step "Moving the voice assistant to the new speech recognition"
-    "$BINDIR/isle-setup-voice" --remove-old </dev/null ||
-        echo "That did not finish; run isle-setup-voice later (the voice assistant needs it)."
 fi
 
 # A running GNOME Shell on Wayland does not know a new extension until the
@@ -258,5 +224,5 @@ fi
 # Some systems put ~/.local/bin on the PATH only once it exists, at the next login; others never.
 case ":$PATH:" in
     *":$BINDIR:"*) ;;
-    *) echo "Note: $BINDIR is not on your PATH, so run Isle's commands with it: $BINDIR/isled --doctor, $BINDIR/isle-setup-voice." ;;
+    *) echo "Note: $BINDIR is not on your PATH, so run Isle's commands with it: $BINDIR/isled --doctor." ;;
 esac

@@ -19,8 +19,6 @@ use tokio::time::Instant;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{Connection, interface};
 
-pub use sleep::locked;
-
 /// Changes arriving within this window are handled together, so a burst of
 /// property updates (or a network briefly reconnecting) yields one event.
 const SETTLE: Duration = Duration::from_millis(800);

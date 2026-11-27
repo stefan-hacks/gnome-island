@@ -7,7 +7,6 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -15,12 +14,12 @@ import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-import {namesProject} from './actionRules.js';
 import * as Alerts from './alerts.js';
 import {AppUsage} from './appUsage.js';
 import {ClipboardHistory} from './clipboard.js';
 import {CompactView} from './compact.js';
-import {grabsKeyboard, inhibitScanout, isWayland, onUiScale, px, uiScale} from './compat.js';
+import {HAS_ACCENT, grabsKeyboard, inhibitScanout, isWayland, onUiScale, px, uiScale} from './compat.js';
+import * as Palette from './palette.js';
 import {Daemon} from './daemon.js';
 import {BOTTOM_PADDING, ExpandedView, PAGE_HEIGHT} from './expanded.js';
 import {Island} from './island.js';
@@ -52,77 +51,9 @@ import {ShelfPage} from './pages/shelf.js';
 import {SystemPage} from './pages/system.js';
 import {TasksPage} from './pages/tasks.js';
 import {TimerPage} from './pages/timer.js';
-import {UsagePage} from './pages/usage.js';
 import {ReminderWatcher} from './reminders.js';
 import * as Theme from './theme.js';
-// Voice assistant stubs (feature removed)
-const GREETING = null;
-const InstalledApps = class { destroy() {} };
-const UNDO_MS = 5000;
-const VoiceView = GObject.registerClass({
-    Signals: {
-        'orb-clicked': {},
-        'close-requested': {},
-        'type-requested': {},
-        'typed': {param_types: [GObject.TYPE_STRING]},
-        'speak': {},
-        'new-chat': {},
-        'undo-new-chat': {},
-        'card-decided': {param_types: [GObject.TYPE_BOOLEAN]},
-        'card-stop': {},
-        'stop': {},
-        'sign-in': {},
-        'set-up': {},
-        'frame': {param_types: [GObject.TYPE_DOUBLE, GObject.TYPE_DOUBLE, GObject.TYPE_BOOLEAN]},
-        'size-changed': {},
-    }
-}, class VoiceView extends St.Widget {
-    _init() {
-        super._init({width: 0, height: 0});
-        this._pointerOn = false;
-        this._micWaiting = false;
-        this._followUp = null;
-    }
-    setState() {}
-    setActive() {}
-    setLevel() {}
-    setHistory() {}
-    showUndo() {}
-    openChat() {}
-    closeChat() {}
-    startTyping() {}
-    exchange() {}
-    fit() { return 0; }
-    decideCard() {}
-    get cardWaiting() { return false; }
-    get typing() { return false; }
-    get phase() { return 'idle'; }
-    get chatOpen() { return false; }
-    get preferredWidth() { return 0; }
-    get pointerOn() { return this._pointerOn; }
-    set pointerOn(v) { this._pointerOn = v; }
-    get micWaiting() { return this._micWaiting; }
-    set micWaiting(v) { this._micWaiting = v; }
-    get followUp() { return this._followUp; }
-    set followUp(v) { this._followUp = v; }
-    set greeting(v) {}
-    set look(v) {}
-    set chatLook(v) {}
-    set shortcut(v) {}
-    withShortcut(hint) { return hint; }
-});
-const stopUnit = () => {};
-const actionTypes = () => ({});
-const aiSettings = () => ({});
-const openSetUp = () => false;
-const openSignIn = () => false;
-const runActions = () => Promise.resolve([]);
-const signInHint = () => '';
-const stopPending = () => {};
-const voiceContext = () => ({});
-
 import {autoHide, revealBand} from './visibilityRules.js';
-import {TextWriter} from './writer.js';
 
 /** While the pointer rests before the island opens (Settings: hover-delay), it moves at most this far (CSS px). */
 const REST_DISTANCE_PX = 10;
@@ -135,10 +66,6 @@ const WARM_ALERT = {key: 'warm', title: '\u2007'.repeat(8), subtitle: '\u2007'.r
     value: '\u2007'.repeat(3), tone: 'neutral'};
 /** And again this long after the island closes, or a page changes out of sight, while it stays closed... */
 const WARM_AFTER_CLOSE_MS = 1500;
-/** How long a permission notice waits for the island's own ask for it, which may come a moment later. */
-const ASK_SETTLE_MS = 1500;
-/** An ask this recent for the session covers its permission notice. */
-const ASKED_RECENTLY_MS = 60000;
 /** ...but for changes, at most this often: a notification updating every second (a download) costs little. */
 const WARM_GAP_MS = 10000;
 /** Outside an island that shrank under it, the pointer is checked this often, and left this long. */
@@ -191,17 +118,13 @@ const IN_BAR_RADIUS = 10;
 const IN_BAR_SHOULDER = 7;
 // The badge's radius plus the room round it (see PADDING in peek.js): the corners follow the badge.
 const PEEK_RADIUS = 28;
-// Off a black bar the voice view has no bar to fill, so it starts this far below
-// the screen's top instead of below the bar.
-const PEEK_TOP_GLASS = 6;
 const PEEK_SHOULDER = 13;
 const EXPANDED_RADIUS = 32;
 const EXPANDED_SHOULDER = 22;
-const VOICE_RADIUS = 26;
 // The pill (Settings → Shape) floats with room above it: centred in the top bar (36 px round a pill, see shell.js), 3 px
 // above and below; just below a bar it hangs under; from a display's top edge without one. Closed, it is 30 px tall in
 // the bar and 32 off it, its signs and clock the bar's size in it as the notch's are (larger off it), and fully round;
-// open, an alert or the assistant grow down from where it sits, round all over.
+// open, an alert grows down from where it sits, round all over.
 const PILL_IN_BAR_GAP = 3;
 const PILL_BELOW_BAR_GAP = 6;
 const PILL_EDGE_GAP = 8;
@@ -213,45 +136,19 @@ const PILL_HEADER_TOP = 8;
 /** The pages a shortcut of their own may open from anywhere (Settings → Shortcuts; `shortcut-<page>`, none set at
  * first: the usual ones are GNOME's). As prefs.js lists them. */
 const SHORTCUT_PAGES = ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps', 'devices',
-    'usage', 'system'];
+    'system'];
 
-/** A question back is shown this long before the island listens for the reply. */
-const VOICE_LISTEN_AGAIN_MS = 900;
-/** It listens by itself at most this many times in a row; a noisy room can't keep it open. */
-const VOICE_MAX_AUTO_LISTENS = 2;
-/** How long an answer stays: one that did something, one to read (by its length), and an error. */
-const VOICE_DONE_MS = 2500;
-const VOICE_READ_MS = {base: 3000, perChar: 45, max: 8000};
-const VOICE_ERROR_MS = 4000;
-/** Once read with the pointer on it, an answer goes this soon after the pointer leaves. */
-const VOICE_LEAVE_MS = 1200;
-/** Listening shown this long (ms) without isled recording yet, it says "Getting ready…" instead. */
-const MIC_WAIT_MS = 400;
-/** Closed while listening, a request isled starts on within this long (ms) was the last words' own. */
-const CLOSED_LISTENING_MS = 3000;
 /** Where in its flow, and how bright, the still glow of an alert that asks is drawn. */
 const ALERT_GLOW_TIME = 2.2;
 const ALERT_GLOW_LEVEL = 0.3;
-/** A command the AI wants run waits this long (ms) for Run or Deny, as isled does (see agent.rs). */
-const APPROVAL_MS = 10 * 60 * 1000;
-/** In the conversation, the field comes back this soon (ms) after an answer. */
-const CHAT_TYPE_AGAIN_MS = 250;
-/** isled's phases while it works on a request: with the island closed, it carries on in the background. */
-const VOICE_WORKING = ['transcribing', 'thinking', 'acting'];
-
 // Pages that open by default when they have something to show, best first, unless one was picked
 // by hand lately. Notifications count only when some arrived unseen (others were shown as alerts).
 const DEFAULT_PAGE_ORDER = ['call', 'notifications', 'music', 'focus'];
-/** The AI agents Isle can hear from (see `Agents1` in the daemon). */
-const AGENT_PROVIDERS = [];
-
 /** Whether `alert` waits on screen while no one is there, its time counted once they are back: a reminder,
  * or a notification, as GNOME's banner does. */
 function waitsWhileAway(alert) {
     return alert.sticky || alert.kind === 'notification';
 }
-
-Theme.setAutoThemeColors(AutoTheme.autoThemeColors);
 
 /** Builds the island a part at a time, then decides what it shows until `destroy`. */
 export class Controller {
@@ -265,10 +162,6 @@ export class Controller {
         // Heard once everything listening is built (see `_connectAll`).
         this._daemon.hold();
         this._timeouts = new Map();
-        /** When the island last asked for each agent session (`provider:session`); see `_onAgentEvent`. */
-        this._askedAt = new Map();
-        /** The AIs whose hook isled is changing now, and whether to ask again after (see `_hookAgent`). */
-        this._hooking = new Map();
         this._presentation = 'compact';
         /** Whether auto-hide has faded the closed island away (see `_syncAutoHide`). */
         this._autoHidden = false;
@@ -286,38 +179,10 @@ export class Controller {
         this._lastTrack = null;
         this._tint = null;
         this._tintStyle = null;
-        this._voiceOpen = false;
-        this._voiceBound = false;
         /** The touchpad swipe over an alert under way: {dy, at, done} (see `_onAlertScroll`). */
         this._swipe = null;
-        /** Whether the alert and voice views were laid out ahead since the theme last changed (see `_warmUp`). */
+        /** Whether the alert views were laid out ahead since the theme last changed (see `_warmUp`). */
         this._viewsWarm = false;
-        /** Counts `_listen` calls, so only the latest sends its request. */
-        this._listenRequest = 0;
-        /** A Listen went to isled and is not over: typing instead cancels it, even before isled says it listens. */
-        this._listenSent = false;
-        /** The last request handed to isled (see `_listenRequest`). */
-        this._sentRequest = -1;
-        this._voiceCloseMs = VOICE_ERROR_MS;
-        /** The last answer whose actions ran, and the last batch of actions run mid-way (see isled's `step`). */
-        this._voiceTurn = 0;
-        this._voiceStep = 0;
-        /** A request carries on after the island closed; its answer comes as an alert. */
-        this._voiceInBackground = false;
-        /** Opened by resting the pointer on it while it works: it goes back as the pointer leaves. */
-        this._voiceByHover = false;
-        /** When it closed while listening (see `CLOSED_LISTENING_MS`), else 0. */
-        this._closedListeningAt = 0;
-        /** Whether isled's assistant state was seen yet (see `_onAssistant`). */
-        this._assistantSeen = false;
-        /** Times in a row it listened again by itself; see `VOICE_MAX_AUTO_LISTENS`. */
-        this._autoListens = 0;
-        /** The window in front when the assistant opened, for it to write into. */
-        this._voiceTarget = null;
-        /** Actions waiting for the island to close; see `closeThen`. */
-        this._voiceAfter = [];
-        /** The window text was last selected in, so a selection only goes to the AI from where it was made. */
-        this._selectedIn = null;
         /** With the island on every display, its copies on the others (see mirror.js), and what their closed
          * views are told as the island's is (see `_setCompact`). */
         this._mirrors = [];
@@ -374,10 +239,9 @@ export class Controller {
         this._clipboard = new ClipboardHistory(this._daemon, this._settings);
         this._appUsage = new AppUsage(this._daemon);
         this._clearingAppUsage = false;
-        this._writer = new TextWriter(this._clipboard);
     }
 
-    /** The island and its closed, alert and voice views; the pages follow a step at a time. */
+    /** The island and its closed and alert views; the pages follow a step at a time. */
     _buildViews() {
         this._island = new Island();
         this._syncTheme();
@@ -385,9 +249,6 @@ export class Controller {
         // Two, taking turns: a new alert fades in over the one it replaces, rather than swapping in a frame.
         this._peeks = [new PeekView(), new PeekView()];
         this._peek = this._peeks[0];
-        this._botLook = this._readBotLook();
-        this._voice = new VoiceView(this._botLook);
-        this._voice.chatLook = this._botLook;
     }
 
     // The bar and the island appear together: the clock gives way to it in the same frame.
@@ -395,7 +256,7 @@ export class Controller {
         this._topBar = new TopBar(this._settings);
         this._shelf = this._expanded.pageNamed('shelf');
         this._shelfHelper = new ShelfHelper(this._island, this._shelf);
-        for (const view of [this._compact, ...this._peeks, this._expanded, this._voice])
+        for (const view of [this._compact, ...this._peeks, this._expanded])
             this._island.addView(view);
         Main.layoutManager.addChrome(this._island, this._chromeParams());
         this._chrome = this._chromeParams();
@@ -417,7 +278,7 @@ export class Controller {
 
     /** The last step: hooks the island to GNOME and isled, then lets isled's held changes through. */
     _connectAll() {
-        // Watch GNOME's light/dark preference so the 'gnome' theme adapts.
+        // Watch GNOME's light/dark preference so the island follows it, and its accent colour.
         try {
             this._interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
             const syncGnomeScheme = () => {
@@ -431,27 +292,18 @@ export class Controller {
         } catch {
             // Not on GNOME or the schema is missing; keep the default dark.
         }
+        // A new accent restyles the island and what is drawn in it.
+        this._accentWatch = Palette.watchAccent(() => this._syncTheme());
 
-        this._primaryChanged = global.display.get_selection().connect('owner-changed', (_selection, type) => {
-            if (type === Meta.SelectionType.SELECTION_PRIMARY)
-                this._selectedIn = global.display.focus_window;
-        });
-        // Clicking into a window, or one an action opened, puts an answer away.
-        this._focusChanged = global.display.connect('notify::focus-window', () => {
-            const focus = global.display.focus_window;
-            if (this._voiceOpen && this._voiceAnswered && focus && focus !== this._voiceTarget)
-                this.collapse();
-            this._passToAgentWindow(focus);
-            this._syncMonitor();
-        });
+        // The window in front changed: the island may follow it to another display.
+        this._focusChanged = global.display.connect('notify::focus-window', () => this._syncMonitor());
         // Drawn into the edge by auto-hide: GNOME may send a window covering the display straight to the screen again.
         this._island.connect('auto-hide-settled', () => this._syncScanout());
         // Hidden by a fullscreen window meanwhile: what waited shows now.
         this._island.connect('notify::visible', () => {
             this._syncScanout();
             this._syncAutoHide();
-            // On every display, a fullscreen window sends it to another display, rather than hiding it: what it
-            // shows (an agent's ask) goes with it.
+            // On every display, a fullscreen window sends it to another display, rather than hiding it.
             if (!this._island.visible && this._mirrors.length && this._wantedMonitor() !== this._monitor) {
                 this._updateGeometry();
                 return;
@@ -495,16 +347,13 @@ export class Controller {
         this._keyboard.connect('caps-lock', (_watcher, on) => this._postSystemAlert(Alerts.capsLock(on), 'caps-lock'));
         this._osd = new OsdHook((icon, label, level, maxLevel, displays) => this._showOsd(icon, label, level, maxLevel, displays));
         this._watchIdle();
-        this._installedApps = new InstalledApps();
         this._reminders = new ReminderWatcher(this._daemon, (reminder, done) => {
             this._post(Alerts.reminder(reminder, () => {
                 this._chime('complete');
                 done();
             }));
         });
-        // this._syncVoiceEnabled(); // Voice assistant removed
         this._bindPageShortcuts();
-        // this._syncUsage(); // Voice assistant removed
         this._syncEventAlerts();
         this._syncPages();
         // The pointer met while it was still being built (after unlocking, at rest on it) is told now.
@@ -529,7 +378,6 @@ export class Controller {
             () => new AppsPage(this._daemon, this._appUsage, size),
             () => new DevicesPage(this._daemon, size),
             () => new SystemPage(this._daemon, size),
-            () => new UsagePage(this._daemon, size),
         ];
     }
 
@@ -573,8 +421,6 @@ export class Controller {
             if (this._presentation === 'expanded')
                 this._island.setTintMotion(time, level);
         });
-        // A request still at work shows its progress, as from the closed island; a new one would be lost.
-        // Voice assistant removed: expanded.connect('voice-requested', () => this._voiceWorking ? this._reopenVoice() : this._openVoice({typing: true}));
         // Settings open in their own window; the island gets out of its way.
         expanded.connect('settings-requested', () => {
             this.collapse();
@@ -672,15 +518,6 @@ export class Controller {
         this._focusMonitorChanged = global.display.connect('window-entered-monitor', () => this._syncMonitor());
         // On every display, it leaves one a fullscreen window takes (see `_wantedMonitor`).
         this._fullscreenChanged = global.display.connect('in-fullscreen-changed', () => this._syncMonitor());
-        // Voice assistant removed: this._settingsChanged.push(this._settings.connect('changed::voice-assistant', () => {
-        //     this._syncVoiceEnabled();
-        //     this._syncUsage();
-        // }));
-        // Voice assistant removed: this._settingsChanged.push(this._settings.connect('changed::voice-shortcut', () => (this._voice.shortcut = this._voiceShortcut)));
-        // Voice assistant removed: for (const key of ['bot-shape', 'bot-color', 'bot-glow'])
-        //     this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncBotLook()));
-        // Voice assistant removed: for (const key of ['usage-enabled', 'usage-claude', 'usage-codex', 'usage-grok', 'usage-warn', 'usage-critical'])
-        //     this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncUsage()));
         for (const key of ['event-alerts', 'event-alert-minutes'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncEventAlerts()));
         for (const key of ['hidden-pages', 'world-clocks', 'app-usage', 'devices-page', 'open-size'])
@@ -701,13 +538,9 @@ export class Controller {
         this._settingsChanged.push(this._settings.connect('changed::clock-format', () => {
             Format.setClockFormat(this._settings.get_string('clock-format'));
             refreshClocks();
-            // A page on show with times in it writes them again too (the Calendar's, the Usage page's).
+            // A page on show with times in it writes them again too (the Calendar's).
             this._expanded?.pages.forEach(page => page.clockChanged?.());
         }));
-        for (const provider of AGENT_PROVIDERS) {
-            this._settingsChanged.push(this._settings.connect(`changed::agent-alerts-${provider}`, () =>
-                this._hookAgent(provider)));
-        }
 
         this._topBar.connect('height-changed', () => this._updateGeometry());
         this._settingsChanged.push(this._settings.connect('changed::island-clock', () => this._updateGeometry()));
@@ -715,13 +548,6 @@ export class Controller {
         this._topBar.connect('moved', () => this._updateGeometry());
         this._topBar.connect('calendar-requested', (_bar, page) => this._toggleFromKeyboard(page));
         island.connect('key-press-event', (_actor, event) => {
-            // A command waiting on the user: Enter runs it, Esc denies it.
-            const key = event.get_key_symbol();
-            if (this._voiceOpen && this._voice.cardWaiting && !this._voice.typing &&
-                [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_Escape].includes(key)) {
-                this._voice.decideCard(key !== Clutter.KEY_Escape);
-                return Clutter.EVENT_STOP;
-            }
             if (event.get_key_symbol() === Clutter.KEY_Escape) {
                 this.collapse();
                 return Clutter.EVENT_STOP;
@@ -729,15 +555,6 @@ export class Controller {
             // Open and holding the keyboard: Ctrl+Tab (Shift back) or Ctrl+PageDown/Up turns the tabs, Ctrl+1…9 picks one.
             if (this._presentation === 'expanded' && this._pageKey(event))
                 return Clutter.EVENT_STOP;
-            // Typing while it listens: the request is typed instead.
-            const typed = event.get_key_unicode();
-            const modified = event.get_state() & (Clutter.ModifierType.CONTROL_MASK | Clutter.ModifierType.MOD1_MASK |
-                Clutter.ModifierType.SUPER_MASK);
-            if (this._voiceOpen && !this._voice.typing && this._voice.phase === 'listening' && !modified &&
-                typed && /\S/.test(typed)) {
-                this._startTyping(typed);
-                return Clutter.EVENT_STOP;
-            }
             return Clutter.EVENT_PROPAGATE;
         });
         this._monitorsChanged = Main.layoutManager.connect('monitors-changed', () => this._updateGeometry());
@@ -748,25 +565,10 @@ export class Controller {
         daemon.connect('changed', (_daemon, key) => {
             if (key === 'nowPlaying')
                 this._onNowPlaying();
-            else if (key === 'assistant')
-                this._onAssistant();
-            else if (key === 'chat')
-                this._onHistory();
         });
-        daemon.connect('voice-level', (_daemon, level) => {
-            // Sound coming in: it records.
-            this._micReady();
-            this._voice.setLevel(level);
-        });
-        daemon.connect('assistant-lost', () => this._onAssistantLost());
         daemon.connect('running-changed', () => this._onServiceChanged());
         // Never started at all (a broken install) is the same as stopped.
         this._onServiceChanged();
-        daemon.connect('usage-alert', (_daemon, provider, window, percent, resetsAt) => {
-            // Not in Do Not Disturb, as other alerts.
-            if (!this._notifications.dnd)
-                this._post(Alerts.usage(provider, window, percent, resetsAt, 95));
-        });
         // isled forgets the settings when it restarts; they are sent again whenever it appears.
         daemon.connect('appeared', (_daemon, name) => {
             if (name === 'updates')
@@ -775,27 +577,12 @@ export class Controller {
                 this._syncLyrics();
             else if (name === 'appUsage')
                 this._syncAppUsage();
-            else if (name === 'agents') {
-                this._syncAgents(true);
-                this._sayPresent(true);
-            }
         });
         daemon.connect('phone-received', (_daemon, name) => this._onPhoneReceived(name));
-        daemon.connect('agent-event', (_daemon, event) => this._onAgentEvent(event));
-        daemon.connect('agent-asking', (_daemon, request) => this._onAgentAsking(request));
-        daemon.connect('agent-withdrawn', (_daemon, id) => this._withdrawAlert(`agent-ask:${id}`));
-        // A command that ended while nobody watched (isled restarted, or the user was logged out).
-        daemon.connect('model-switched', (_daemon, provider, plan, picked, used) =>
-            this._post(Alerts.modelSwitched(provider, plan, picked, used)));
-        daemon.connect('assistant-notice', (_daemon, text, ok) =>
-            this._post(Alerts.assistant(ok ? {phase: 'reply', reply: text} : {phase: 'error', error: text},
-                () => this._openVoice({typing: true}))));
         this._expanded.pageNamed('calendar').connect('event-soon', (_page, json) => this._onEventSoon(JSON.parse(json)));
         daemon.connect('changed', (_daemon, key) => {
             if (key === 'updates')
                 this._onLatest();
-            else if (key === 'agents')
-                this._agentsUnsynced ? this._syncAgents() : this._hookNewAgents();
             // Back online: an "Offline" still waiting its turn, or on screen, is no longer so.
             else if (key === 'system' && daemon.state.system?.network?.connected)
                 this._withdrawAlert('network');
@@ -804,49 +591,8 @@ export class Controller {
         });
         this._settingsChanged.push(this._settings.connect('changed::check-updates', () => this._syncUpdates()));
         this._settingsChanged.push(this._settings.connect('changed::lyrics-online', () => this._syncLyrics()));
-        this._voice.connect('orb-clicked', () => this._onVoiceKey());
-        // The × on an answer or an alert puts it away, as a click on the answer or a right click on the alert does.
-        this._voice.connect('close-requested', () => this.collapse());
         for (const peek of this._peeks)
             peek.connect('close-requested', () => this._alert && !this._expandWanted && this._dismissAlert(true));
-        this._voice.connect('type-requested', () => this._startTyping(''));
-        this._voice.connect('typed', (_view, text) => this._ask(text));
-        // Typing, then speaking after all: the field goes, it listens (the conversation stays open).
-        this._voice.connect('speak', () => {
-            this._autoListens = 0;
-            this._listen();
-        });
-        this._voice.connect('new-chat', () => this._newChat());
-        this._voice.connect('undo-new-chat', () => this._undoNewChat());
-        this._voice.connect('card-decided', (_view, run) => this._deciding?.done(run));
-        this._voice.connect('card-stop', () => stopUnit(this._daemon.state.assistant?.card?.stop));
-        this._voice.connect('stop', () => {
-            // A command card still waiting goes with the request: it is never asked again in an alert.
-            this._deciding?.done(false);
-            this._daemon.call('assistant', 'Cancel');
-            this.collapse();
-            // Stopped, not left to carry on.
-            this._voiceInBackground = false;
-            this._closedListeningAt = 0;
-            this._syncAssistantBusy();
-        });
-        // An AI's CLI signs in from a terminal; the island gets out of its way.
-        this._voice.connect('sign-in', () => {
-            const state = this._daemon.state.assistant ?? {};
-            if (openSignIn(state.provider, state.program))
-                this.collapse();
-            else
-                this._voice.setState({...state, hint: signInHint(state.provider)});
-        });
-        this._voice.connect('set-up', () => {
-            if (openSetUp(this._daemon.state.assistant?.model, this._voiceShortcut))
-                this.collapse();
-        });
-        this._voice.connect('frame', (_view, time, level, work) => this._island.setTintMotion(time, level, work));
-        this._voice.connect('size-changed', () => {
-            if (this._presentation === 'voice')
-                this._render();
-        });
         daemon.connect('pomodoro-finished', (_daemon, finished, next) => {
             this._chime('complete');
             this._post(Alerts.pomodoroFinished(finished, next, daemon.state.pomodoro, daemon));
@@ -987,7 +733,7 @@ export class Controller {
     /** The pointer came onto a copy of the island: the island itself takes the copy's place, unless it is open on
      * another display (then once it closes, see `_render`). Presses on a copy go no further. */
     _useMirror(mirror, {press = false} = {}) {
-        if (this._destroying || !this._mirrors.includes(mirror) || !mirror.shown || this._expandWanted || this._voiceOpen)
+        if (this._destroying || !this._mirrors.includes(mirror) || !mirror.shown || this._expandWanted)
             return Clutter.EVENT_STOP;
         // A copy that grew under a still pointer (an alert): no hover yet, on the island either (see `_onHoverChanged`).
         const came = !mirror.island.changedUnderPointer;
@@ -1019,7 +765,7 @@ export class Controller {
         if (!tap && event.get_button() !== Clutter.BUTTON_PRIMARY)
             return Clutter.EVENT_STOP;
         this._useMirror(mirror, {press: true});
-        if (this._monitor !== mirror.monitor || this._expandWanted || this._voiceOpen)
+        if (this._monitor !== mirror.monitor || this._expandWanted)
             return Clutter.EVENT_STOP;
         this._openFromClosed();
         if (tap && this._expandWanted && !this._keyboardGrab)
@@ -1268,7 +1014,7 @@ export class Controller {
             : this._topBar.height + PILL_BELOW_BAR_GAP * scale;
     }
 
-    // Calendar and AI agents
+    // Calendar
 
     /** The calendar alarms, as Settings say (see `CalendarPage.alarmLead`). */
     _syncEventAlerts() {
@@ -1291,7 +1037,7 @@ export class Controller {
             // Devices is off until turned on, as an app is installed: its own switch, not `hidden-pages`.
             else if (page.name === 'devices')
                 page.hidden = !this._settings.get_boolean('devices-page');
-            else if (page.name !== 'call' && page.name !== 'usage')
+            else if (page.name !== 'call')
                 page.hidden = hidden.includes(page.name);
         }
         this._syncUnseen();
@@ -1302,17 +1048,27 @@ export class Controller {
         this._expanded.large = this._settings.get_string('open-size') === 'large';
     }
 
+    /** Lets go of GNOME's appearance and accent settings. */
+    _disconnectScheme() {
+        if (this._interfaceChanged)
+            this._interfaceSettings.disconnect(this._interfaceChanged);
+        this._interfaceChanged = null;
+        this._interfaceSettings = null;
+        Palette.unwatchAccent(this._accentWatch);
+        this._accentWatch = null;
+    }
+
     /** The island in GNOME's colour, switching dark or light with the system's appearance setting. */
     _syncTheme() {
         Theme.setTheme(this._settings.get_string('island-theme'));
         for (const island of [this._island, ...this._mirrors.map(mirror => mirror.island)])
             this._styleIsland(island);
-        // An agent's alert glows in the new theme's colours on the copies too.
+        // An alert's glow takes the new theme's colours on the copies too.
         for (const mirror of this._mirrors) {
             mirror.glowAlert = null;
             this._tintMirror(mirror);
         }
-        // An agent's alert on show takes the new theme's glow (see alerts.js); none while still building.
+        // An alert on show takes the new theme's glow (see alerts.js); none while still building.
         if (this._expanded)
             this._syncTint();
     }
@@ -1321,7 +1077,8 @@ export class Controller {
     _styleIsland(island) {
         const themeName = this._settings.get_string('island-theme');
         const light = themeName === 'gnome' && !Theme.gnomeDark();
-        for (const [name, on] of [['isle-light', light]]) {
+        // The accent follows GNOME's where it has one (the stylesheet reads it as -st-accent-color).
+        for (const [name, on] of [['isle-light', light], ['isle-accent-system', HAS_ACCENT]]) {
             if (on)
                 island.add_style_class_name(name);
             else
@@ -1398,134 +1155,13 @@ export class Controller {
         }, () => this._expanded?.pageNamed('calendar')?.alertShown(event)));
     }
 
-    /** The hooks as Settings say, once isled is there: a switch left on comes back after a reinstall, and one
-     * turned off while isled was away takes its hook out. */
-    _syncAgents(appeared = false) {
-        // Started again, isled's properties may come a moment after it: then on the first of them.
-        this._agentsUnsynced = !this._daemon.state.agents && (appeared || this._agentsUnsynced);
-        if (this._agentsUnsynced)
-            return;
-        const agents = this._daemon.state.agents;
-        this._agentsFound = Object.fromEntries(AGENT_PROVIDERS.map(provider => [provider, Boolean(agents[provider]?.found)]));
-        for (const provider of AGENT_PROVIDERS) {
-            const {found, hooked} = agents[provider] ?? {};
-            // Not found any more, a hook left behind still goes when its switch is off.
-            if ((found || hooked) && Boolean(hooked) !== this._settings.get_boolean(`agent-alerts-${provider}`))
-                this._hookAgent(provider);
-        }
-    }
-
-    /** An AI installed (or found again) while Isle runs gets its hook, if its switch is on. A hook the user took
-     * out of the AI's own config by hand stays out: only an agent that just appeared is hooked. */
-    _hookNewAgents() {
-        const agents = this._daemon.state.agents ?? {};
-        for (const provider of AGENT_PROVIDERS) {
-            const {found, hooked} = agents[provider] ?? {};
-            const appeared = found && !this._agentsFound?.[provider];
-            if (this._agentsFound)
-                this._agentsFound[provider] = Boolean(found);
-            if (appeared && !hooked && this._settings.get_boolean(`agent-alerts-${provider}`))
-                this._hookAgent(provider);
-        }
-    }
-
-    /** `_setHooked`, one call at a time per AI: two at once (isled appearing as its state comes) would race
-     * on the AI's config file, and the one refused would turn the switch off. One asked meanwhile runs after. */
-    async _hookAgent(provider) {
-        if (this._hooking.has(provider)) {
-            this._hooking.set(provider, true);
-            return;
-        }
-        this._hooking.set(provider, false);
-        try {
-            await this._setHooked(provider);
-        } finally {
-            const again = this._hooking.get(provider);
-            this._hooking.delete(provider);
-            if (again && !this._destroying)
-                this._hookAgent(provider);
-        }
-    }
-
-    /** Puts in or takes out `provider`'s hook, as its switch says; refused, the switch goes off and says why. */
-    async _setHooked(provider) {
-        const on = this._settings.get_boolean(`agent-alerts-${provider}`);
-        const {error} = await this._daemon.attempt('agents', 'SetHooked', provider, on);
-        if (this._destroying)
-            return;
-        // On by default: the first time it connects, it says so once, so nothing changes unseen.
-        if (!error && on) {
-            const told = this._settings.get_strv('agents-announced');
-            if (!told.includes(provider)) {
-                this._settings.set_strv('agents-announced', [...told, provider]);
-                this._post(Alerts.agentConnected(provider, this._botLook, () => this._extension.openPreferences()));
-            }
-            return;
-        }
-        if (!error || !on)
-            return;
-        this._settings.set_boolean(`agent-alerts-${provider}`, false);
-        this._post(Alerts.agentRefused(provider, error));
-    }
-
-    /** Whether alerts are on for `provider`. Grok runs Claude's hooks, so it follows Claude's switch. */
-    _alertsOn(provider) {
-        return this._settings.get_boolean(`agent-alerts-${provider === 'grok' ? 'claude' : provider}`);
-    }
-
-    /** Claude Code, Codex or Grok needs the user, or is done: an alert, unless its window is the one in front. */
-    _onAgentEvent(event) {
-        if (!this._alertsOn(event.provider) || this._notifications.dnd)
-            return;
-        // A permission the island asked for itself needs no second alert; one it could not ask (a long
-        // command, too many waiting) does. Its ask may come a moment after this.
-        if (event.kind === 'permission') {
-            const key = `${event.provider}:${event.session}`;
-            this._later(`agent-permission:${key}`, ASK_SETTLE_MS, () => {
-                if (Date.now() - (this._askedAt.get(key) ?? 0) > ASKED_RECENTLY_MS)
-                    this._showAgentEvent(event);
-            });
-            return;
-        }
-        this._showAgentEvent(event);
-    }
-
-    /** The alert for `event`, unless the agent's window is the one in front. */
-    _showAgentEvent(event) {
-        const window = this._agentWindow(event);
-        if (window && window === global.display.focus_window)
-            return;
-        const show = window ? () => Main.activateWindow(window) : null;
-        this._post(event.kind === 'done' ? Alerts.agentDone(event, this._botLook, show) : Alerts.agent(event, show));
-    }
-
-    /** The window (a terminal, VS Code) the agent runs in: one of the hook's parent processes (`pids`), else the
-     * latest whose title names the project. Null when unsure, so nothing is held back or sent there by mistake. */
-    _agentWindow({project, pids}) {
-        const windows = global.get_window_actors().map(actor => actor.meta_window);
-        const named = window => namesProject(window.get_title() ?? '', project);
-        const parents = new Set(pids ?? []);
-        const own = windows.filter(window => parents.has(window.get_pid()));
-        // One process may hold several windows (GNOME Terminal, VS Code): the one naming the project.
-        if (own.length === 1)
-            return own[0];
-        if (own.length > 1) {
-            const mine = own.filter(named);
-            return mine.length === 1 ? mine[0] : null;
-        }
-        if (!project)
-            return null;
-        return windows.filter(named).sort((a, b) => b.get_user_time() - a.get_user_time())[0] ?? null;
-    }
-
-    /** Sizes and shapes the island for what it shows now: the assistant, the pages, an alert, or nothing. */
+    /** Sizes and shapes the island for what it shows now: the pages, an alert, or nothing. */
     _render() {
         if (this._destroying)
             return;
-        const presentation = this._voiceOpen ? 'voice'
-            : this._expandWanted ? 'expanded' : this._alert ? 'peek' : 'compact';
+        const presentation = this._expandWanted ? 'expanded' : this._alert ? 'peek' : 'compact';
         this._presentation = presentation;
-        // Alerts, the open island and the assistant are never auto-hidden; the resting island waits again.
+        // Alerts and the open island are never auto-hidden; the resting island waits again.
         this._syncAutoHide();
         if (presentation !== 'compact')
             this._putAwayWarm();
@@ -1568,15 +1204,6 @@ export class Controller {
             view = this._expanded;
             break;
         }
-        case 'voice': {
-            // Like an alert, it hangs below the bar (or near the top of the screen); a pill's from where it floats.
-            const inset = gap ?? (this._blendsIn ? top : PEEK_TOP_GLASS * scale);
-            size = {width: this._voice.preferredWidth, height: inset + this._voice.fit(), radius: VOICE_RADIUS * scale,
-                shoulder: gap === null ? PEEK_SHOULDER * scale : 0};
-            view = this._voice;
-            view.style = `padding-top: ${inset / scale}px;`;
-            break;
-        }
         case 'peek':
             size = this._peekShape(this._peek, this._onBar);
             view = this._peek;
@@ -1592,7 +1219,6 @@ export class Controller {
             this._topBar.reserveWidth(this._compact.preferredWidth, this._footprint(this._compact));
         this._island.morph(size, view);
         this._expanded.setActive(presentation === 'expanded');
-        this._voice.setActive(presentation === 'voice');
         // A new alert under the pointer: its × shows (or not) at once.
         this._syncClose();
         this._syncTint();
@@ -1705,7 +1331,7 @@ export class Controller {
     }
 
     /** Lays out ahead, closed and a step at a time, what the frames showing it would otherwise style and lay
-     * out: the pages changed out of sight, and with `all` the alert and voice views. */
+     * out: the pages changed out of sight, and with `all` the alert views. */
     _warmUp(all) {
         const island = this._island;
         const expanded = this._expanded;
@@ -1713,7 +1339,6 @@ export class Controller {
         if (!island.mapped)
             return;
         const pages = expanded.pages.filter(page => page.cold && !page.hidden);
-        // The voice view only while the assistant is turned on.
         const steps = [];
         if (all) {
             // Each alert view shown with a ring alert's parts until the next step: a frame lays them out. Those of
@@ -1726,8 +1351,6 @@ export class Controller {
                 steps.push(() => kept(owner) && owner.warmView(peek, true) && peek.setAlert(WARM_ALERT, null, {fresh: true}));
                 steps.push(() => kept(owner) && owner.warmView(peek, false));
             }
-            if (this._voiceBound)
-                steps.push(() => island.warmView(this._voice, true) && island.warmView(this._voice, false));
         }
         if (pages.length || all) {
             steps.push(() => {
@@ -1781,27 +1404,13 @@ export class Controller {
         this._later('warm', Math.max(WARM_AFTER_CLOSE_MS, WARM_GAP_MS - sinceLast), () => this._warmUp(false));
     }
 
-    /** Bot/AI features removed in this fork. */
-    _readBotLook() {
-        return {shape: 'circle', palette: {glow: null, body: null, eyes: null}};
-    }
-
-    /** Settings changed the bot: the voice view and the island's glow follow. */
-    _syncBotLook() {
-        this._botLook = this._readBotLook();
-        this._voice.look = this._botLook;
-        this._voice.chatLook = this._botLook;
-        this._syncTint();
-    }
-
-    /** The island's colours for what it shows: the bot's glow, an alert's, or the open page's tint. */
+    /** The island's colours for what it shows: an alert's glow, or the open page's tint. */
     _syncTint() {
         const expanded = this._presentation === 'expanded';
-        const voice = this._presentation === 'voice';
-        // An alert that asks or tells what an agent did glows in its colours, still: drawn once.
+        // An alert that carries a glow shows it, still: drawn once.
         const glow = this._presentation === 'peek' ? this._alert?.glow : null;
-        const tint = voice ? this._botLook.palette.glow : glow ?? (expanded ? this._expanded.tint : null);
-        const style = voice || glow ? 'aura' : expanded ? this._expanded.tintStyle : null;
+        const tint = glow ?? (expanded ? this._expanded.tint : null);
+        const style = glow ? 'aura' : expanded ? this._expanded.tintStyle : null;
         const newGlow = Boolean(glow) && this._alert !== this._glowAlert;
         this._glowAlert = glow ? this._alert : null;
         if (tint !== this._tint || style !== this._tintStyle) {
@@ -1859,20 +1468,6 @@ export class Controller {
         if (!this._island.hovered && unmoved && !this._expandWanted)
             return;
         this._syncClose();
-        // An answer stays while the pointer is on it, and as long again once it leaves. Peeked at by hovering
-        // while it works, it goes back to the background as the pointer leaves.
-        if (this._voiceOpen) {
-            if (this._island.hovered) {
-                this._cancel('voice-close');
-                this._cancel('collapse');
-            } else if (this._voicePeeked) {
-                // Answered meanwhile, it closes on its own time instead (see `_onAssistant`).
-                this._later('collapse', COLLAPSE_DELAY_MS, () => this._voicePeeked && this.collapse());
-            } else {
-                this._scheduleVoiceClose(Math.min(this._voiceCloseMs, VOICE_LEAVE_MS));
-            }
-            return;
-        }
         // An alert waits while the pointer is on it, as a notification should; not the volume's.
         if (this._alert && !this._alert.transient && this._presentation === 'peek') {
             if (this._island.hovered)
@@ -1901,21 +1496,14 @@ export class Controller {
         }
     }
 
-    /** Opened by hovering and only showing its work: the pointer leaving puts it back in the background. Once
-     * used (the conversation, typing, a click that took the keyboard) it stays. */
-    get _voicePeeked() {
-        return this._voiceByHover && VOICE_WORKING.includes(this._voice.phase) && !this._voice.chatOpen && !this._keyboardGrab;
-    }
-
-    /** Under the pointer, the × on an answer, and on an alert that hovering doesn't open (see `_expandOnRest`). */
+    /** Under the pointer, the × on an alert that hovering doesn't open (see `_expandOnRest`). */
     _syncClose() {
         const on = this._pointerOn;
-        this._voice.pointerOn = on && this._presentation === 'voice';
         const opens = this._settings.get_string('open-on') === 'hover' && !this._alertHoldsHover;
         this._peek.showClose(on && this._presentation === 'peek' && !opens);
     }
 
-    /** An alert with buttons (Join, Allow…), or one that opens no page (the assistant's answer), is on show: the
+    /** An alert with buttons (Join, Allow…), or one that opens no page, is on show: the
      * pointer goes there to press or read it, not to open the island. */
     get _alertHoldsHover() {
         const alert = this._alert;
@@ -1936,11 +1524,8 @@ export class Controller {
             if (this._alertHoldsHover)
                 return;
             const [nowX, nowY] = global.get_pointer();
-            // The assistant still at work: its progress, rather than the pages (as a click does).
             const rested = Math.hypot(nowX - x, nowY - y) <= px(REST_DISTANCE_PX);
-            if (rested && this._voiceWorking)
-                this._reopenVoice({byHover: true});
-            else if (rested)
+            if (rested)
                 this.expand();
             else if (this._island.hovered)
                 this._expandOnRest();
@@ -2011,7 +1596,7 @@ export class Controller {
 
     /** Whether the open island stays open on the pinned lyrics (#62), the pointer away or not. */
     get _lyricsHeld() {
-        return this._expandWanted && !this._voiceOpen && this._expanded.page?.name === 'music' &&
+        return this._expandWanted && this._expanded.page?.name === 'music' &&
             this._expanded.page.holdsOpen;
     }
 
@@ -2023,7 +1608,7 @@ export class Controller {
                 this._setKeyboard(false);
             return;
         }
-        if (this._expandWanted && !this._voiceOpen && !this._keyboardGrab && !this._island.hovered)
+        if (this._expandWanted && !this._keyboardGrab && !this._island.hovered)
             this._later('collapse', COLLAPSE_DELAY_MS, () => this._collapseUnlessHeld());
     }
 
@@ -2031,7 +1616,7 @@ export class Controller {
     _openFromClosed() {
         // Clicking a notification opens it, like GNOME's banner did.
         if (!this._expandWanted && this._alert?.onActivate) {
-            // Done with: the assistant it may open puts it back in line no more.
+            // Done with: it is not put back in line.
             this._alert.answered = true;
             this._alert.onActivate();
             this._dismissAlert(true);
@@ -2040,11 +1625,6 @@ export class Controller {
         // isled down: why the island can do little, and how to fix it, rather than the pages.
         if (!this._expandWanted && this._compact.serviceDown) {
             this._post(Alerts.serviceDown(() => this._daemon.start()));
-            return Clutter.EVENT_STOP;
-        }
-        // The assistant still at work: its progress, rather than the pages.
-        if (!this._expandWanted && this._voiceWorking) {
-            this._reopenVoice();
             return Clutter.EVENT_STOP;
         }
         if (!this._expandWanted) {
@@ -2100,7 +1680,7 @@ export class Controller {
         if (!(type === Clutter.EventType.TOUCH_BEGIN ||
             (type === Clutter.EventType.BUTTON_PRESS && event.get_button() === Clutter.BUTTON_PRIMARY)))
             return Clutter.EVENT_PROPAGATE;
-        // The field or its text, not its icons (the calendar's chip, the assistant's Send).
+        // The field or its text, not its icons (the calendar's chip).
         const actor = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, ...event.get_coords());
         const entry = actor instanceof St.Entry ? actor : actor?.get_parent();
         if (!(entry instanceof St.Entry) || (actor !== entry && actor !== entry.clutter_text) ||
@@ -2136,18 +1716,6 @@ export class Controller {
         if (!this._shelfHelper.containsPointer() &&
             !this._island.contains(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, ...event.get_coords())))
             return Clutter.EVENT_STOP;
-        // A click puts an answer away; the face and the Sign in button take their own clicks.
-        if (this._voiceOpen) {
-            // Peeked at by hovering while it works, a click keeps it open, Esc putting it back.
-            if (this._voicePeeked) {
-                this._voiceByHover = false;
-                this._setKeyboard(true);
-            }
-            if (!this._voiceAnswered || this._voice.chatOpen)
-                return Clutter.EVENT_PROPAGATE;
-            this.collapse();
-            return Clutter.EVENT_STOP;
-        }
         switch (button) {
         case Clutter.BUTTON_PRIMARY:
             return this._openFromClosed();
@@ -2189,15 +1757,9 @@ export class Controller {
         const target = pageName ?? this._alertPage ?? this._defaultPage();
         if (target)
             this._expanded.showPage(target, {animate: this._expandWanted});
-        // Opening the island takes over from the alert being shown; one asking for an answer waits its turn.
-        if (this._alert?.key?.startsWith('agent-ask:') || this._alert?.key?.startsWith('task-ask:'))
-            this._shelveAlert();
-        else
-            this._dismissAlert(false);
+        // Opening the island takes over from the alert being shown.
+        this._dismissAlert(false);
         this._expandWanted = true;
-        // Closed once it is open, a command still waiting for Run or Deny waits its turn as an alert.
-        if (this._voiceOpen)
-            this._closeVoice();
         this._render();
     }
 
@@ -2238,20 +1800,15 @@ export class Controller {
             this._later('preview-restore', PREVIEW_RESTORE_MS, () => music.showMode(preview.mode));
     }
 
-    /** Closes the open island or the assistant, then shows what waited. */
+    /** Closes the open island, then shows what waited. */
     collapse() {
         if (this._destroying)
             return;
         this._cancel('collapse');
         this._setKeyboard(false);
         // Once closed and settled, what changed meanwhile is laid out for next time (see `_warmUp`); the
-        // alert and voice views keep their layout, unless the theme changed.
+        // alert views keep their layout, unless the theme changed.
         this._later('warm', WARM_AFTER_CLOSE_MS, () => this._warmUp(!this._viewsWarm));
-        if (this._voiceOpen) {
-            this._closeVoice();
-            this._nextAlert();
-            return;
-        }
         if (!this._expandWanted)
             return;
         this._expandWanted = false;
@@ -2382,8 +1939,7 @@ export class Controller {
             // Left during the grab, the pointer told the island nothing: an alert would wait for it forever.
             // Read now, so the alert shown next is timed by where the pointer really is.
             this._island.syncHover();
-            // An open assistant closes on its own timer.
-            if (!this._island.hovered && !this._voiceOpen)
+            if (!this._island.hovered)
                 this._later('collapse', COLLAPSE_DELAY_MS, () => this._collapseUnlessHeld());
         }
     }
@@ -2408,7 +1964,7 @@ export class Controller {
         // last. They close (unpinned) and the alert shows; volume and the like are let pass, as when open.
         if (!alert.transient && this._lyricsHeld && !this._island.hovered && !this._keyboardGrab)
             this.collapse();
-        if (this._expandWanted || this._voiceOpen) {
+        if (this._expandWanted) {
             // Volume and the like are stale by the time the island closes.
             if (!alert.transient)
                 this._enqueue(alert);
@@ -2517,7 +2073,6 @@ export class Controller {
     /** Puts the alert away; with `showNext`, the next in line comes on. */
     _dismissAlert(showNext) {
         this._cancel('alert');
-        // Put away without an answer, it says so (an agent then asks in its terminal).
         if (this._alert && !this._alert.answered)
             this._alert.onDismissed?.();
         this._alert = null;
@@ -2525,8 +2080,7 @@ export class Controller {
             this._nextAlert();
     }
 
-    /** Puts the alert on screen back first in line, not put away (an agent's ask keeps waiting for its answer);
-     * a passing or answered one just goes. */
+    /** Puts the alert on screen back first in line, not put away; a passing or answered one just goes. */
     _shelveAlert() {
         const alert = this._alert;
         this._cancel('alert');
@@ -2535,38 +2089,17 @@ export class Controller {
             this._queue.unshift(alert);
     }
 
-    // Hidden by a fullscreen window: an agent's ask goes to its terminal, as one asked now would (see
-    // `_onAgentAsking`); the alert on screen waits to be seen, its time not running out unseen.
+    // Hidden by a fullscreen window: the alert on screen waits to be seen, its time not running out unseen.
     _onHidden() {
-        this._passAgentAsks();
         this._shelveAlert();
         this._render();
-    }
-
-    /** The agents' asks on screen or waiting, unanswered, go back to their terminals. */
-    _passAgentAsks() {
-        const asks = [this._alert, ...this._queue].filter(alert => alert?.onDismissed && !alert.answered);
-        this._queue = this._queue.filter(alert => !asks.includes(alert));
-        for (const alert of asks) {
-            alert.answered = true;
-            alert.onDismissed();
-        }
-    }
-
-    /** Tells isled the island is there to answer agents' asks, or not: then they ask in their terminals at once.
-     * An isled from before it (not restarted since an update) has no SetPresent, and waits as it did. */
-    _sayPresent(present) {
-        // Never starting isled just to hear the island goes: one not running has no asks waiting.
-        if (present || this._daemon.running)
-            this._daemon.attemptQuietly('agents', 'SetPresent', present);
     }
 
     /** Shows the first alert in line that still has something to say, once nothing else is on screen. */
     _nextAlert() {
         if (this._destroying)
             return;
-        // One shows already (the command asked as the assistant closed): the queue waits behind it.
-        if (this._alert || !this._island.visible || this._expandWanted || this._voiceOpen || !this._queue.length) {
+        if (this._alert || !this._island.visible || this._expandWanted || !this._queue.length) {
             this._render();
             return;
         }
@@ -2590,7 +2123,7 @@ export class Controller {
         if (!this._settings.get_boolean('replace-osd') || !this._island.visible)
             return false;
         // While the island is open the OSD would cover it; let GNOME show it.
-        if (this._expandWanted || this._voiceOpen)
+        if (this._expandWanted)
             return false;
         const own = this._monitor?.index;
         if (displays) {
@@ -2694,466 +2227,6 @@ export class Controller {
         }, this._extension.path.startsWith('/usr/')));
     }
 
-    // Usage
-
-    /** Sends the usage settings to isled, and the warning marks to the page. */
-    _syncUsage() {
-        const config = {
-            enabled: false,
-            claude: false,
-            codex: false,
-            grok: false,
-            // Off, a plan seen there starts no AI to list its models.
-            assistant: false,
-            warn: 80,
-            critical: 95,
-        };
-        this._expanded.pageNamed('usage')?.setMarks(config.warn, config.critical);
-        this._daemon.call('usage', 'SetConfig', JSON.stringify(config));
-    }
-
-    // Voice
-
-    /** Binds the shortcut and shows the mic button while the assistant is turned on. */
-    _syncVoiceEnabled() {
-        const enabled = false;
-        if (enabled && !this._voiceBound) {
-            Main.wm.addKeybinding('voice-shortcut', this._settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW | Shell.ActionMode.POPUP,
-                () => this._onVoiceKey());
-        } else if (!enabled && this._voiceBound) {
-            Main.wm.removeKeybinding('voice-shortcut');
-            if (this._voiceOpen)
-                this.collapse();
-            // Turned off, a request at work is stopped: the island would show it, and open on nothing else.
-            this._closedListeningAt = 0;
-            if (this._voiceInBackground) {
-                this._deciding?.done(false);
-                this._daemon.call('assistant', 'Cancel');
-                this._voiceInBackground = false;
-                this._syncAssistantBusy();
-            }
-        }
-        this._voiceBound = enabled;
-        if (enabled)
-            this._viewsWarm = false;
-        this._expanded.voiceEnabled = enabled;
-        this._voice.shortcut = this._voiceShortcut;
-    }
-
-    // The shortcut (or the face) opens the assistant listening; while listening it finishes,
-    // and once answered it listens again for a follow-up.
-    _onVoiceKey() {
-        // Hidden by a fullscreen window: it would listen unseen.
-        if (!this._island.visible)
-            return;
-        if (!this._voiceOpen) {
-            // A request still at work shows its progress; a new one waits until it is done.
-            if (this._voiceWorking)
-                this._reopenVoice();
-            else
-                this._openVoice();
-            return;
-        }
-        // isled's phase, not the view's: the view says listening before isled has started.
-        const phase = this._daemon.state.assistant?.phase;
-        if (phase === 'listening')
-            this._daemon.call('assistant', 'Stop');
-        else if (this._voiceAnswered) {
-            this._autoListens = 0;
-            this._listen();
-        }
-    }
-
-    // Opened by Super+I it listens; with `typing` (opened with the mouse) the field is ready instead, and an
-    // ongoing conversation shows above it.
-    _openVoice({typing = false} = {}) {
-        if (!this._voiceBound)
-            return;
-        // Opened again before the last answer's actions ran: they belonged to that one.
-        this._cancel('voice-after');
-        this._voiceAfter = [];
-        this._voiceTarget = global.display.focus_window;
-        this._cancel('expand');
-        this._cancel('collapse');
-        this._expandWanted = false;
-        this._shelveAnswer();
-        this._voiceOpen = true;
-        this._voiceByHover = false;
-        this._voiceInBackground = false;
-        this._voiceTurn = this._daemon.state.assistant?.turn ?? 0;
-        this._voiceStep = this._daemon.state.assistant?.step ?? 0;
-        this._autoListens = 0;
-        // The conversation open last time stays shut, unless opened with the mouse (just below).
-        this._voice.closeChat();
-        if (!typing) {
-            this._listen({greet: true});
-            return;
-        }
-        this._startTyping('');
-        this._warm();
-        if (this._history.length) {
-            this._voice.setHistory(this._history);
-            this._voice.openChat();
-        }
-    }
-
-    /** The AI starts as the field opens, ready by the time the request is typed (see `Warm` in isled). */
-    async _warm() {
-        try {
-            const json = await voiceContext(this._settings, this._notifications,
-                {apps: this._installedApps.names, selectedIn: this._selectedIn});
-            this._daemon.call('assistant', 'Warm', json);
-        } catch (e) {
-            console.warn(`Isle: could not get the AI ready: ${e.message}`);
-        }
-    }
-
-    /** Types the request instead of saying it: listening stops (speech recognition never starts). */
-    _startTyping(initial) {
-        // Closed, it would take the keyboard from the windows unseen.
-        if (!this._voiceOpen)
-            return;
-        this._voiceByHover = false;
-        if (this._listenSent || this._daemon.state.assistant?.phase === 'listening')
-            this._daemon.call('assistant', 'Cancel');
-        this._listenSent = false;
-        this._listenRequest++;
-        this._cancel('voice-close');
-        this._cancel('voice-listen');
-        this._setKeyboard(true);
-        this._voice.followUp = null;
-        this._voice.greeting = null;
-        this._voice.startTyping(initial, this._daemon.state.assistant?.card);
-        this._render();
-    }
-
-    /** Asks a typed request, with what the island knows, as `_listen` does for a spoken one. */
-    async _ask(text) {
-        this._askedTyped = true;
-        // In the conversation, what was sent shows at once, as in Messages; isled's own copy replaces it.
-        if (this._voice.chatOpen)
-            this._voice.setHistory([...this._history, {role: 'user', text, at: Date.now()}]);
-        const request = ++this._listenRequest;
-        this._voice.setState({phase: 'thinking', heard: text});
-        this._render();
-        let json;
-        try {
-            json = await voiceContext(this._settings, this._notifications,
-                {apps: this._installedApps.names, selectedIn: this._selectedIn});
-        } catch (e) {
-            console.warn(`Isle: could not gather the request's context: ${e.message}`);
-            json = JSON.stringify({...aiSettings(this._settings), actions: actionTypes(this._settings)});
-        }
-        if (this._voiceOpen && request === this._listenRequest)
-            this._sendRequest(request, 'Ask', text, json);
-    }
-
-    // Sends a request to isled; not running (or refusing it), it would never answer, so the island says so
-    // rather than listen or think forever.
-    async _sendRequest(request, method, ...args) {
-        this._sentRequest = request;
-        const {result, error} = await this._daemon.attempt('assistant', method, ...args);
-        if (result || request !== this._listenRequest)
-            return;
-        // Closed meanwhile: nothing carries on in the background.
-        if (!this._voiceOpen) {
-            this._voiceInBackground = false;
-            this._syncAssistantBusy();
-            return;
-        }
-        const why = error || (this._daemon.running ? 'Isle couldn’t take that' : 'Isle’s service isn’t running');
-        this._listenSent = false;
-        this._voice.setState({phase: 'error', error: why, hint: this._askAgainHint});
-        this._setKeyboard(false);
-        this._render();
-        this._scheduleVoiceClose(VOICE_ERROR_MS);
-    }
-
-    // As the assistant opens: an answer of its own on show has been seen, so it goes rather than come back
-    // once the assistant closes; any other alert waits its turn.
-    _shelveAnswer() {
-        if (this._alert?.key === 'assistant')
-            this._alert.answered = true;
-        this._shelveAlert();
-    }
-
-    /** Shows the assistant again as it is (at work, or with the answer it came to), without listening; `byHover`
-     * only while the pointer rests on it, the keyboard left to the app. */
-    _reopenVoice({byHover = false} = {}) {
-        const state = this._daemon.state.assistant;
-        if (!this._voiceBound || !state)
-            return;
-        // Ended since (another request, or isled restarted), there is nothing to show again: the conversation.
-        if (!['reply', 'error', ...VOICE_WORKING].includes(state.phase)) {
-            this._openVoice({typing: true});
-            return;
-        }
-        this._cancel('expand');
-        this._cancel('collapse');
-        this._expandWanted = false;
-        this._shelveAnswer();
-        this._voiceOpen = true;
-        this._voiceByHover = byHover;
-        this._voiceInBackground = false;
-        this._voiceTarget = global.display.focus_window;
-        this._voice.followUp = null;
-        this._voice.greeting = null;
-        // Its progress or answer in the pill; the chevron opens the conversation.
-        this._voice.closeChat();
-        this._voice.setState(state);
-        this._syncAssistantBusy();
-        // At work, Esc and clicks elsewhere put it back in the background, and Enter or Esc answer its card.
-        if (VOICE_WORKING.includes(state.phase) && !byHover)
-            this._setKeyboard(true);
-        this._render();
-        if (this._voiceAnswered)
-            this._scheduleVoiceClose(VOICE_READ_MS.max);
-    }
-
-    /** The assistant's shortcut as people write it, or '' when it has none. */
-    get _voiceShortcut() {
-        return Format.shortcutLabel([][0] ?? '');
-    }
-
-    /** How to ask again, under an error: the shortcut, if there is one. */
-    get _askAgainHint() {
-        return this._voiceShortcut ? `Press ${this._voiceShortcut} to ask again.` : 'Ask again from the mic in the island.';
-    }
-
-    /** Whether the assistant works on a request with the island closed. */
-    get _voiceWorking() {
-        return this._voiceInBackground && VOICE_WORKING.includes(this._daemon.state.assistant?.phase);
-    }
-
-    /** The closed island shows the assistant at work. */
-    _syncAssistantBusy() {
-        this._setCompact('assistantBusy', this._voiceWorking);
-    }
-
-    /** Shows "Listening…" and sends isled a Listen with the request's context; `greet` for a conversation's first. */
-    async _listen({greet = false} = {}) {
-        this._voiceByHover = false;
-        this._askedTyped = false;
-        // Read before the keyboard is taken, while the selection is surely the app's.
-        // The app list only matters to a conversation's first request.
-        const apps = greet ? this._installedApps.names : [];
-        const context = voiceContext(this._settings, this._notifications, {apps, selectedIn: this._selectedIn});
-        const request = ++this._listenRequest;
-        this._cancel('voice-close');
-        this._cancel('voice-listen');
-        // A follow-up shows what was just said back, one dim line above "Listening…".
-        this._voice.followUp = greet ? null : Format.answerPlain(this._voice.exchange?.reply ?? '') || null;
-        // Esc and clicks elsewhere close it while it listens and thinks.
-        this._setKeyboard(true);
-        this._voice.greeting = greet ? GREETING : null;
-        this._voice.micWaiting = false;
-        this._voice.setState({phase: 'listening'});
-        // Not recording yet after a moment (isled getting the AI or the speech model ready): it says so.
-        this._later('mic-wait', MIC_WAIT_MS, () => {
-            if (this._voiceOpen && request === this._listenRequest && this._voice.phase === 'listening')
-                this._voice.micWaiting = true;
-        });
-        this._render();
-        let json;
-        try {
-            json = await context;
-        } catch (e) {
-            // Never left listening for nothing: ask without the extras.
-            console.warn(`Isle: could not gather the request's context: ${e.message}`);
-            json = JSON.stringify({
-                ...aiSettings(this._settings),
-                actions: actionTypes(this._settings),
-                whisper_model: 'small',
-                language: '',
-            });
-        }
-        // Closed, or asked to listen again, meanwhile.
-        if (this._voiceOpen && request === this._listenRequest) {
-            this._listenSent = true;
-            this._sendRequest(request, 'Listen', json);
-        }
-    }
-
-    /** Follows isled's assistant: shows each phase, runs the answer's actions, and closes or alerts once done. */
-    _onAssistant() {
-        const state = this._daemon.state.assistant;
-        if (!state)
-            return;
-        // Built again (turned back on after a lock) while a request was at work: it carries on as if asked with the
-        // island closed. A batch isled still waits on is told as cut short, never run twice (it may have happened).
-        if (!this._assistantSeen) {
-            this._assistantSeen = true;
-            if (!this._voiceOpen && VOICE_WORKING.includes(state.phase)) {
-                this._voiceInBackground = true;
-                this._voiceTurn = state.turn ?? 0;
-                this._voiceStep = state.step ?? 0;
-                if (state.phase === 'acting') {
-                    const detail = 'Isle was restarted (the screen locked) while this ran; it may not have happened';
-                    this._daemon.call('assistant', 'Results', state.step,
-                        JSON.stringify((state.actions ?? []).map(action => ({type: action.type, ok: false, detail}))));
-                }
-            }
-        }
-        // Closed as the last words were heard, isled had just begun on them unseen (its state lags a moment):
-        // the request carries on as one closed while at work, its actions run and its answer told.
-        if (!this._voiceOpen && !this._voiceInBackground && VOICE_WORKING.includes(state.phase) &&
-            Date.now() - this._closedListeningAt < CLOSED_LISTENING_MS) {
-            this._closedListeningAt = 0;
-            this._voiceInBackground = true;
-        }
-        const ours = this._voiceOpen || this._voiceInBackground;
-        // Actions it takes mid-way, open or closed: each batch once, and what they did goes back.
-        if (ours && state.phase === 'acting' && state.step !== this._voiceStep) {
-            this._voiceStep = state.step;
-            const step = state.step;
-            runActions(state.actions, this._voiceActions()).then(results =>
-                this._daemon.call('assistant', 'Results', step, JSON.stringify(results)));
-        }
-        this._syncAssistantBusy();
-        if (!this._voiceOpen) {
-            this._onAssistantInBackground(state);
-            return;
-        }
-        if (state.phase === 'idle')
-            return;
-        if (state.phase === 'listening')
-            this._micReady();
-        // Typing: the listening it stopped may still report in, "Didn't catch that" too.
-        const stopped = ['listening', 'transcribing'].includes(state.phase) || (state.phase === 'error' && state.heard_nothing);
-        if (this._voice.typing && stopped)
-            return;
-        // Nothing said back to a follow-up: it just closes, no error.
-        if (state.phase === 'error' && state.heard_nothing && this._voice.followUp) {
-            this.collapse();
-            return;
-        }
-        this._voice.setState(state);
-        this._render();
-        // New text is only measured right once styled; fit the island again then.
-        this._later('voice-fit', ALERT_FIT_DELAY_MS, () => {
-            if (this._presentation === 'voice')
-                this._render();
-        });
-        // Once answered, typing goes back to the windows; the answer closes on its own.
-        if (state.phase === 'reply' || state.phase === 'error') {
-            this._listenSent = false;
-            this._setKeyboard(false);
-        }
-        if (state.phase === 'reply' && state.turn !== this._voiceTurn) {
-            this._voiceTurn = state.turn;
-            runActions(state.actions, this._voiceActions());
-            // In the conversation the answer is already in the list: the field is ready for the next word.
-            if (this._voice.chatOpen && !state.listen) {
-                // Not once closed meanwhile (Esc, or an action that closes it first, as `write` does).
-                this._later('chat-type', CHAT_TYPE_AGAIN_MS, () => this._voiceOpen && this._voice.chatOpen && this._startTyping(''));
-            } else if (state.listen && this._autoListens < VOICE_MAX_AUTO_LISTENS) {
-                this._autoListens++;
-                // Asked something back: listen for the reply without a key press.
-                this._later('voice-listen', VOICE_LISTEN_AGAIN_MS, () => {
-                    if (this._voiceOpen && this._voice.phase === 'reply')
-                        this._listen();
-                });
-            } else {
-                const {base, perChar, max} = VOICE_READ_MS;
-                this._scheduleVoiceClose(state.actions?.length ? VOICE_DONE_MS
-                    : Math.min(max, base + perChar * (state.reply?.length ?? 0)));
-            }
-        } else if (state.phase === 'error') {
-            // Long enough to reach the Sign in button.
-            this._scheduleVoiceClose(state.sign_in || state.set_up ? VOICE_READ_MS.max : VOICE_ERROR_MS);
-        }
-    }
-
-    // Answered with the island closed: its actions run, and the answer (or what went wrong) shows as an
-    // alert, which opens it in full.
-    _onAssistantInBackground(state) {
-        if (!this._voiceInBackground)
-            return;
-        if (state.phase === 'reply' && state.turn !== this._voiceTurn) {
-            this._voiceTurn = state.turn;
-            runActions(state.actions, this._voiceActions());
-        } else if (state.phase !== 'error') {
-            return;
-        }
-        this._voiceInBackground = false;
-        this._syncAssistantBusy();
-        // Closed as it turned what was said into text, and nothing was: there is nothing to tell.
-        if (state.phase === 'error' && state.heard_nothing)
-            return;
-        this._post(Alerts.assistant({...state, hint: this._voice.withShortcut(state.hint ?? '')}, () => this._reopenVoice()));
-    }
-
-    /** isled records (it said so, or sound comes in): "Listening…" again (see `micWaiting` in voice.js). */
-    _micReady() {
-        this._cancel('mic-wait');
-        this._voice.micWaiting = false;
-    }
-
-    /** The conversation, as isled keeps it (see chat.rs). */
-    get _history() {
-        return Array.isArray(this._daemon.state.chat) ? this._daemon.state.chat : [];
-    }
-
-    /** The conversation changed; one brought back by Undo opens again. */
-    _onHistory() {
-        this._voice.setHistory(this._history);
-        if (this._openWhenBack) {
-            this._cancel('chat-undo');
-            this._openWhenBack = false;
-            if (this._voiceOpen)
-                this._voice.openChat();
-        }
-    }
-
-    // +: isled starts a new conversation; Undo brings the old one back for a moment, then it is deleted.
-    _newChat() {
-        this._openWhenBack = false;
-        this._daemon.call('assistant', 'NewChat');
-        this._voice.showUndo(true);
-        this._later('chat-undo', UNDO_MS, () => this._voice.showUndo(false));
-    }
-
-    /** Asks isled for the old conversation back, opening it when it comes (see `_onHistory`). */
-    _undoNewChat() {
-        this._openWhenBack = true;
-        // Not back by then (isled busy, or it dropped it), it never pops open on a later change.
-        this._later('chat-undo', UNDO_MS, () => (this._openWhenBack = false));
-        this._daemon.call('assistant', 'UndoNewChat');
-    }
-
-    // A command the AI wants run waits for Run or Deny: on its card while the island shows the assistant,
-    // else in an alert. Resolves true for Run, false for Deny, and 'unanswered' after APPROVAL_MS.
-    _decide(action) {
-        return new Promise(resolve => {
-            const entry = {
-                id: action.id,
-                action,
-                done: run => {
-                    if (this._deciding !== entry)
-                        return;
-                    this._deciding = null;
-                    this._cancel('decide');
-                    this._withdrawAlert(`task-ask:${action.id}`);
-                    resolve(run);
-                },
-            };
-            this._deciding?.done(false);
-            this._deciding = entry;
-            this._later('decide', APPROVAL_MS, () => entry.done('unanswered'));
-            if (this._voiceOpen)
-                this._setKeyboard(true);
-            else
-                this._askInAlert(action);
-        });
-    }
-
-    /** Run or Deny for the command, as an alert while the island is closed. */
-    _askInAlert(action) {
-        // Its buttons answer its own command, never one asked after it.
-        this._post(Alerts.taskAsks(action, this._botLook, run => this._deciding?.action === action && this._deciding.done(run)));
-    }
-
     /** Takes the alert with `key` away, shown or waiting its turn; one answered on screen goes once its answer
      * has shown ("Running"). */
     _withdrawAlert(key) {
@@ -3207,136 +2280,6 @@ export class Controller {
         const waiting = [this._alert, ...this._queue].some(alert => alert?.key === 'phone-received');
         this._phoneNames = waiting ? [...this._phoneNames ?? [], name] : [name];
         this._post(Alerts.phoneReceived(this._phoneNames, () => this._shelf.showTab('files')));
-    }
-
-    // Claude Code or Codex asks a permission: an alert to answer it, unless the user would not see it
-    // (its window in front, Do Not Disturb, alerts off); then it asks in its own terminal.
-    _onAgentAsking(request) {
-        const now = Date.now();
-        for (const [key, at] of this._askedAt) {
-            if (now - at > ASKED_RECENTLY_MS)
-                this._askedAt.delete(key);
-        }
-        this._askedAt.set(`${request.provider}:${request.session}`, now);
-        const pass = () => this._daemon.call('agents', 'Resolve', request.id, '');
-        if (!this._alertsOn(request.provider) || this._notifications.dnd ||
-            !this._island.visible)
-            return pass();
-        const window = this._agentWindow(request);
-        if (window && window === global.display.focus_window)
-            return pass();
-        const alert = Alerts.agentAsks(request, this._botLook,
-            answer => this._daemon.call('agents', 'Resolve', request.id, answer));
-        // Put away unanswered: the terminal asks instead.
-        alert.onDismissed = pass;
-        alert.agentWindow = window;
-        return this._post(alert);
-    }
-
-    // Gone to the agent's own window while its ask waits here: it asks there instead (Codex shows its
-    // prompt only once Isle lets go).
-    _passToAgentWindow(focus) {
-        if (!focus)
-            return;
-        const asks = [this._alert, ...this._queue].filter(alert => alert?.agentWindow === focus);
-        for (const alert of asks) {
-            this._withdrawAlert(alert.key);
-            alert.onDismissed?.();
-        }
-    }
-
-    /** An answer or an error is on show, no longer listening or thinking. */
-    get _voiceAnswered() {
-        return ['reply', 'error'].includes(this._voice.phase);
-    }
-
-    // isled restarted (an update) or stopped while listening or thinking: it will never answer, so
-    // the island says so rather than wait forever.
-    _onAssistantLost() {
-        // Its request is gone, so is a command card waiting for it.
-        this._deciding?.done(false);
-        // isled counts its answers and batches of actions from 0 again.
-        this._voiceTurn = 0;
-        this._voiceStep = 0;
-        if (this._voiceInBackground) {
-            this._voiceInBackground = false;
-            this._syncAssistantBusy();
-            this._post(Alerts.assistant({phase: 'error', error: 'Isle restarted', hint: this._askAgainHint},
-                () => this._openVoice()));
-            return;
-        }
-        if (!this._voiceOpen || !['listening', ...VOICE_WORKING].includes(this._voice.phase))
-            return;
-        this._voice.setState({phase: 'error', error: 'Isle restarted', hint: this._askAgainHint});
-        this._setKeyboard(false);
-        this._render();
-        this._scheduleVoiceClose(VOICE_ERROR_MS);
-    }
-
-    /** Closes an answer after `ms`, unless the pointer is on it or the conversation is open. */
-    _scheduleVoiceClose(ms) {
-        this._voiceCloseMs = ms;
-        // An action may have closed it already; an open conversation stays until put away.
-        if (!this._voiceOpen || this._voice.chatOpen)
-            return;
-        if (this._voiceAnswered && !this._pointerOn)
-            this._later('voice-close', ms, () => this.collapse());
-    }
-
-    /** What the assistant's actions act on; see `ACTIONS` in voice.js. */
-    _voiceActions() {
-        return {
-            daemon: this._daemon,
-            eventCalendar: () => this._settings.get_string('event-calendar'),
-            audio: this._audio,
-            notifications: this._notifications,
-            target: this._voiceTarget,
-            writer: this._writer,
-            decide: action => this._decide(action),
-            // The answer shows for a moment, then the page.
-            showNotifications: () => this._later('voice-page', 1200, () => {
-                // Left out in Settings meanwhile: the answer stays.
-                if (this._expanded.pageNamed('notifications').hidden)
-                    return;
-                this.expand('notifications');
-                if (!this._island.hovered && !this._keyboardGrab)
-                    this._holdOpen();
-            }),
-            // Closed first, so the island is not in a screenshot or over the lock screen.
-            // Every close-first action of an answer runs, in order, once the island has closed.
-            closeThen: callback => {
-                this._voiceAfter.push(callback);
-                this.collapse();
-                this._later('voice-after', 450, () => {
-                    const callbacks = this._voiceAfter;
-                    this._voiceAfter = [];
-                    callbacks.forEach(run => run());
-                });
-            },
-        };
-    }
-
-    /** Ends the conversation: the AI and the speech model quit until next time. */
-    _closeVoice() {
-        this._cancel('voice-close');
-        this._cancel('voice-listen');
-        this._cancel('chat-type');
-        this._cancel('voice-page');
-        this._voiceOpen = false;
-        this._voiceByHover = false;
-        this._micReady();
-        this._listenSent = false;
-        // A command still waiting for Run or Deny is asked in an alert now.
-        if (this._deciding)
-            this._askInAlert(this._deciding.action);
-        // Still at work, or typed and not yet taken up (its AI still starting): it carries on, and its answer
-        // comes as an alert.
-        const asked = this._voice.phase === 'thinking' && this._sentRequest === this._listenRequest;
-        this._voiceInBackground = asked || VOICE_WORKING.includes(this._daemon.state.assistant?.phase);
-        // Still listening as far as it knows: isled may be turning the last words into a request (see `_onAssistant`).
-        this._closedListeningAt = !this._voiceInBackground && this._voice.phase === 'listening' ? Date.now() : 0;
-        this._syncAssistantBusy();
-        this._daemon.call('assistant', 'End');
     }
 
     /** Plays a theme sound, if chimes are on. */
@@ -3395,7 +2338,7 @@ export class Controller {
         }
     }
 
-    /** Turns Isle off: agents' asks go back to their terminals, then all it built is torn down. */
+    /** Turns Isle off: all it built is torn down. */
     destroy() {
         // Failed to start: what it built went then.
         if (this._failed)
@@ -3408,10 +2351,6 @@ export class Controller {
             return;
         }
         this._stopRevealWait();
-        // Turned off (the screen locks too): agents waiting on an answer here ask in their terminals at once,
-        // and so do those that ask until Isle is back.
-        this._passAgentAsks();
-        this._sayPresent(false);
         // Sharing with a phone never outlives Isle (the screen locking turns it off too): asked whatever the
         // state last said (a Start may be on its way), but never starting isled just for that.
         if (this._daemon.running)
@@ -3419,21 +2358,14 @@ export class Controller {
         // What waits goes with Isle, never shown (a notification marked read, its sound played) as it goes.
         this._queue = [];
         Alerts.stopWatching();
-        global.display.get_selection().disconnect(this._primaryChanged);
+        this._disconnectScheme();
         Main.layoutManager.uiGroup.disconnect(this._panelAdded);
         if (this._focusChanged)
             global.display.disconnect(this._focusChanged);
         this._focusChanged = 0;
         global.display.disconnect(this._focusMonitorChanged);
         global.display.disconnect(this._fullscreenChanged);
-        stopPending();
-        if (this._voiceBound)
-            Main.wm.removeKeybinding('voice-shortcut');
         this._unbindPageShortcuts();
-        // A command waiting for Run or Deny ends with Isle; built again, it is asked again (see `_onAssistant`).
-        this._deciding?.done(false);
-        if (this._voiceOpen)
-            this._closeVoice();
         // Releasing the keyboard may schedule a collapse; cancel it after. Tearing down schedules nothing.
         this._setKeyboard(false);
         for (const name of [...this._timeouts.keys()])
@@ -3463,8 +2395,6 @@ export class Controller {
         // The views listen to the services below, so they go first.
         this._destroyMirrors();
         this._island.destroy();
-        this._writer.destroy();
-        this._installedApps.destroy();
         this._appUsage.destroy();
         this._clipboard.destroy();
         this._call.destroy();
@@ -3507,16 +2437,12 @@ export class Controller {
             this._cancel(name);
         // What the last step had connected before it failed (see `_connectAll`).
         Alerts.stopWatching();
-        stopPending();
-        if (this._primaryChanged)
-            global.display.get_selection().disconnect(this._primaryChanged);
+        this._disconnectScheme();
         if (this._panelAdded)
             Main.layoutManager.uiGroup.disconnect(this._panelAdded);
         for (const id of [this._focusChanged, this._focusMonitorChanged, this._fullscreenChanged].filter(Boolean))
             global.display.disconnect(id);
         this._focusChanged = 0;
-        if (this._voiceBound)
-            Main.wm.removeKeybinding('voice-shortcut');
         this._unbindPageShortcuts();
         this._setKeyboard(false);
         const monitor = global.backend.get_core_idle_monitor();
@@ -3526,21 +2452,19 @@ export class Controller {
         if (this._monitorsChanged)
             Main.layoutManager.disconnect(this._monitorsChanged);
         this._releaseScanout();
-        for (const part of [this._osd, this._keyboard, this._reminders, this._installedApps])
+        for (const part of [this._osd, this._keyboard, this._reminders])
             part?.destroy();
         this._shelfHelper?.destroy();
-        // No island to answer agents' asks: they ask in their terminals.
-        this._sayPresent(false);
         // The views are the island's once it is on screen (see `_buildIsland`); before, each goes by itself.
         if (!this._island?.get_parent()) {
-            for (const view of [this._compact, ...this._peeks ?? [], this._voice, this._expanded])
+            for (const view of [this._compact, ...this._peeks ?? [], this._expanded])
                 view?.destroy();
             if (!this._expanded)
                 this._pages.forEach(page => page.destroy());
         }
         this._destroyMirrors();
         this._island?.destroy();
-        for (const service of [this._topBar, this._writer, this._appUsage, this._clipboard, this._focusMode, this._call,
+        for (const service of [this._topBar, this._appUsage, this._clipboard, this._focusMode, this._call,
             this._privacy, this._audio, this._notifications, this._daemon])
             service?.destroy();
         this._settings = null;

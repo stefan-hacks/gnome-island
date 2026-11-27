@@ -16,7 +16,6 @@ test('only a closed island on screen hides, after the wait, with the pointer awa
     assert.equal(autoHide({...closed, mode: 'off'}), false);
     assert.equal(autoHide({...closed, presentation: 'peek'}), false);
     assert.equal(autoHide({...closed, presentation: 'expanded'}), false);
-    assert.equal(autoHide({...closed, presentation: 'voice'}), false);
     assert.equal(autoHide({...closed, hovered: true}), false);
     assert.equal(autoHide({...closed, visible: false}), false);
 });

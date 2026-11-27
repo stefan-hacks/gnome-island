@@ -125,56 +125,18 @@ const INTERFACES = {
             <method name="Clear"/>`),
         properties: {},
     },
-    usage: {
-        xml: node('Usage1', `
-            <method name="SetConfig"><arg name="config" type="s" direction="in"/></method>
-            <method name="Refresh"/>
-            <signal name="Alert"><arg name="provider" type="s"/><arg name="window" type="s"/><arg name="percent" type="d"/><arg name="resets_at_ms" type="x"/></signal>
-            <property name="Usage" type="s" access="read"/>`),
-        properties: {Usage: 'usage'},
-    },
     updates: {
         xml: node('Updates1', `
             <method name="SetEnabled"><arg name="enabled" type="b" direction="in"/></method>
             <property name="Latest" type="s" access="read"/>`),
         properties: {Latest: 'updates'},
     },
-    agents: {
-        xml: node('Agents1', `
-            <method name="SetHooked"><arg name="provider" type="s" direction="in"/><arg name="on" type="b" direction="in"/></method>
-            <method name="Resolve"><arg name="id" type="s" direction="in"/><arg name="decision" type="s" direction="in"/></method>
-            <method name="SetPresent"><arg name="present" type="b" direction="in"/></method>
-            <signal name="Event"><arg name="event" type="s"/></signal>
-            <signal name="Asking"><arg name="request" type="s"/></signal>
-            <signal name="Withdrawn"><arg name="id" type="s"/></signal>
-            <property name="Agents" type="s" access="read"/>`),
-        properties: {Agents: 'agents'},
-    },
-    assistant: {
-        xml: node('Assistant1', `
-            <method name="Warm"><arg name="context" type="s" direction="in"/></method>
-            <method name="Listen"><arg name="context" type="s" direction="in"/></method>
-            <method name="Ask"><arg name="text" type="s" direction="in"/><arg name="context" type="s" direction="in"/></method>
-            <method name="Stop"/>
-            <method name="End"/>
-            <method name="Results"><arg name="step" type="t" direction="in"/><arg name="results" type="s" direction="in"/></method>
-            <method name="Cancel"/>
-            <method name="NewChat"/>
-            <method name="UndoNewChat"/>
-            <method name="ClearChat"/>
-            <signal name="Level"><arg name="level" type="d"/></signal>
-            <signal name="Notice"><arg name="text" type="s"/><arg name="ok" type="b"/></signal>
-            <signal name="ModelSwitched"><arg name="provider" type="s"/><arg name="plan" type="s"/><arg name="picked" type="s"/><arg name="used" type="s"/></signal>
-            <property name="State" type="s" access="read"/>
-            <property name="History" type="s" access="read"/>`),
-        properties: {State: 'assistant', History: 'chat'},
-    },
 };
 /** State keys whose property is plain text rather than JSON. */
 const PLAIN = new Set(['updates']);
 
-// Signals: `changed` (key) when `state[key]` is new; `appeared` (interface), `running-changed` and `assistant-lost`
-// (a request in flight dies) as isled comes and goes; isled's own signals, renamed in `_onSignal`.
+// Signals: `changed` (key) when `state[key]` is new; `appeared` (interface), and `running-changed`
+// as isled comes and goes; isled's own signals, renamed in `_onSignal`.
 export class Daemon extends Signals.EventEmitter {
     /** Makes a proxy per interface and starts isled if needed. */
     constructor() {
@@ -258,16 +220,6 @@ export class Daemon extends Signals.EventEmitter {
                 if (proxy.g_name_owner)
                     this.emit('appeared', name);
             });
-            // Whatever it was doing for the voice assistant is lost with it; not when it first starts.
-            if (name === 'assistant') {
-                let owner = proxy.g_name_owner;
-                proxy.connect('notify::g-name-owner', () => {
-                    const was = owner;
-                    owner = proxy.g_name_owner;
-                    if (was && was !== owner)
-                        this.emit('assistant-lost');
-                });
-            }
             proxy.connect('g-signal', (_proxy, _sender, signal, parameters) =>
                 this._onSignal(name, signal, parameters.deep_unpack()));
             refresh();
@@ -344,35 +296,13 @@ export class Daemon extends Signals.EventEmitter {
         case 'PhaseFinished':
             this.emit('pomodoro-finished', ...args);
             break;
-        case 'Level':
-            this.emit('voice-level', args[0]);
-            break;
-        case 'Notice':
-            this.emit('assistant-notice', args[0], args[1]);
-            break;
-        case 'ModelSwitched':
-            this.emit('model-switched', ...args);
-            break;
-        case 'Withdrawn':
-            this.emit('agent-withdrawn', args[0]);
-            break;
-        case 'Asking':
-            try {
-                this.emit('agent-asking', JSON.parse(args[0]));
-            } catch (e) {
-                console.warn(`Isle: invalid permission request: ${e.message}`);
-            }
-            break;
-        case 'Alert':
-            this.emit('usage-alert', ...args);
-            break;
         case 'Received':
             this.emit('phone-received', args[0]);
             break;
         case 'Event':
             try {
-                // System1's and Agents1's: the computer, or an AI agent that needs you or is done.
-                this.emit(name === 'agents' ? 'agent-event' : 'system-event', JSON.parse(args[0]));
+                // System1's: the computer's (power, network, Bluetooth).
+                this.emit('system-event', JSON.parse(args[0]));
             } catch (e) {
                 console.warn(`Isle: invalid ${name} event: ${e.message}`);
             }

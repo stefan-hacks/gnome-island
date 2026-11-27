@@ -48,16 +48,7 @@ connects to the network only for these:
 | Synced lyrics, when LRCLIB has none | [NetEase Cloud Music](https://music.163.com) (`music.163.com/api`), asked by the extension | The song's title and artist (to search), then the id of the song found, once per song (then cached). Off until switched on in Settings → Music player |
 | Synced lyrics, with a key | [Musixmatch](https://developer.musixmatch.com) (`api.musixmatch.com`), asked by the extension | The song's title, artist and length, with your own API key, once per song (then cached). Off until switched on and skipped without a key; the key is kept in Isle's settings on this computer as plain text |
 | Cover art | The address the music player gives for the song's cover | A plain download of that picture, once per song (then cached) |
-| Claude plan usage | `api.anthropic.com/api/oauth/usage` | Claude Code's own sign-in token, read from Claude Code's credentials; Isle never signs in or refreshes it. Off when AI usage, or Claude in it, is turned off |
-| ChatGPT plan usage | `chatgpt.com/backend-api/wham/usage` | Codex's own sign-in token and account id, read from Codex's `auth.json`; Isle never signs in or refreshes it. Off when AI usage, or ChatGPT in it, is turned off |
-| Grok plan usage | Grok's own billing (`cli-chat-proxy.grok.com/v1`, or the address set in Grok's own config; https only) | Grok's own sign-in token and user id, read from Grok's sign-in; Isle never signs in or refreshes it. Off when AI usage, or Grok in it, is turned off |
-| Voice assistant | The AI command-line app you picked (Claude Code, Codex, Antigravity, Grok, opencode or Pi), which sends it to its own service under your plan (opencode and Pi: to the provider of the model picked, under your own key or subscription) | The text of your request (speech is turned into text on this computer), the context it needs (time, open apps and windows, reminders and events, which Linux and package managers this is), the output of the checks and commands it runs for you (with keys, tokens and passwords blanked), the conversation so far and, only if you allow it, the selected text or your notifications |
-| Web search by the assistant | Whatever the AI's own web search and page reading reach; opencode searches with [Exa](https://exa.ai) (`mcp.exa.ai`), as opencode does for its own models, and reads no pages itself | Search words and page addresses the AI chooses for your request |
-| Package checks by the assistant | Your package managers' own servers (npm's registry, Snap and Flatpak stores, dnf's mirrors) | Package names it looks up, when a check like `npm view codex` or `snap find vlc` asks them |
-| Song check | `open.spotify.com/oembed` | A Spotify link the AI suggested, to check it exists before playing it |
-| OpenCode Go's models | `opencode.ai/zen/go/v1/models` (OpenCode's public model list) | A plain request, no key, only with an OpenCode Go sign-in, when Settings or the assistant looks at opencode's models (at most every 6 hours) |
 | New versions | `api.github.com` (Isle's latest release) | A plain request, at most once a day; off when New versions is turned off in Settings |
-| Speech model | `huggingface.co` (the official whisper.cpp and Silero files) | A plain download, only when you run `isle-setup-voice` (or press Set up); each file's SHA-256 is checked |
 | Shelf files you share with your phone | Your phone, over the local network, only while sharing (see below) | The names, sizes and contents of the Shelf's files, to a phone you allowed; nothing goes through the internet |
 | Events you add to an account's calendar | That account's server (Google, or another in Online Accounts), through Evolution Data Server, as any calendar app sends it | The event's title, day and time, once, when you add it to that calendar (picked with the chip in the add field). Just before, isled opens a connection to that server and closes it, sending nothing, to see it is in reach; behind a proxy it skips that |
 
@@ -65,51 +56,20 @@ Lyrics providers are asked in the order of Settings → Music player, each only 
 all stop with Settings → Island → Alerts → Lyrics. Cava, if you turn it on, listens to what this computer plays, in
 its own process and only while its bars are on screen; nothing it hears is kept or sent.
 
-When ChatGPT can't be asked (offline, signed out), its limits are read from
-Codex's own logs on this computer, with no network at all.
-
 ## What stays on your computer
 
 - The clipboard history, shelf, reminders, calendar events kept in Isle (with
   Isle picked, with no account, or waiting for their calendar's server to be
-  in reach), timer settings and the assistant's conversation, in `~/.local/share/isle`
-  (readable by you only). The conversation is deleted, with the AI's own
-  copy of it, at midnight at the latest (or after 30 minutes or 2 hours
-  quiet, as set in Settings), on **+**, and on **Clear the conversation
-  now**. opencode keeps Isle's copy in `~/.local/share/isle/opencode`, apart
-  from your own opencode's, and its models list in `~/.cache/isle/opencode`;
-  Pi keeps Isle's in `~/.local/share/isle/pi/sessions`, apart from your own.
-- Logs of the commands the assistant ran for you, in
-  `~/.cache/isle/runs` (readable by you only), deleted once Isle has
-  followed each to its end.
+  in reach), timer settings, in `~/.local/share/isle`
+  (readable by you only).
 - Caches of covers and lyrics, in `~/.cache/isle`.
-- What your login shell sets for your AI tools: once at start, isled runs
-  your shell as a login shell to read its environment, and keeps only
-  `PATH` and the variables those tools read (`CLAUDE_CONFIG_DIR`,
-  `CODEX_HOME`, `ANTHROPIC_*`, `CLAUDE_CODE_*`, `OPENAI_*`, `AWS_*`, proxy
-  and certificate settings, where Node managers live). They stay in
-  isled's memory and go only to the AI tools it starts.
-- Your voice: speech is recognised by whisper.cpp (isle-whisper) on this computer, and
-  the recording is never stored or sent.
+- What your login shell sets: once at start, isled runs your shell as a login shell to read its environment,
+  and keeps only `PATH`, proxy and certificate settings. They stay in isled's memory.
 - The call preview: GNOME Shell draws it from the call's window as it is on
   screen; nothing is recorded, and it hides while you share your screen.
 - Meeting links: read from the event in your desktop calendars (Evolution
   Data Server) on this computer, and opened in your browser only when you
   click Join.
-- AI agents: for each of Claude Code and Codex it finds (unless turned off
-  in Settings), Isle adds its hooks to `~/.claude/settings.json` or
-  `~/.codex/hooks.json`, keeping a copy of the file as it was
-  (`*.isle-backup`) the first time. The hook runs `isled --agent-hook`,
-  which passes what the agent asks (the project's folder name, the tool and
-  its command or file) or its last message to the island over the session
-  bus, and for a permission waits for your answer and prints it for the
-  agent; nothing is sent anywhere. Only GNOME Shell can answer it. A
-  command the island cannot show whole (over more lines, longer than 160
-  characters, or with hidden characters) is never asked there: the agent
-  asks in its terminal. **Always** keeps only the rule the agent suggests
-  for that command or folder, never a change of its permission mode. Turning
-  the switch off, or uninstalling Isle, removes Isle's entries and leaves
-  the rest of the file as it is.
 
 ## Clipboard history
 
@@ -221,94 +181,12 @@ server; the island then offers the command that lets in the local network on
 those ports (`sudo ufw allow from <network> to any port 47830:47839 proto
 tcp`), until a phone gets through. Isle never changes the firewall itself.
 
-## The voice assistant's safety model
-
-- The AI only answers. It cannot run commands or change files itself: Isle
-  runs its actions, and only those it knows (music, apps and windows, files,
-  reminders and events, a few system settings, writing text where your
-  cursor is).
-- Each AI is started with only web search and reading pages: Claude Code with
-  just its web tools, Codex with its shell, file, browser and computer-use
-  tools off, agy in its own home folder behind a hook that refuses anything
-  else, Grok in its own home folder (sharing only your sign-in) with its
-  terminal, file editing, task and image tools refused, and opencode 1.4.8 or
-  newer (an older one is refused) in folders of its own
-  (`~/.local/share/isle/opencode`) with every tool but web search denied, each
-  by name, and not even offered to the model (no shell, files, page fetching,
-  subagents or skills). Only the file reader is offered, as OpenCode's free
-  models answer nothing without it, and it may open only a path that never
-  exists (`/nonexistent/isle-reads-nothing`). It gets none of your opencode config (`opencode.json`,
-  so no MCP servers, plugins or custom providers of yours), no project files,
-  and none of your environment but the locale, time zone and proxy settings.
-  Your sign-ins come from `~/.local/share/opencode/auth.json` (opencode 1.x)
-  or opencode 2's own database, through `opencode auth export` and `auth
-  import`, for each request: only API keys and OAuth sign-ins; an "external"
-  or "well-known" sign-in is left out, as it would bring its server's own
-  config, MCP servers and permissions with it. When opencode renews an OAuth
-  sign-in during a request (ChatGPT's, whose old refresh token then stops
-  working), Isle writes just that entry back over the older one you still
-  have, so your own opencode stays signed in. Nothing else is ever changed.
-  Isle's own 1.x copy is deleted as the request ends, also when it was
-  stopped; its 2.x database keeps the sign-ins it was given so later requests
-  stay signed in, readable by you only. It also keeps a list of the ids it
-  copied (no secrets, readable by you only), so a sign-in you remove from your
-  own database goes from Isle's too; one only Isle has stays. To avoid
-  starting opencode for every check, Isle keeps the sign-ins it exported in
-  memory for up to 30 seconds; they are not written to another file.
-  Pi, which has no web search, is started with no tools at all (`--no-tools`)
-  and none of your extensions, skills, prompt templates, themes or context
-  files (`AGENTS.md`), ignoring project files, in Isle's own workspace; the
-  request goes to it on its standard input, never on the command line. Its
-  update checks and telemetry are off for these runs (`PI_OFFLINE`). Your
-  sign-ins stay in Pi's own `~/.pi/agent`, which Pi reads and renews itself;
-  Isle only reads whether there are any, and your settings' model.
-- Files: Isle searches by name for it, within your home folder and removable
-  drives, and reads only small plain-text files you ask about. It skips
-  hidden folders, never searches those that hold keys or passwords (`.ssh`,
-  `.gnupg`, keyrings), judges a link by where it really points (a link to
-  `~/.ssh` is `~/.ssh`) and does not follow links while searching. It opens
-  documents and media, never programs, scripts or anything executable.
-- Checks the AI asks for run at once only when they read, in exact shapes:
-  each program on a fixed list with only the subcommands and options listed
-  for it, then package names (`uname -a`, `cat /etc/os-release`, `apt-cache
-  policy vlc`, `dpkg -s vlc`, `rpm -q vlc`, `dnf info vlc`, `pacman -Qi vlc`,
-  `flatpak list --app`, `snap info vlc`, `npm view @openai/codex version`,
-  `which node`, `<program> --version`…). Anything else (another file, an
-  option that writes, edits or runs something, a path) is refused. They run
-  directly with execve and no shell, so `;`, `|`, `&&`, redirects and `$( )`
-  cannot add a second command.
-- Every other command is shown in full on a card and runs only when you
-  press **Run**: one line of at most 400 characters, with no hidden or
-  reordering characters, so what you read is all that runs. Run and Deny
-  (and Allow on an agent's alert) take no press in the first half second,
-  so a click or Enter meant for something else never answers them. isled builds a `systemd-run` call for it; GNOME Shell starts
-  it only if it is exactly that: Isle's own options, the log in Isle's
-  folder, and the shown command last, unchanged. Root commands go through
-  polkit (GNOME's password dialog), get only the system's folders on their
-  `PATH` (so a program in your home cannot stand in for `apt`), and have
-  their output written to the log by your user, not by root. Commands that
-  would wipe the system or a disk are refused before you are asked, and a
-  denied command is not tried again.
-- Command output is passed to the AI with keys, tokens and passwords
-  blanked, and at most its last 4 KB.
-- Text from other apps (your selection, notifications, window titles,
-  command output, web pages) is passed to the AI as data, never as
-  instructions.
-
 ## Scope
 
 Areas where a report is especially welcome:
 
 - `isled`'s D-Bus API on the session bus (`docs/dbus-api.md`): input that
   crashes it, or reads or changes data it should not.
-- The voice assistant: a way for a request, a web page, a file, a
-  notification or other text to make Isle run something you did not ask for
-  or did not see on the card, run a check that changes anything, read
-  hidden or private files, or gain root without GNOME's password dialog.
-- The AI agents' hooks: a way for another program to answer an agent's
-  permission, or to read what the agents ask.
-- The AI usage page: a sign-in token (Claude Code's, Codex's or Grok's) sent
-  anywhere but its own service, or written anywhere.
 - The calendar: an event sent to a calendar you didn't pick, or one you
   deleted in Isle left in your account's calendar.
 - The clipboard history in `~/.local/share/isle`: copies kept from apps on

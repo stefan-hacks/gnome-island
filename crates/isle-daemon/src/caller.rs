@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 stefan-hacks
 
-//! Who may call what: the methods that read the user's clipboard or steer the assistant (which can type
-//! and open things) answer GNOME Shell, where the extension runs, and no other program on the bus.
+//! Who may call what: the methods that read the user's clipboard answer GNOME Shell, where the
+//! extension runs, and no other program on the bus.
 
 use zbus::message::Header;
 use zbus::names::BusName;

@@ -472,10 +472,6 @@ export default class IslePreferences extends ExtensionPreferences {
     }
 }
 
-
-
-
-
 /** A switch bound to a boolean key. */
 function switchRow(settings, key, title, subtitle) {
     const row = new Adw.SwitchRow({title, subtitle});
@@ -1095,17 +1091,6 @@ function chooseCity(window, onPick) {
     fill();
     dialog.present(window);
 }
-
-
-
-
-
-/** `command` on the PATH or where installers and Node version managers put it, as isled looks; else null. */
-// The same places isled looks in (brain.rs `install_dirs`), for an AI installed with npm, nvm, Homebrew…
-
-/** nvm's Nodes' bin folders, newest first. */
-
-// AI plan usage data removed in this fork.
 
 /** Items of a drop-down's list that wrap a long name rather than cutting it. */
 function wrappingItems() {

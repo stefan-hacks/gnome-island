@@ -29,8 +29,8 @@ import {Art, Bars, PrivacyDots, RecordingDot, Ring, icon, restsAt} from './widge
 /** Sizes hanging below the top bar, and inside it with smaller text, in CSS pixels. `clock` is the
  * island with nothing beside the clock, and the least it gets beside an activity. */
 const SIZES = {
-    hanging: {clock: 164, art: 24, artRadius: 6, ring: 20, bars: 16, moon: 14, call: 15, bot: 19.5},
-    inBar: {clock: 144, art: 22, artRadius: 6, ring: 18, bars: 14, moon: 13, call: 14, bot: 17.5},
+    hanging: {clock: 164, art: 24, artRadius: 6, ring: 20, bars: 16, moon: 14, call: 15},
+    inBar: {clock: 144, art: 22, artRadius: 6, ring: 18, bars: 14, moon: 13, call: 14},
 };
 /** The island's height below the top bar, or in it, until it is laid out (see `vfunc_allocate`); and its
  * corners' radius (COMPACT_RADIUS and IN_BAR_RADIUS in controller.js). */
@@ -133,8 +133,6 @@ export const CompactView = GObject.registerClass({
         this._micOff = new St.Icon({gicon: icon('isle-mic-off-symbolic'), icon_size: 15, style_class: 'isle-call-muted', y_align: Clutter.ActorAlign.CENTER});
         // isled is not running: what needs it cannot work (see the controller's service watch).
         this._serviceDown = new St.Icon({gicon: icon('dialog-warning-symbolic'), icon_size: 15, style_class: 'isle-compact-warning', y_align: Clutter.ActorAlign.CENTER});
-        // Bot/AI/assistant features removed in this fork.
-        this._assistant = null;
 
         const center = new St.Widget({layout_manager: new CentreLayout(), x_expand: true});
         const times = new St.Widget({layout_manager: new CentreLayout(), y_align: Clutter.ActorAlign.CENTER});
@@ -329,7 +327,7 @@ export const CompactView = GObject.registerClass({
         setWidth(this._moonBalance, moon);
         this._moonBalance.visible = this._moon.visible;
         // The day before the time, the two centred together; not beside an activity (music, a call, the timer, a
-        // recording, the assistant at work), whose sides take its room. The unseen dot alone leaves it.
+        // recording), whose sides take its room. The unseen dot alone leaves it.
         const activity = (this._lead.visible && this._lead.child !== this._dot) || this._right.visible;
         const date = this._settings.get_boolean('clock-date') && !activity && !this._privacy.recording;
         this._clockDate.visible = date;
@@ -467,14 +465,6 @@ export const CompactView = GObject.registerClass({
         this._refresh();
     }
 
-    /** Shows that the assistant works on a request, on the right, first of all. */
-    set assistantBusy(busy) {
-        if (busy === Boolean(this._assistantBusy))
-            return;
-        this._assistantBusy = busy;
-        this._refresh();
-    }
-
     /** In a pill (Settings → Shape): its ends round as half its height, and its clock alone narrower. */
     set pill(pill) {
         if (pill === this._pill)
@@ -512,7 +502,7 @@ export const CompactView = GObject.registerClass({
         this._refresh();
     }
 
-    /** Sizes the signs set in stage pixels (cover, assistant, ring) for the place and the scale. */
+    /** Sizes the signs set in stage pixels (cover, ring) for the place and the scale. */
     _sizeSigns() {
         const size = SIZES[this._inBar ? 'inBar' : 'hanging'];
         this._art.resize(size.art, size.artRadius);
@@ -585,7 +575,7 @@ export const CompactView = GObject.registerClass({
         if (this._lead.child !== left)
             this._swap(this._lead, left);
         this._lead.visible = Boolean(left);
-        // Right, the first that applies: isled down, the assistant at work, a call's muted microphone, the next
+        // Right, the first that applies: isled down, a call's muted microphone, the next
         // activity's sign, what goes with the first (the song's bars, the timer's time left).
         let right = withTimer ? this._bars
             : second ? {music: this._secondArt, timer: this._secondRing, call: this._secondPhone}[second]
@@ -772,11 +762,6 @@ export const CompactView = GObject.registerClass({
             GLib.source_remove(this._timeouts[name]);
             delete this._timeouts[name];
         }
-    }
-
-    /** The assistant's shape and colours — bot/AI features removed in this fork. */
-    _botLook() {
-        return {shape: 'circle', palette: {glow: null, body: null, eyes: null}};
     }
 
     /** Stops timers and signals, and destroys the signs not in a slot right now. */

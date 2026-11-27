@@ -4,6 +4,26 @@ All notable changes to GNOME Island are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Removed
+
+- **The voice assistant and every AI feature**: voice input and speech recognition (`isle-whisper`, whisper.cpp,
+  `isle-setup-voice`), the AI assistant and its chat, the bot, the AI agent alerts (Claude Code, Codex hooks) and the
+  AI Usage page, with their settings, D-Bus interfaces (`Assistant1`, `Agents1`, `Usage1`), icons, styles, docs and
+  packaging. `isled --agent-hook` stays as a no-op so hooks an earlier Isle left in an AI tool's settings do nothing.
+- **Wallpaper auto-theme** (and its GTK, Flatpak and kitty writers): it overwrote the GNOME accent colour.
+
+### Fixed
+
+- The island follows GNOME's light and dark setting and the accent colour live. The listeners are now released when Isle is
+  turned off, and the accent is read without risking the shell on GNOME 46, which has no accent setting.
+- Accent colours apply to every accent-coloured control again (switches, the volume, the day, tabs); the teal accent now
+  matches GNOME's.
+- Light mode: text, rings, strokes, dots and the vitals page no longer fall back to white on light grey; accent text is
+  darkened to read on the light island.
+- Stale code, settings and styles from the removed features.
+
 ## [1.8.0] - 2026-11-25
 
 ### Added

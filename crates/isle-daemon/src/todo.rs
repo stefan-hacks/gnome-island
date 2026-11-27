@@ -34,11 +34,6 @@ impl TodoService {
         }
     }
 
-    /// The current list, for the assistant to read.
-    pub fn list(&self) -> &TodoList {
-        &self.list
-    }
-
     /// Saves the list, rearms the midnight wait and tells the extension.
     async fn changed(&self, emitter: &SignalEmitter<'_>) -> zbus::Result<()> {
         self.store.save(&self.list);

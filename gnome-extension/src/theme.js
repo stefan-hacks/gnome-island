@@ -1,26 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 stefan-hacks
 
-// The island's look: Isle's own black, or glass over what is behind it. What Cairo paints in the island's
+// The island's look: GNOME's own dark or light grey, following the system's appearance setting. What Cairo paints in the island's
 // colour asks here; CSS does the rest. Settings loads it too: no shell imports.
 
-<<<<<<< HEAD
-// GNOME dark grey: the panel and menus of GNOME's default dark style, so the island blends in.
-||||||| ede1148
-import {autoThemeColors} from './autoTheme.js';
+import {legibleOn} from './contrast.js';
 
-// What is behind is blurred and toned in one pass (glass.js): its lightness mapped to lo + span × l^gamma, its
-// colour kept × saturation (`small` on a closed island or an alert, `large` open), a sheen and a glow added.
-=======
-let _autoThemeColors = null;
-export function setAutoThemeColors(fn) {
-    _autoThemeColors = fn;
-}
-
-// What is behind is blurred and toned in one pass (glass.js): its lightness mapped to lo + span × l^gamma, its
-// colour kept × saturation (`small` on a closed island or an alert, `large` open), a sheen and a glow added.
->>>>>>> 6cf2f6dcecc6d16415f1b8da07251b568d5c75b5
 const LOOKS = {
+    // GNOME dark grey: the panel and menus of GNOME's default dark style, so the island blends in.
     gnome: {fill: [0.118, 0.118, 0.118, 1], solid: [0.118, 0.118, 0.118], edge: null, blur: null},
 };
 
@@ -31,9 +18,9 @@ let _current = 'gnome';
 /** Whether the GNOME scheme is dark ('prefer-dark') or light (anything else). */
 let gnomeScheme = 'prefer-dark';
 
-/** Sets the look by its Settings name (always 'gnome'). */
+/** Sets the look by its Settings name (only gnome is left). */
 export function setTheme(name) {
-    _current = 'gnome';
+    _current = name === 'gnome' ? 'gnome' : 'gnome';
 }
 
 /** Sets the GNOME colour scheme so the 'gnome' theme adapts: 'prefer-dark' or anything else for light. */
@@ -50,27 +37,9 @@ export function gnomeDark() {
 }
 
 /** The look in use. */
-<<<<<<< HEAD
-const look = () => LOOKS.gnome;
-||||||| ede1148
 const look = () => {
-    if (autoActive) {
-        const auto = autoThemeColors();
-        if (auto)
-            return {fill: auto.fill, solid: auto.solid, edge: null, blur: null};
-    }
     return LOOKS.gnome;
 };
-=======
-const look = () => {
-    if (autoActive) {
-        const auto = _autoThemeColors ? _autoThemeColors() : null;
-        if (auto)
-            return {fill: auto.fill, solid: auto.solid, edge: null, blur: null};
-    }
-    return LOOKS.gnome;
-};
->>>>>>> 6cf2f6dcecc6d16415f1b8da07251b568d5c75b5
 
 /** Whether the island shows what is behind it (always false now). */
 export function translucent() {
@@ -92,9 +61,17 @@ export function edge() {
     return look().edge;
 }
 
-/** A signal colour (green, red, orange…) as RGB for the island. */
+/** What is drawn over the island's fill (lines, strokes, rings): white on the dark island, near-black on the light. */
+export function ink() {
+    return gnomeDark() ? [1, 1, 1] : [0.118, 0.118, 0.118];
+}
+
+/**
+ * A signal colour (green, red, orange…, or white for a neutral alert) as RGB for the island. On the light island
+ * it is darkened until it shows against the fill (3:1, as icons and lines need); the dark one keeps it as it is.
+ */
 export function semantic(rgb) {
-    return rgb;
+    return gnomeDark() ? rgb : legibleOn(rgb, GNOME_LIGHT.solid, 3);
 }
 
 /** How what is behind the island is blurred and toned, or null for not at all. */

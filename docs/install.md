@@ -55,34 +55,9 @@ Alt+F2, type `r` and press Enter.)
 The island now sits in the middle of the top bar, in place of the clock.
 Rest the pointer on it to open it.
 
-## 4. The voice assistant (optional)
+## 4. Check it
 
-Everything else works without it. To ask the island things out loud with
-Super+I:
-
-1. Install and sign in to one of Claude Code, Codex, Grok, opencode, Pi or Antigravity (the
-   [README](../README.md#voice-assistant) says how; each uses your own plan).
-2. Set up speech recognition once, in a terminal. It downloads the speech
-   model picked in Settings → Assistant (`small`, 265 MB, by default; or name
-   one, which Settings then uses: `isle-setup-voice base`) and needs nothing
-   else installed. A graphics
-   card is used through Vulkan when there is one, else the processor:
-
-   ```sh
-   ~/.local/bin/isle-setup-voice
-   ```
-
-   Set up with an older Isle, speech recognition used a Python environment
-   of up to 3 GB; updating Isle with the installer downloads the new model
-   and deletes it by itself (`isle-setup-voice --remove-old` does the same by
-   hand). In the assistant, a **Set up** button opens a terminal that runs
-   `isle-setup-voice` for you.
-
-3. Pick the AI in Isle's Settings → Assistant, or leave it on Automatic,
-   and press Super+I. An AI installed later is found by itself.
-
-`isle-setup-voice` ends by checking what Isle itself finds; run the same check
-any time:
+To check that the background service is running, at any time:
 
 ```sh
 ~/.local/bin/isled --doctor
@@ -91,12 +66,7 @@ any time:
 (Isle's commands are in `~/.local/bin`. When that folder is on your PATH,
 which the installer checks, their names alone do.)
 
-It lists speech recognition (its models, and the GPU or processor it runs
-on) and each AI, where it is installed and whether
-you are signed in. Isle finds AIs installed with npm (also a prefix of your
-own), nvm, volta, fnm, pnpm, bun, Homebrew, mise, asdf, Nix or their own
-installers, and takes what your login shell sets for them
-(`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, an API key, a proxy).
+It says whether the service is running and shows recent log lines.
 
 ## Updating
 
@@ -132,9 +102,8 @@ To install a particular version, put `ISLE_VERSION` before `bash`:
 ```
 
 This removes the extension, its programs, its service and its font, the
-voice assistant's speech recognition and its models, Isle's caches, and a
-battery charge limit Isle set (asking for your password), and takes Isle's
-hooks out of Claude Code's and Codex's settings. Your tasks,
+Isle's caches, and a
+battery charge limit Isle set (asking for your password). Your tasks,
 calendar events, clipboard history, timer settings and app usage (if you
 turned the Apps page on) stay in `~/.local/share/isle`; delete it too to
 remove everything.
@@ -178,8 +147,7 @@ the Extensions app or with:
 gnome-extensions enable gnome-island@stefan-hacks.github.com
 ```
 
-`isled` starts on its own when the extension first calls it. The voice
-assistant is set up per user as above, with `isle-setup-voice`.
+`isled` starts on its own when the extension first calls it.
 
 ### Arch Linux
 
@@ -205,14 +173,11 @@ you over a system-wide package: GNOME Shell, D-Bus and systemd all look in
 your home folder first. Run `isle-uninstall` to remove your own copy; the
 package's then takes over, with your settings and data kept.
 
-Before removing the package itself, each user who ran Isle takes its alert
-hooks out of Claude Code's and Codex's settings, which would otherwise call
-an `isled` that is gone. A battery charge limit set with the assistant
-stays after the package goes, so lift it first too:
+A battery charge limit set with `isle-charge-limit`
+stays after the package goes, so lift it first:
 
 ```sh
-isled --unhook-all
-isle-charge-limit 100       # only if the assistant set a charge limit
+isle-charge-limit 100       # only if you set a charge limit
 sudo apt remove isle        # or: sudo dnf remove isle, sudo pacman -R isle-bin
 ```
 
@@ -234,18 +199,14 @@ Everything goes in your home folder:
 | Where | What |
 |---|---|
 | `~/.local/share/gnome-shell/extensions/gnome-island@stefan-hacks.github.com` | The GNOME Shell extension |
-| `~/.local/bin` | `isled` (the background service), `isle-shelf` (drag and drop), `isle-whisper` (speech recognition), `isle-uninstall`, `isle-setup-voice`, `isle-charge-limit` |
+| `~/.local/bin` | `isled` (the background service), `isle-shelf` (drag and drop), `isle-uninstall`, `isle-charge-limit` |
 | `~/.config/systemd/user`, `~/.local/share/dbus-1/services` | Starting `isled` with your session |
 | `~/.local/share/fonts/isle` | Inter, the island's typeface |
-| `~/.local/share/isle` | Your data, and the speech models `isle-setup-voice` downloads (`models`) |
+| `~/.local/share/isle` | Your data |
 | `~/.local/share/doc/isle` | This README |
 
-Once running, Isle adds its hooks to Claude Code's `~/.claude/settings.json`
-and Codex's `~/.codex/hooks.json` when it finds them, so they ask you on
-the island (Codex asks once, at its next start, to trust them); turning
-them off in Settings → AI Usage → AI Agents, or uninstalling, takes them
-out. Commands you run from the assistant keep their logs in
-`~/.cache/isle/runs` until they end.
+If an earlier Isle added hooks to Claude Code's `~/.claude/settings.json` or Codex's `~/.codex/hooks.json`,
+they call `isled --agent-hook`, which now does nothing; you can delete those entries.
 
 On a first install only, it sets Isle's look (a slim glass top bar with the
 island in it); updates leave it as you have it. It never changes other
@@ -274,10 +235,6 @@ the [README](../README.md#troubleshooting) for the ufw and firewalld commands.
 
 **Music does not show.** Check the background service:
 `systemctl --user status isled`.
-
-**The voice assistant does not answer.** Run `~/.local/bin/isled --doctor` (with a .deb, .rpm
-or AUR package, `isled --doctor`): it says what is missing (speech recognition, an AI, or its
-sign-in) and what to run.
 
 **Anything else.** GNOME Shell's log shows extension errors:
 `journalctl -b -o cat /usr/bin/gnome-shell | grep -i isle`. Please

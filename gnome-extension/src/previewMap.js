@@ -99,7 +99,6 @@ export const PREVIEWS = {
     'shortcut-calendar': null,
     'shortcut-apps': null,
     'shortcut-devices': null,
-    'shortcut-usage': null,
     'shortcut-system': null,
 
     // Written by the shell itself (a page remembered, a question answered once, a count cleared): never a preview.
@@ -115,15 +114,6 @@ export const PREVIEWS = {
 
     // The preview itself.
     'preview-settings': null,
-
-    // Auto-theme settings: applied live, nothing to open the island for.
-    'auto-theme-enabled': null,
-    'auto-theme-shell': null,
-    'auto-theme-gtk': null,
-    'auto-theme-flatpak': null,
-    'auto-theme-kitty': null,
-    'auto-theme-refresh': null,
-    'auto-theme-current-bundle': null,
 };
 
 /** What opens for a change of `key`: {page, mode?}, or null for nothing. */

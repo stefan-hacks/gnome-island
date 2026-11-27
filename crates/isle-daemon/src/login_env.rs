@@ -2,7 +2,7 @@
 // Copyright (C) 2026 stefan-hacks
 
 //! What the login shell sets that isled, started by systemd, lacks: the PATH of nvm or Homebrew, and
-//! the AI CLIs' keys, config folders and proxies. Asked once at start; what systemd sets wins.
+//! the proxy and certificate settings. Asked once at start; what systemd sets wins.
 
 use std::ffi::OsString;
 use std::io::Read;
@@ -19,29 +19,7 @@ const TIMEOUT: Duration = Duration::from_secs(3);
 const MARK: &str = "ISLE-ENV-1f2e";
 
 /// Variables taken over, by name or by the start of it.
-const KEPT: &[&str] = &[
-    "CLAUDE_CONFIG_DIR",
-    "CODEX_HOME",
-    "OPENAI_API_KEY",
-    "OPENAI_BASE_URL",
-    "GEMINI_API_KEY",
-    "GOOGLE_API_KEY",
-    "GOOGLE_CLOUD_PROJECT",
-    "GOOGLE_APPLICATION_CREDENTIALS",
-    "CLOUD_ML_REGION",
-    "NODE_EXTRA_CA_CERTS",
-    "NODE_OPTIONS",
-    "SSL_CERT_FILE",
-    "SSL_CERT_DIR",
-    "NVM_DIR",
-    "VOLTA_HOME",
-    "PNPM_HOME",
-    "BUN_INSTALL",
-    "FNM_DIR",
-    "N_PREFIX",
-    "NPM_CONFIG_PREFIX",
-];
-const KEPT_PREFIXES: &[&str] = &["ANTHROPIC_", "CLAUDE_CODE_", "AWS_", "VERTEX_"];
+const KEPT: &[&str] = &["SSL_CERT_FILE", "SSL_CERT_DIR"];
 const PROXIES: &[&str] = &["http_proxy", "https_proxy", "no_proxy", "all_proxy"];
 
 /// Takes over what the login shell sets. Call it before any other thread runs.
@@ -63,7 +41,6 @@ pub fn import() {
             continue;
         }
         let wanted = KEPT.contains(&name.as_str())
-            || KEPT_PREFIXES.iter().any(|prefix| name.starts_with(prefix))
             || PROXIES.contains(&name.to_lowercase().as_str());
         if wanted && std::env::var_os(&name).is_none() {
             // SAFETY: as above.
@@ -201,11 +178,11 @@ mod tests {
     fn reads_the_environment_after_the_mark() {
         let mut out = b"Welcome back!\n".to_vec();
         out.extend(MARK.as_bytes());
-        out.extend(b"PATH=/a:/b\0CODEX_HOME=/x/codex\0EMPTY=\0ODD\0");
+        out.extend(b"PATH=/a:/b\0SSL_CERT_FILE=/x/ca.pem\0EMPTY=\0ODD\0");
         let env = parse(&out);
         assert_eq!(env.len(), 3);
         assert_eq!(env[0], ("PATH".into(), "/a:/b".into()));
-        assert_eq!(env[1], ("CODEX_HOME".into(), "/x/codex".into()));
+        assert_eq!(env[1], ("SSL_CERT_FILE".into(), "/x/ca.pem".into()));
         assert!(parse(b"no mark here").is_empty());
     }
 

@@ -8,7 +8,6 @@ import GLib from 'gi://GLib';
 import * as Format from './format.js';
 import * as Playback from './playback.js';
 import {notificationIcon, plainBody} from './notifications.js';
-import * as Theme from './theme.js';
 import {LOW_BATTERY, deviceIcon} from './widgets.js';
 
 const OSD_DURATION = 1500;
@@ -21,8 +20,6 @@ const TRANSIENT_NOTIFICATION_DURATION = 2500;
 const DECLINING = /^(decline|reject|deny|dismiss|cancel|ignore|hang up|end call|not now|tolak|abaikan|batal|tutup)\b/i;
 /** As many of a notification's buttons as GNOME's banner shows. */
 const MAX_NOTIFICATION_BUTTONS = 3;
-/** The longest an answer stays to be read, as the open island gives it (see VOICE_READ_MS in controller.js). */
-const ANSWER_MAX_DURATION = 8000;
 /** A critical notification stays this long once someone is there to see it. */
 const CRITICAL_DURATION = 20000;
 
@@ -359,41 +356,7 @@ export function notification(item, urgent, {onShown, onSeen, onWithdrawn}, share
     return alert;
 }
 
-/** "5 hours" → "5-hour limit", "Week · Opus" → "weekly Opus limit". */
-function limitName(window) {
-    if (window === '5 hours')
-        return '5-hour limit';
-    const [span, model] = window.split(' · ');
-    const kind = span === 'Week' ? 'Weekly' : span;
-    return model ? `${kind} ${model} limit` : `${kind} limit`;
-}
-
-/** An AI plan limit nears its end: the provider's logo in a ring of the share, "86%" beside it. */
-export function usage(provider, window, percent, resetsAt, critical) {
-    const at = GLib.DateTime.new_from_unix_local(Math.floor(resetsAt / 1000));
-    // Within the next 20 hours (later today or tomorrow morning), the time alone; later, with the day.
-    const when = resetsAt - Date.now() < 20 * 3600e3 ? Format.timeOfDay(at) : `${at.format('%a')} ${Format.timeOfDay(at)}`;
-    const name = provider.toLowerCase();
-    return {
-        key: `usage:${provider}:${window}`,
-        icon: name.includes('claude') ? 'isle-claude'
-            : name.includes('grok') ? 'isle-grok'
-            : name.includes('gpt') || name.includes('codex') ? 'isle-openai' : 'isle-gauge',
-        ring: Math.min(1, percent / 100),
-        title: provider,
-        subtitle: resetsAt > 0 ? `${limitName(window)} · resets ${when}` : limitName(window),
-        value: percentText(percent),
-        // In the plan's own colour, as on the Usage page; red once nearly used up.
-        tone: Math.round(percent) >= critical ? 'bad'
-            : name.includes('claude') ? 'claude'
-            : name.includes('grok') ? 'grok'
-            : name.includes('gpt') || name.includes('codex') ? 'codex' : 'neutral',
-        duration: REMINDER_DURATION,
-        page: 'usage',
-    };
-}
-
-/** A reminder the voice assistant set ("remind me in ten minutes to..."). `onShown` once on screen. */
+/** A reminder that came due. `onShown` once on screen. */
 export function reminder({id, text}, onShown) {
     return {
         // Its own key, so reminders due together queue instead of replacing each other.
@@ -458,52 +421,6 @@ export function meeting(event, link, join, onShown) {
         },
     };
     return alert;
-}
-
-const AGENT_NAMES = {claude: 'Claude', codex: 'Codex', grok: 'Grok'};
-const AGENT_APPS = {claude: 'Claude Code', codex: 'Codex', grok: 'Grok'};
-/** The agent's icon and accent colour; Claude's for anything unknown. */
-const agentIcon = provider => provider === 'codex' ? 'isle-openai' : provider === 'grok' ? 'isle-grok' : 'isle-claude';
-const agentTone = provider => provider === 'codex' ? 'codex' : provider === 'grok' ? 'grok' : 'claude';
-
-/** An AI agent needs the user, or is done ({provider, kind, project, message}); `show` brings its window up. */
-export function agent(event, show) {
-    const name = AGENT_NAMES[event.provider] ?? 'Your AI';
-    const waiting = event.kind === 'permission' || event.kind === 'waiting';
-    const title = {permission: `${name} needs your OK`, waiting: `${name} is waiting for you`}[event.kind] ?? `${name} is done`;
-    // Said once: the title already says it needs an OK; the tool it asks for, as a question.
-    const tool = /permission to use (.+?)\.?$/i.exec(event.message ?? '')?.[1];
-    const detail = {permission: tool ? `Allow ${tool}?` : '', waiting: ''}[event.kind] ?? event.message?.trim();
-    return {
-        // One per session: a newer word from the same one replaces it.
-        key: `agent:${event.provider}:${event.session || event.project}`,
-        icon: agentIcon(event.provider),
-        motion: waiting ? 'ring' : 'bounce',
-        title,
-        subtitle: [event.project, detail].filter(Boolean).join(' · '),
-        tone: agentTone(event.provider),
-        duration: waiting ? REMINDER_DURATION + 4000 : REMINDER_DURATION,
-        // It waits on the user: it stays until they are there to see it.
-        sticky: waiting,
-        action: show ? {label: 'Show', callback: show} : null,
-    };
-}
-
-/** The light round an alert that asks (amber), and one that tells an agent is done (green). */
-const ASKING_GLOW = [[1, 0.62, 0.04], [1, 0.42, 0.25], [1, 0.8, 0.3]];
-const DONE_GLOW = [[0.19, 0.82, 0.35], [0.35, 0.88, 0.75], [0.7, 0.94, 0.35]];
-/** On glass, each runs one way as Classic does, deep to light: orange to gold, green to teal. */
-const GLASS_ASKING_GLOW = [[0.99, 0.48, 0.06], [0.93, 0.62, 0.07], [0.86, 0.75, 0.33]];
-const GLASS_DONE_GLOW = [[0.21, 0.64, 0.05], [0.07, 0.72, 0.45], [0.31, 0.86, 0.74]];
-
-/** What a tool call asks to do, on one line: a shell command as it is, else the tool and what it touches
- * (isled sends that as a line; see agents/hook.rs `request`). */
-function toolLine(tool, input) {
-    const line = String(typeof input === 'string' ? input
-        : input?.command ?? input?.file_path ?? input?.path ?? input?.url ?? input?.pattern ?? '').split('\n')[0];
-    if (/^(bash|shell|exec_command|local_shell)$/i.test(tool ?? '') && line)
-        return line;
-    return [tool, line].filter(Boolean).join(' ');
 }
 
 /** A Shelf file was saved into Downloads as `name`; `show` shows it in the file manager. */
@@ -584,139 +501,6 @@ export function phoneReceived(names, onShown) {
     };
 }
 
-/** An AI agent asks to run something ({provider, project, tool, input, always}), shown by the assistant;
- * `answer(choice)` sends allow, deny or always back. */
-export function agentAsks(request, look, answer) {
-    // Allow is the one to press; Always (Claude keeps a rule for next time) is offered, never pressed for you.
-    const actions = [
-        {label: 'Deny', answer: 'deny', callback: () => answer('deny')},
-        ...request.always ? [{label: 'Always', answer: 'allow', done: 'Always allowed here', callback: () => answer('always')}] : [],
-        {label: 'Allow', answer: 'allow', primary: true, callback: () => answer('allow')},
-    ];
-    return {
-        key: `agent-ask:${request.id}`,
-        bot: {look, glyph: '!'},
-        title: `${request.project || AGENT_APPS[request.provider]} needs permission`,
-        subtitle: request.project ? AGENT_APPS[request.provider] : '',
-        code: toolLine(request.tool, request.input),
-        tone: 'warn',
-        // Read as it is drawn: the theme may change while it shows.
-        get glow() {
-            return Theme.translucent() ? GLASS_ASKING_GLOW : ASKING_GLOW;
-        },
-        actions,
-        // It waits on the user: it stays until answered, or until the agent stops asking.
-        sticky: true,
-        duration: 600000,
-        priority: 'instant',
-    };
-}
-
-/** An AI agent finished ({provider, project, message: its last words}); `show` brings its window up. */
-export function agentDone(event, look, show) {
-    const summary = firstSentence(event.message) || 'Finished';
-    return {
-        key: `agent:${event.provider}:${event.session || event.project}`,
-        bot: {look, glyph: 'check', form: 'success'},
-        title: summary,
-        titleLines: 2,
-        subtitle: `${[event.project, AGENT_APPS[event.provider]].filter(Boolean).join(' · ')} finished`,
-        tone: 'good',
-        get glow() {
-            return Theme.translucent() ? GLASS_DONE_GLOW : DONE_GLOW;
-        },
-        actions: [
-            ...show ? [{label: 'Open terminal', callback: show}] : [],
-            {label: 'OK', primary: true, callback: () => {}},
-        ],
-        duration: REMINDER_DURATION,
-    };
-}
-
-/** The first sentence of `text`, cut to a line's worth. */
-function firstSentence(text) {
-    // The words first (`{"say":"…"}` is that sentence), then the first line that says something: not a
-    // heading alone ("## Summary"), code or a rule, unless that is all there is.
-    const words = Format.spoken(text ?? '');
-    const linesOf = part => part.split('\n').map(line => line.trim()).filter(Boolean);
-    const line = linesOf(words.replace(/```[\s\S]*?(```|$)/g, '')).find(each => !/^(#{1,6}\s|([-*_]\s*){3,}$)/.test(each)) ??
-        linesOf(words)[0] ?? '';
-    // Markdown's marks only, not the characters of names (`user_id` keeps its underscore).
-    const first = Format.answerPlain(line.split(/(?<=[.!?])\s/)[0])
-        .replace(/^[#>\s]+/, '')
-        .replace(/(^|[^\w])_([^_]+)_(?=[^\w]|$)/g, '$1$2')
-        .replace(/(^|[^\w*])\*([^*]+)\*(?=[^\w*]|$)/g, '$1$2')
-        .trim();
-    return first.length > 140 ? `${first.slice(0, 139).trimEnd()}…` : first;
-}
-
-/** Isle's assistant wants to run `card.command` while the island is closed; `answer(run)` decides. */
-export function taskAsks(card, look, answer) {
-    return {
-        key: `task-ask:${card.id}`,
-        bot: {look, glyph: '!'},
-        title: card.why,
-        subtitle: card.risks?.includes('root') ? 'Isle wants to run this · asks for your password' : 'Isle wants to run this',
-        code: card.command,
-        tone: 'warn',
-        glow: look.palette.glow,
-        actions: [
-            {label: 'Deny', answer: 'deny', callback: () => answer(false)},
-            {label: 'Run', answer: 'allow', primary: true, done: 'Running', callback: () => answer(true)},
-        ],
-        sticky: true,
-        duration: 600000,
-        priority: 'instant',
-    };
-}
-
-/** Isle connected to `provider` for the first time; `settings` opens where it can be turned off. */
-export function agentConnected(provider, look, settings) {
-    return {
-        key: `agent-connected:${provider}`,
-        bot: {look, glyph: 'check', form: 'success'},
-        title: `${AGENT_APPS[provider]} is connected`,
-        subtitle: provider === 'codex' ? 'In Codex, type /hooks once and allow Isle' : 'Answer it from here when it asks',
-        tone: 'good',
-        actions: [
-            {label: 'Settings', callback: settings},
-            {label: 'OK', primary: true, callback: () => {}},
-        ],
-        duration: REMINDER_DURATION,
-    };
-}
-
-/** The model picked for the assistant isn't on `provider`'s plan now (it lapsed, say): `used` answers instead. */
-export function modelSwitched(provider, plan, picked, used) {
-    const name = {claude: 'Claude', codex: 'ChatGPT', grok: 'Grok', agy: 'Antigravity', opencode: 'opencode', pi: 'Pi'}[provider] ??
-        'Your AI';
-    return {
-        key: `model-switched:${provider}`,
-        icon: {claude: 'isle-claude', codex: 'isle-openai', grok: 'isle-grok'}[provider] ?? 'isle-sparkle-symbolic',
-        title: plan ? `${name} ${plan} doesn’t include ${picked}` : `${picked} isn’t available`,
-        // A long model name ("Claude Opus 4.6 (Thinking)") wraps rather than being cut.
-        titleLines: 2,
-        // The pick comes back by itself once the plan allows it again.
-        subtitle: `Using ${used} for now`,
-        tone: 'neutral',
-        duration: REMINDER_DURATION,
-    };
-}
-
-/** The alerts from `provider` could not be turned on; `reason` is isled's. */
-export function agentRefused(provider, reason) {
-    const name = AGENT_NAMES[provider] ?? 'Your AI';
-    return {
-        key: `agent-refused:${provider}`,
-        icon: agentIcon(provider),
-        motion: 'shake',
-        title: `Couldn’t turn on ${name} alerts`,
-        subtitle: reason,
-        tone: 'bad',
-        duration: REMINDER_DURATION,
-    };
-}
-
 /** A newer Isle is out; `open` shows Settings' Update. `packaged`: installed system-wide (.deb, .rpm, AUR). */
 export function update(version, open, packaged = false) {
     return {
@@ -731,7 +515,7 @@ export function update(version, open, packaged = false) {
     };
 }
 
-/** isled is not running: the island's music, timer, reminders and assistant wait for it. */
+/** isled is not running: the island's music, timer and reminders wait for it. */
 export function serviceDown(restart) {
     return {
         key: 'service-down',
@@ -767,27 +551,6 @@ export function notificationsSummary(items) {
         },
     };
     return alert;
-}
-
-/** The voice assistant finished a request the island closed on: its answer, or what went wrong. `open`
- * shows it in full. */
-export function assistant(state, open) {
-    const failed = state.phase === 'error';
-    const text = failed ? state.error || 'Something went wrong' : Format.answerPlain(state.reply ?? '') || 'Done';
-    return {
-        key: 'assistant',
-        icon: failed ? 'dialog-warning-symbolic' : 'isle-mic-symbolic',
-        motion: failed ? 'shake' : 'bounce',
-        title: text,
-        // An answer may take three lines, so a question at its end still shows.
-        titleLines: 3,
-        subtitle: failed ? state.hint ?? '' : 'Isle Assistant',
-        cutSubtitle: failed ? undefined : 'Isle Assistant · Click to read more',
-        tone: failed ? 'bad' : 'good',
-        // Long enough to read, as the open island gives it.
-        duration: Math.min(ANSWER_MAX_DURATION, STATUS_DURATION + 45 * text.length),
-        onActivate: open,
-    };
 }
 
 /** GNOME's screen recorder started. */

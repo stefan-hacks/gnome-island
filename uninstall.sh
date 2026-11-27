@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 stefan-hacks
-# Removes everything install.sh and isle-setup-voice put in place. Your shelf, clipboard history,
+# Removes everything install.sh put in place. Your shelf, clipboard history,
 # tasks, timer settings and app usage in ~/.local/share/isle are kept; delete that folder to remove them.
 set -uo pipefail
 
 UUID="gnome-island@stefan-hacks.github.com"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
-# A system-wide package (.deb, .rpm, AUR) stays in use: it keeps the extension on and the voice set-up.
+# A system-wide package (.deb, .rpm, AUR) stays in use: it keeps the extension on.
 SYSTEM=0
 [ -d "/usr/share/gnome-shell/extensions/$UUID" ] && SYSTEM=1
 
@@ -31,8 +31,7 @@ pkill -x isle-shelf 2>/dev/null
 rm -rf "$DATA/gnome-shell/extensions/$UUID" "$DATA/doc/isle" "$DATA/fonts/isle"
 fc-cache "$DATA/fonts" >/dev/null 2>&1
 if [ "$SYSTEM" = 0 ]; then
-    # The voice assistant's speech models (and an older setup's Python venv, up to 3 GB with CUDA), Isle's
-    # caches and its AIs' own homes.
+    # What an earlier Isle left behind (speech models, the AI assistant's files), Isle's caches.
     rm -rf "$DATA/isle/models" "$DATA/isle/voice-venv" "$DATA/isle/isle-whisper.py" "$DATA/isle/assistant" "$DATA/isle/codex" \
            "$DATA/isle/agy" "$DATA/isle/grok" "$DATA/isle/opencode" "$DATA/isle/claude-sign-in.json" \
            "$DATA/isle/updates.json" "$DATA/isle/install.lock" \
@@ -48,8 +47,6 @@ if [ "$SYSTEM" = 0 ]; then
         done
     fi
 fi
-# The AI alerts' hooks in Claude Code's and Codex's own settings would run an isled that is gone.
-[ -x "$HOME/.local/bin/isled" ] && "$HOME/.local/bin/isled" --unhook-all 2>/dev/null
 rm -f "$HOME/.local/bin/isled" "$HOME/.local/bin/isle-shelf" "$HOME/.local/bin/isle-whisper" "$HOME/.local/bin/isle-charge-limit" \
       "$HOME/.local/bin/isle-setup-voice" "$HOME/.local/bin/isle-uninstall" \
       "$DATA/dbus-1/services/io.github.stefanhacks.gnomeisland.Daemon.service" \
@@ -63,7 +60,3 @@ if [ "$SYSTEM" = 1 ]; then
     exit 0
 fi
 echo "Isle has been removed."
-HUB="${HF_HUB_CACHE:-${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/hub}"
-if ls -d "$HUB"/models--Systran--faster-whisper-* >/dev/null 2>&1; then
-    echo "An older speech model stays in $HUB (models--Systran--faster-whisper-*); delete it to free its space."
-fi

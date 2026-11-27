@@ -5,12 +5,11 @@
 pkgname=isle-bin
 pkgver=1.7.3
 pkgrel=1
-pkgdesc='A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, app usage and a voice assistant'
+pkgdesc='A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, and app usage'
 arch=('x86_64')
 url='https://github.com/stefan-hacks/gnome-island'
 license=('GPL-3.0-or-later' 'OFL-1.1')
 depends=('gnome-shell>=1:46' 'dconf' 'gtk4' 'glib2' 'pango' 'gdk-pixbuf2' 'gcc-libs' 'glibc' 'bash')
-optdepends=('vulkan-icd-loader: speech recognition on the graphics card, else on the processor')
 provides=('isle')
 conflicts=('isle')
 options=('!strip' '!debug')
@@ -22,8 +21,7 @@ package() {
   cd "isle-$pkgver-$CARCH-linux"
   local uuid=gnome-island@stefan-hacks.github.com
 
-  install -Dm755 -t "$pkgdir/usr/bin" bin/isled bin/isle-shelf bin/isle-whisper scripts/isle-charge-limit
-  install -Dm755 scripts/setup-voice.sh "$pkgdir/usr/bin/isle-setup-voice"
+  install -Dm755 -t "$pkgdir/usr/bin" bin/isled bin/isle-shelf scripts/isle-charge-limit
 
   local ext="$pkgdir/usr/share/gnome-shell/extensions/$uuid"
   install -d "$ext"

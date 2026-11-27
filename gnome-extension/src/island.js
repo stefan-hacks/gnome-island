@@ -853,7 +853,7 @@ export const Island = GObject.registerClass({
     }
 
     /** The theme changed: the shape in its colour, glass blurring what is behind, and everything Cairo paints in
-     * the island's colour (the bot's badge ring, a call's corners) drawn again. A rare change: a walk is fine. */
+     * the island's colour (a call's corners) drawn again. A rare change: a walk is fine. */
     refreshTheme() {
         this._backdrop.look = Theme.blur();
         this._sync();
@@ -881,7 +881,7 @@ export const Island = GObject.registerClass({
     }
 
     /** Draws the glow layer once with nothing lit (its uniforms all 0), so its shader is built before an alert's or the
-     * assistant's first frame needs it; that takes a frame of its own. */
+     * first frame of a view needs it; that takes a frame of its own. */
     _warmGlow() {
         this.disconnect(this._warmId);
         this._warmId = 0;

@@ -35,9 +35,8 @@ service() {
 # Everything but the license, under $1, with Inter in $2 (each system has its own fonts folder).
 stage() {
     local root="$1" fonts="$1$2"
-    install -Dm755 -t "$root/usr/bin" "$SRC/bin/isled" "$SRC/bin/isle-shelf" "$SRC/bin/isle-whisper" \
+    install -Dm755 -t "$root/usr/bin" "$SRC/bin/isled" "$SRC/bin/isle-shelf" \
         "$SRC/scripts/isle-charge-limit"
-    install -Dm755 "$SRC/scripts/setup-voice.sh" "$root/usr/bin/isle-setup-voice"
 
     local ext="$root/usr/share/gnome-shell/extensions/$UUID"
     mkdir -p "$ext"
@@ -77,7 +76,7 @@ EOF
     # The libraries the programs link, as package names and versions (libc6, libgtk-4-1, …).
     mkdir -p "$WORK/shlibs/debian"
     printf 'Source: isle\n\nPackage: isle\nArchitecture: amd64\n' > "$WORK/shlibs/debian/control"
-    depends="$(cd "$WORK/shlibs" && dpkg-shlibdeps -O --warnings=0 "$root/usr/bin/isled" "$root/usr/bin/isle-shelf" "$root/usr/bin/isle-whisper" |
+    depends="$(cd "$WORK/shlibs" && dpkg-shlibdeps -O --warnings=0 "$root/usr/bin/isled" "$root/usr/bin/isle-shelf" |
         sed -n 's/^shlibs:Depends=//p')"
 
     mkdir -p "$root/DEBIAN"
@@ -88,14 +87,13 @@ Architecture: amd64
 Maintainer: $MAINTAINER
 Installed-Size: $(du -sk --exclude=DEBIAN "$root" | cut -f1)
 Depends: $depends, gnome-shell (>= 46), dbus-user-session | default-dbus-session-bus
-Recommends: libvulkan1
 Section: gnome
 Priority: optional
 Homepage: https://github.com/stefan-hacks/gnome-island
 Description: $SUMMARY
  Isle turns the middle of the GNOME Shell top bar into a notch-style island: music
  with synced lyrics, calls, a focus timer, reminders, a calendar, a file shelf,
- app usage, charging and system alerts, and an optional voice assistant.
+ app usage, charging and system alerts.
  .
  Each user logs out and back in, then turns the extension on once: gnome-extensions enable $UUID
 EOF
@@ -119,7 +117,6 @@ URL: https://github.com/stefan-hacks/gnome-island
 Packager: $MAINTAINER
 Requires: gnome-shell >= 46
 # Speech recognition on the graphics card; without it, on the processor.
-Recommends: vulkan-loader
 # Built by package.sh already, and stripped there.
 %global debug_package %{nil}
 %global __strip /bin/true
@@ -127,7 +124,7 @@ Recommends: vulkan-loader
 %description
 Isle turns the middle of the GNOME Shell top bar into a notch-style island: music
 with synced lyrics, calls, a focus timer, reminders, a calendar, a file shelf,
-app usage, charging and system alerts, and an optional voice assistant.
+app usage, charging and system alerts.
 
 Each user logs out and back in, then turns the extension on once: gnome-extensions enable $UUID
 
@@ -139,8 +136,6 @@ cp -a "$stage/." "%{buildroot}/"
 %doc /usr/share/doc/isle
 /usr/bin/isled
 /usr/bin/isle-shelf
-/usr/bin/isle-whisper
-/usr/bin/isle-setup-voice
 /usr/bin/isle-charge-limit
 /usr/share/gnome-shell/extensions/$UUID
 /usr/share/glib-2.0/schemas/org.gnome.shell.extensions.isle.gschema.xml

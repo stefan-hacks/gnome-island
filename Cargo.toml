@@ -4,15 +4,13 @@ members = [
     "crates/isle-core",
     "crates/isle-daemon",
     "crates/isle-shelf",
-    "crates/isle-whisper",
 ]
-# isle-shelf needs the GTK 4 development files, and isle-whisper cmake, a C++
-# compiler, libclang and (for the GPU) the Vulkan headers and glslc, so they
-# are only built when asked for: `cargo build -p isle-shelf -p isle-whisper`.
+# isle-shelf needs the GTK 4 development files, so it is only built when asked for:
+# `cargo build -p isle-shelf`.
 default-members = ["crates/isle-core", "crates/isle-daemon"]
 
 [workspace.package]
-version = "1.8.0"
+version = "1.7.5"
 edition = "2024"
 # isle-core and isled use let chains (1.88); isle-shelf sets its own, for gtk-rs.
 rust-version = "1.88"
@@ -46,8 +44,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 # Compares phone sharing's secret token in constant time.
 subtle = "2"
-# Edits Codex's config.toml in place, keeping its comments and layout.
-toml_edit = { version = "0.25", default-features = false, features = ["display", "parse"] }
 tokio = { version = "1", features = ["fs", "io-util", "macros", "net", "process", "rt", "signal", "sync", "time"] }
 # No gzip: the few small JSON answers are not worth a deflate implementation.
 ureq = { version = "3", default-features = false, features = ["rustls", "json"] }
@@ -59,8 +55,7 @@ lto = "fat"
 codegen-units = 1
 strip = true
 
-# The service and the shelf are small and mostly wait: built for size. isle-whisper keeps
-# full speed for transcribing.
+# The service and the shelf are small and mostly wait: built for size.
 [profile.release.package.isle-daemon]
 opt-level = "s"
 
@@ -70,13 +65,6 @@ opt-level = "s"
 [profile.release.package.isle-shelf]
 opt-level = "s"
 
-# Their libraries too (zbus, tokio, image, ureq...): less code for isled to hold in memory. Not
-# whisper's, which keep full speed.
+# Their libraries too (zbus, tokio, image, ureq...): less code for isled to hold in memory.
 [profile.release.package."*"]
 opt-level = "s"
-
-[profile.release.package.whisper-rs]
-opt-level = 3
-
-[profile.release.package.whisper-rs-sys]
-opt-level = 3

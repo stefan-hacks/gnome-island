@@ -114,13 +114,6 @@ impl<T: Serialize + DeserializeOwned + Default> Store<T> {
         }
     }
 
-    /// Saves before returning, for a file another `Store` of it may read or delete right after.
-    pub fn save_now(&self, value: &T) {
-        if self.queue(value).is_some() {
-            self.writer.write();
-        }
-    }
-
     /// Hands `value` to the writer; whether a write was already waiting, `None` if not to be saved.
     fn queue(&self, value: &T) -> Option<bool> {
         if self.read_only {
@@ -137,19 +130,6 @@ impl<T: Serialize + DeserializeOwned + Default> Store<T> {
         bytes.push(b'\n');
         // A write already waiting takes these bytes instead of its own.
         Some(lock(&self.writer.pending).replace(bytes).is_some())
-    }
-}
-
-impl<T> Store<T> {
-    /// Deletes the file, and any save still waiting to be written: what it held is gone for good.
-    pub fn remove(&self) {
-        let _writing = lock(&self.writer.writing);
-        lock(&self.writer.pending).take();
-        match fs::remove_file(&self.path) {
-            Ok(()) => {}
-            Err(err) if err.kind() == io::ErrorKind::NotFound => {}
-            Err(err) => warn!("could not delete {}: {err}", self.path.display()),
-        }
     }
 }
 

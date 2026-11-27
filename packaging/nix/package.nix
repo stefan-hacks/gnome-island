@@ -7,12 +7,6 @@
 , glib
 , pango
 , gdk-pixbuf
-, cmake
-, clang
-, libclang
-, vulkan-headers
-, vulkan-loader
-, glslang
 , makeWrapper
 , gnome-shell
 , glibc
@@ -33,9 +27,6 @@ rustPlatform.buildRustPackage {
 
   nativeBuildInputs = [
     pkg-config
-    cmake
-    clang
-    libclang
     makeWrapper
     glib # for glib-compile-schemas
   ];
@@ -46,9 +37,6 @@ rustPlatform.buildRustPackage {
     glib
     pango
     gdk-pixbuf
-    vulkan-headers
-    vulkan-loader
-    glslang
   ];
 
   cargoLock = {
@@ -58,7 +46,7 @@ rustPlatform.buildRustPackage {
   # Tests include integration tests that hang in sandboxed builds.
   doCheck = false;
 
-  # Build only the daemon and shelf by default; whisper needs Vulkan which is optional.
+  # The daemon and the shelf.
   buildPhase = ''
     runHook preBuild
     cargo build --release -p isle-daemon -p isle-shelf
@@ -95,7 +83,6 @@ rustPlatform.buildRustPackage {
     cp target/release/isle-shelf "$out/bin/"
 
     # Scripts
-    cp ${src}/scripts/setup-voice.sh "$out/bin/isle-setup-voice"
     cp ${src}/scripts/isle-charge-limit "$out/bin/"
 
     # Services

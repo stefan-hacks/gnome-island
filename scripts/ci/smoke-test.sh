@@ -114,17 +114,10 @@ session() {
     info="$(gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
         --method org.gnome.Shell.Extensions.GetExtensionInfo "$UUID" 2>&1 || true)"
     state="$(printf '%s' "$info" | grep -oE "'state': <[0-9.]+>" | grep -oE '[0-9]+' | head -n1 || true)"
-    local isled whisper
+    local isled
     isled="$(command -v isled || echo "$HOME/.local/bin/isled")"
-    whisper="$(command -v isle-whisper || echo "$HOME/.local/bin/isle-whisper")"
     "$isled" --version
     "$isled" --doctor || fail "isled --doctor failed."
-    # Speech recognition starts with no GPU and no Vulkan loader, on the processor.
-    say "isle-whisper --probe"
-    local probe
-    probe="$("$whisper" --probe 2>&1 || true)"
-    printf '%s\n' "$probe"
-    [[ "$probe" == *'"device"'* ]] || fail "isle-whisper --probe did not answer."
     kill "$shell" 2>/dev/null || true
     wait "$shell" 2>/dev/null || true
 

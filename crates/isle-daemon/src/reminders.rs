@@ -24,11 +24,6 @@ impl RemindersService {
         let reminders = store.load();
         Self { reminders, store }
     }
-
-    /// The current reminders, for the daemon's own checks.
-    pub fn reminders(&self) -> &Reminders {
-        &self.reminders
-    }
 }
 
 #[interface(name = "io.github.stefanhacks.gnomeisland.Reminders1")]

@@ -4,9 +4,7 @@
 //! `isled`: the Isle background service, on the session bus as `io.github.stefanhacks.gnomeisland.Daemon`.
 //! See `docs/dbus-api.md` for the interfaces.
 
-mod agents;
 mod app_usage;
-mod assistant;
 mod calendar;
 mod caller;
 mod clipboard;
@@ -25,7 +23,6 @@ mod system;
 mod todo;
 mod updates;
 mod uri;
-mod usage;
 
 use anyhow::{Context, bail};
 use futures_util::StreamExt;
@@ -34,9 +31,7 @@ use tokio::signal::unix::{SignalKind, signal};
 use zbus::connection;
 use zbus::fdo::{DBusProxy, RequestNameFlags, RequestNameReply};
 
-use crate::agents::AgentsService;
 use crate::app_usage::AppUsageService;
-use crate::assistant::AssistantService;
 use crate::calendar::CalendarService;
 use crate::clipboard::ClipboardService;
 use crate::media::MediaService;
@@ -47,7 +42,6 @@ use crate::shelf::ShelfService;
 use crate::system::SystemService;
 use crate::todo::TodoService;
 use crate::updates::UpdatesService;
-use crate::usage::UsageService;
 
 const BUS_NAME: &str = "io.github.stefanhacks.gnomeisland.Daemon";
 const OBJECT_PATH: &str = "/io/github/stefanhacks/gnomeisland/Daemon";
@@ -56,14 +50,11 @@ const CACHED_SONGS: usize = 500;
 
 const HELP: &str = "isled: the Isle background service (started by systemd or D-Bus, not by hand)
 
-Usage: isled [--version | --doctor | --report | --unhook-all | --help]
+Usage: isled [--version | --doctor | --report | --help]
   --version     print the version
-  --doctor      check the service, speech recognition, each AI's install and sign-in, and its alerts
+  --doctor      check that the service is running
   --report      everything a bug report needs: versions, the doctor's check and recent logs
-  --unhook-all  take Isle's alert hooks out of Claude Code's and Codex's settings
-  --help        print this
-
-Claude Code and Codex run `isled --agent-hook claude|codex` themselves, once their alerts are on.";
+  --help        print this";
 
 /// glibc keeps freed memory to use again, so one big picture or download held isled's memory up for
 /// good: big blocks go back to the system once freed, and one pool serves both threads.
@@ -95,15 +86,8 @@ async fn run() -> anyhow::Result<()> {
         .collect();
     match args.get(1).map(String::as_str) {
         None => {}
-        // Run by an AI's hook: says nothing and always succeeds.
-        Some("--agent-hook") => {
-            agents::hook::run(&args[2..]).await;
-            return Ok(());
-        }
-        Some("--unhook-all") => {
-            agents::unhook_all();
-            return Ok(());
-        }
+        // Hooks an earlier Isle left in an AI tool's settings still run this: they do nothing now.
+        Some("--agent-hook" | "--unhook-all") => return Ok(()),
         Some("--version" | "-V") => {
             println!("isled {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
@@ -148,8 +132,6 @@ async fn run() -> anyhow::Result<()> {
             store::prune_newest(&store::cache_dir().join(kind), CACHED_SONGS);
         }
     });
-    let (assistant, assistant_commands) = AssistantService::new();
-    let (usage, usage_refresh) = UsageService::new();
     let (updates, updates_wake) = UpdatesService::new();
     let (media, media_wishes) = MediaService::new();
     let server = session.object_server();
@@ -163,23 +145,15 @@ async fn run() -> anyhow::Result<()> {
     server.at(OBJECT_PATH, RemindersService::load()).await?;
     server.at(OBJECT_PATH, SystemService::default()).await?;
     server.at(OBJECT_PATH, AppUsageService::load()).await?;
-    server.at(OBJECT_PATH, assistant).await?;
-    server.at(OBJECT_PATH, usage).await?;
     server.at(OBJECT_PATH, updates).await?;
-    server.at(OBJECT_PATH, AgentsService::default()).await?;
 
     let media = server.interface::<_, MediaService>(OBJECT_PATH).await?;
     let pomodoro = server.interface::<_, PomodoroService>(OBJECT_PATH).await?;
     let todo = server.interface::<_, TodoService>(OBJECT_PATH).await?;
     let system = server.interface::<_, SystemService>(OBJECT_PATH).await?;
     let app_usage = server.interface::<_, AppUsageService>(OBJECT_PATH).await?;
-    let assistant = server.interface::<_, AssistantService>(OBJECT_PATH).await?;
-    let usage = server.interface::<_, UsageService>(OBJECT_PATH).await?;
-    tokio::spawn(usage::run(usage, usage_refresh));
     let updates = server.interface::<_, UpdatesService>(OBJECT_PATH).await?;
     tokio::spawn(updates::run(updates, updates_wake));
-    let agents = server.interface::<_, AgentsService>(OBJECT_PATH).await?;
-    tokio::spawn(agents::watch(agents));
     tokio::spawn(shelf::prune(
         server.interface::<_, ShelfService>(OBJECT_PATH).await?,
     ));
@@ -187,12 +161,7 @@ async fn run() -> anyhow::Result<()> {
         server.interface::<_, ClipboardService>(OBJECT_PATH).await?,
     ));
     let calendar = server.interface::<_, CalendarService>(OBJECT_PATH).await?;
-    tokio::spawn(calendar::send_waiting(calendar.clone(), session.clone()));
-    let own_data = assistant::Sources {
-        todo: todo.clone(),
-        calendar,
-        reminders: server.interface::<_, RemindersService>(OBJECT_PATH).await?,
-    };
+    tokio::spawn(calendar::send_waiting(calendar, session.clone()));
 
     let session_for_media = session.clone();
     tokio::spawn(async move {
@@ -202,7 +171,6 @@ async fn run() -> anyhow::Result<()> {
     });
     tokio::spawn(todo::run(todo));
     tokio::spawn(app_usage::run(app_usage));
-    tokio::spawn(assistant::run(assistant, own_data, assistant_commands));
 
     match zbus::Connection::system().await {
         Ok(bus) => system::spawn_watchers(bus, system),
@@ -250,7 +218,7 @@ async fn run() -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Hands memory freed after big, passing work (an image, an assistant's turn) back to the system.
+/// Hands memory freed after big, passing work (an image or a download) back to the system.
 fn trim_memory() {
     // SAFETY: malloc_trim only walks the allocator's own free lists.
     #[cfg(target_env = "gnu")]
@@ -289,9 +257,6 @@ async fn doctor() {
             "not running (systemctl --user restart isled)"
         }
     );
-    assistant::prepare_report().await;
-    println!("Voice assistant:\n{}", assistant::report());
-    println!("AI alerts:\n{}", agents::report());
 }
 
 /// `isled --report`: what a bug report needs, to paste whole; it holds no clipboard, tasks or chats.

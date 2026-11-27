@@ -14,6 +14,7 @@ import St from 'gi://St';
 
 import {VERTICAL, iconSize, onUiScale, px, uiScale} from '../compat.js';
 import {isShelfCopy} from '../downloads.js';
+import * as Theme from '../theme.js';
 import {Lines, icon, iconButton, label} from '../widgets.js';
 
 /** The shelf holds this many files (as isled enforces). */
@@ -225,7 +226,7 @@ export const FilesView = GObject.registerClass({
         const scale = uiScale();
         const zone = dragging || this._items.length === 0;
         roundedRect(cr, width, height, ZONE_RADIUS * scale, 0.5 * scale);
-        cr.setSourceRGBA(1, 1, 1, zone ? fill : 0);
+        cr.setSourceRGBA(...Theme.ink(), zone ? fill : 0);
         cr.fillPreserve();
         if (zone && t > 0) {
             cr.save();
@@ -241,7 +242,7 @@ export const FilesView = GObject.registerClass({
         if (full && dragging)
             cr.setSourceRGBA(1, 0.36, 0.36, 0.6);
         else
-            cr.setSourceRGBA(1, 1, 1, Math.max(zone ? line : 0, 0.9 * this._landed));
+            cr.setSourceRGBA(...Theme.ink(), Math.max(zone ? line : 0, 0.9 * this._landed));
         strokeDashed(cr, scale);
         cr.$dispose();
     }

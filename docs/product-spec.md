@@ -50,7 +50,7 @@ round a pill (32 round the notch), as a notched display's menu bar holds its not
 bar setting; hanging, 6 px below the bar, 32 tall; on a display without the bar, 8 px from its top. Its
 clock and signs are the notch's: the bar's size inside it (a 15 px clock, a 22 px cover), larger off it
 (17 px, 24 px). Closed, its ends are half its height round; an alert, the open island and the
-assistant grow down from where it sits, their corners as in the table on all four sides (no larger
+grows down from where it sits, their corners as in the table on all four sides (no larger
 than half their height), the open island with a header of its own (32 px) 8 px down, its tabs 11 px from
 the pill's edge and clear of its corners, its pages 20 px from the sides and the bottom as the notch's. It never blends into a
 black bar, and a faint hairline (lit from above) sets it apart from what is behind it on black too.
@@ -114,13 +114,13 @@ glass round its corners, and greys a step brighter so text reads over bright
 windows. An answer (Allow, Run, Join), a toggle that is on (Do Not Disturb,
 Mute, lyrics, the output button, world clocks), the volume's fill and the
 caret take GNOME's accent colour (the user's, from GNOME 47; blue before); an
-OK stays white. The assistant's and the alerts' light follows the island's
-shape on Black and Glass alike; on Glass it keeps to the edge, each colour
+OK stays white. The alerts' light follows the island's
+shape; on Glass it keeps to the edge, each colour
 lit by its own lightness, so it never burns to white.
 
 Colours fit the look. On Glass the signal colours are lifted a quarter
 towards white, so they read on the lighter grey without glaring:
-alerts' badges and icons, the agent's tick and cross, the timer's glyph, ring
+alerts' badges and icons, the timer's glyph, ring
 and time, the recording and privacy dots and the service warning; red, green
 and orange text (a recording's length, a call's phone and length, Reminders'
 title, the calendar's month) and links likewise. Text picked in a field takes
@@ -206,7 +206,6 @@ place, dimmed, so the layout never jumps.
 | Pointer on an alert | Holds it; it goes 1.5 s after the pointer leaves (one asking, a reminder or an event keeps its own time). One the pointer doesn't open (with a button) and an answer show a × on their icon to put them away | – |
 | Two-finger swipe up / down on an alert | Put it away / open it | – |
 | Super+V (GNOME's calendar shortcut) | Open the Calendar page, held open (Settings → Island → Shortcuts may give it to the clipboard history instead, search ready, pressed on the Shelf's row; with the page it opens left out of the island, it opens the other one) | Close; on another page, turn to this one |
-| Super+I (Settings: any shortcut) | Ask the assistant; typing while it listens types the request instead | Speak again |
 | Click a tab | – | Go to that page |
 | Ctrl+Tab, Ctrl+Shift+Tab (or Ctrl+Page Down / Up), held open from the keyboard | – | The next or previous page with a tab, round from the last to the first |
 | Ctrl+1 … Ctrl+9, held open from the keyboard | – | The first … ninth tab shown |
@@ -226,8 +225,8 @@ call starts → Call during a call → Notifications if some arrived unseen
 runs → Music.
 
 Pages, in order: **Call** (only during a call) **· Music · Notifications ·
-Timer · Reminders · Shelf · Calendar · Apps · Usage** (Apps only with its switch
-on, Usage only with an AI plan found), one tab each in the header. Lists scroll
+Timer · Reminders · Shelf · Calendar · Apps** (Apps only with its switch
+on), one tab each in the header. Lists scroll
 with the wheel or touchpad and never show a scrollbar.
 
 ## 4. Closed island
@@ -268,10 +267,10 @@ with the wheel or touchpad and never show a scrollbar.
   extension) takes the pointer: pointing there brings it back without opening it (it opens once the
   pointer moves on it and rests again), and what is below takes clicks as if it weren't there; on X11
   (GNOME 49 and older) that holds in the top bar only, as a display without it keeps the island's
-  input region. Alerts, the open island and the assistant still show.
+  input region. Alerts and the open island still show.
 - Over a full-screen app the island is GNOME's to hide, and alerts wait until the app leaves full
   screen; with Settings → Alerts → Over full-screen apps on, it stays there hidden instead and shows
-  only for alerts (and the open island or assistant asked for), never on pointing.
+  only for alerts (and the open island asked for), never on pointing.
 - Centre: the clock (24- or 12-hour as Settings → Appearance → Time format says, by default as GNOME's clock; with 12 hours a smaller, dimmer AM or PM beside it), exactly centred; with Settings → Appearance → Show the date, the day before it ("Fri 6", as large, 70% white, 6 px from it), day and time centred together and the island only as much wider as they need, also beside the unseen dot, not beside an activity (music, a call, the timer, the assistant at work: their sides take its room); while the screen records,
   how long it has been recording in its place. A call keeps the clock (its length is on the open
   island). With Settings → Appearance → Clock in the island off (#62), the closed island (and its copies) keeps
@@ -293,8 +292,6 @@ with the wheel or touchpad and never show a scrollbar.
   video or voice note until it is over, at its end or paused a minute; none with the Music page left out) → the timer (a session or break under way); with none, a white dot while
   notifications are unseen. Right, first that applies:
   1. a warning (Isle's service stopped; a click offers to restart it);
-  2. the bot, 18 px, in the look chosen, blinking and glancing every few seconds (the assistant works
-     on a request or a command runs with the island closed; a click shows it);
   3. a red crossed-out microphone while a call is muted;
   4. the second activity's sign: the timer's ring (filling as the phase runs), the song's cover, or a
      call's green phone;
@@ -343,13 +340,13 @@ the left, a tab per page: icons, the open page's in a lit pill with its
 name, and a red dot on Notifications while some are unseen. On the right a
 red "● 0:42" pill while the screen records (click to stop), a green "📞 1:15"
 pill during a call on any page but Call (click: the Call page), the privacy
-dots, the music bars, the assistant's sparkle, `[timer ring] Tue 20 Oct 12:26` and the gear. The
+dots, the music bars, `[timer ring] Tue 20 Oct 12:26` and the gear. The
 first tab's pill, the gear's icon and the pages' contents share the same 20 px edges; every tab is 26 px
 tall, 3 px from the band's top and bottom, the open one's name on the clock's line. When the tabs and
 the status together need more than 600, the island grows to fit them, by the same amount on both
 sides so it stays centred. The Call tab, its phone in green, only shows during a call, and the
 Devices tab only while a Bluetooth device is connected. The Call tab always comes first; the others are
-in Isle's order (Music, Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices, Usage) unless
+in Isle's order (Music, Notifications, Timer, Reminders, Shelf, Calendar, Apps, Devices) unless
 Settings → Island → Pages moves them: its arrows move a tab left or right, at once, the open page staying
 open, and Reset Order puts Isle's order back. Ctrl+1–9 and Ctrl+Tab follow the order shown. Scrolling or swiping over the header changes
 the page (see §3).
@@ -452,7 +449,7 @@ back when they stop, or if cava is not installed or cannot start.
 for it, 4.5 s after the last change: on the lyrics for cava's and the lyrics providers' settings, on the page
 a page's own settings are for, on its default page for the island's look; closed again unless the pointer is on
 it, and the music page put back as it was. Not while the island is open already, and not for settings the closed
-island already shows, shortcuts, alerts and the assistant.
+island already shows, shortcuts and alerts.
 
 Between songs the island stays steady: when a song that was playing gives
 way to nothing (browsers report no title and "Paused" for a moment between
@@ -713,8 +710,7 @@ calendar that takes events (not a subscribed one, such as holidays) in the
 field's place (the header says "New events go
 to", with Done), a row each with its account in grey, then Isle on this
 computer, a tick on the one in use. Until one is picked, the first
-account's calendar; with no account, Isle's own. The assistant adds to the
-same one. When the account can't be reached the event is kept in Isle and
+account's calendar; with no account, Isle's own.  When the account can't be reached the event is kept in Isle and
 the field says "Saved in Isle instead" a moment.
 
 **Apps** (title "App Usage"): where the time went. Off until its switch in
@@ -786,7 +782,6 @@ banner does. Right-clicking an alert puts it away without opening it.
 | Screen recording started | red record icon | Recording screen | Stop | 2.6 s |
 | Notification (GNOME's sound) | app icon, large | title / first line (only who it is from while the screen is shared) | its first button ("Mark as read") | 4 s; passing (a screenshot taken) 2.5 s; critical 20 s, instant and sticky |
 | Reminder (+ chime) | bell | the reminder | – | 8 s, sticky |
-| Assistant done in the background (resting the pointer holds it; it opens no page) | mic | the answer / Isle Assistant (· Click to read more, when cut) | – | as long as it takes to read, at most 8 s |
 | Isle's service stopped | warning | Isle's service isn't running | Restart | 8 s |
 | A phone asks to connect (sharing) | phone | Allow iPhone · Safari — code 4821? (on two lines if long) / its address · the same code on the phone? | Deny, Allow (for that phone) | sticky, instant; goes once answered (here or on the Phone tab) or after 2 min |
 | Files from a phone (opens the Shelf's Files) | phone, green | IMG_3307.jpg / From your phone · on the Shelf; "3 files from your phone" for more while it shows | – | 4 s |
@@ -794,16 +789,12 @@ banner does. Right-clicking an alert puts it away without opening it.
 | A Shelf file saved (↓) | ↓, green | Saved to Downloads / its name in Downloads | Show | 4 s |
 | Saving it failed | warning, red | Couldn't save to Downloads / why | – | 4 s |
 | Newer Isle (once per version) | update | Isle 0.x is out | How | 8 s |
-| AI plan nearly used up | the plan's logo in a ring of its colour (Claude coral, ChatGPT green; red when nearly gone) | Claude / Weekly limit · resets Sat 09:30 | 86% | 8 s |
 | Event about to start (Settings: 1–60 min before, 5 by default) | video camera when it has a meeting link, else calendar | Weekly sync in 5 min / 17:30 – 18:00 · Google Meet | Join (blue), with a Meet, Zoom, Teams or Webex link | sticky |
-| Claude Code needs the user (off by default) | Claude's logo | Claude needs your OK / project · Allow Bash? (or "is waiting for you") | Show (its window) | sticky |
-| Claude Code or Codex is done (off by default) | its logo | Codex is done / project · the gist of its last message | Show | 8 s |
-| An AI's alerts could not be turned on | its logo | Couldn't turn on Codex alerts / why | – | 8 s |
 
 Badges are grey unless the colour says something (green charging, red low
 battery or failure, the plan's own colour, blue for an event); nothing amber.
 Join is the one blue button, marking the action to take. Buttons on alerts,
-notifications and the assistant are translucent grey pills with white text,
+notifications are translucent grey pills with white text,
 lighter under the pointer.
 
 While the event alert is on, GNOME's own calendar reminder (Evolution's
@@ -840,101 +831,6 @@ from the event itself, through Evolution Data Server, on this computer:
 Google's conference data first, then the URL, location and description. An
 alarm the computer slept through is dropped once the event has started.
 
-**AI agents.** Claude Code and Codex are connected as soon as Isle finds
-them (installed later too), once announced by an alert; Settings → AI Usage
-→ AI Agents turns each off. Connecting adds Isle's hooks to the agent's own
-settings: `PermissionRequest` (timeout 600 s), `Notification` and `Stop` in
-Claude Code's `~/.claude/settings.json` (or `$CLAUDE_CONFIG_DIR`, as
-isled's service sees it); `PermissionRequest` and `Stop` in Codex's
-`~/.codex/hooks.json` (an older Codex: `notify` in its `config.toml`). The
-user's own hooks, keys, comments and order are kept; turning the switch
-off, or uninstalling, takes out Isle's entries only.
-
-A permission comes as an alert that stays until answered: the bot (46 px)
-with an amber "!" badge, "‹project› needs permission", the agent's name,
-the command or file in a code line, and Deny, Allow and (Claude Code)
-Always, the last a white pill. Pressed, the badge turns into a green tick
-and the bot hops ("Allowed", "Always allowed here"), or a red cross and a
-shake ("Denied"), and the alert goes 0.85 s later. Hovering it never opens
-the island. Put away unanswered, with the agent's window in front (then or
-later), during Do Not Disturb, or with the island hidden, the agent asks in
-its own terminal instead; answered there first, the alert goes. A finished
-agent's alert has the bot with a green tick, the first sentence of what it
-said, and Open terminal.
-
-### Voice assistant
-
-Super+I opens a pill below the top bar (280 px wide while it listens, 600 px,
-the open island's least width, once there is more to show): the bot on the left (36 px), the text beside
-it, one round 32 px button at the end. The bot takes the shape (circle,
-pebble, squircle, capsule, cloud, hexagon, drop, ghost) and colour chosen
-in Settings → Assistant → Look, shaded with a soft highlight, a darker rim
-and a glint. Its eyes have lids: they follow the pointer on a spring, glance
-about and blink; they perk up and bounce with the voice, read along as you
-type and as the answer shows, look up while it thinks, narrow while a
-command runs, smile at an answer and droop on an error; it nods at Run and
-shakes at Deny. Light rises from the panel's edge, brightest along the
-bottom and gone by the top of the sides, in the bot's glow colours (or the
-classic violet, blue and cyan), two highlights travelling round the rim; it
-follows the voice, each key typed, and breathes while it works. No blobs of
-colour.
-
-| State | Text | End button |
-|---|---|---|
-| Listening | "How can I help?" (a follow-up: what it asked) | keyboard (type instead) |
-| Typing | a pill field, Send inside it (dim until there is text) | – |
-| Working | what was heard, the step now, done steps ticked below | Stop (a white square) |
-| Answer | what was heard, the answer | keyboard (follow up) |
-| Error | what went wrong, what to do, and Sign in or Set up when that fixes it | keyboard |
-
-After 8 s on one step, "Still working · 0:12" shows under it. While the AI
-writes its answer, the answer shows as it comes (opencode and Antigravity give
-it once written).
-
-**The AIs.** Claude Code, Codex, Grok, opencode, Pi or Antigravity, whichever is
-picked in Settings → Assistant (Automatic: the first signed in, in that
-order), each with the user's own sign-in and kept to answering. opencode
-answers by default with the model the user's own opencode uses (its config's
-`model`, else the one used last). Settings names the OpenCode plan by the
-sign-ins (Free models, OpenCode Zen, OpenCode Go: Go Plus and Go Teams have
-Go's models and differ in limits only, which no API tells) and offers: up to
-8 models used last in opencode ("Recent · …"), OpenCode's free ones ("Free ·
-…", no sign-in needed), Zen's with a Zen key and Go's with a Go sign-in, as
-`opencode.ai/zen/go/v1/models` lists them now ("Go · …"). Only models
-`opencode models` lists are offered. No usage page. Pi answers with the
-providers signed in to in Pi (`/login`) or an API key, by default with the
-model the user's Pi uses (its settings' default), or one picked in Settings
-from those `pi --list-models` lists; signed in to ChatGPT, only the models
-Codex lists for that account. It runs with no tools, extensions, skills,
-prompt templates or context files, and its sessions are kept apart from the
-user's. No web search, no usage page.
-
-**The command card.** A command the AI wants run shows in the pill as a
-small terminal: its purpose (bold) and a line on it, then `$ command` in
-monospace with the program bold and `sudo` amber, then, left, the one thing
-to know (Removes files or apps, red; Runs a script from the web, amber;
-Needs your password, amber) and, right, Deny `esc` and Run `↩`. Running:
-"Running · 1:12", the last two lines it printed, a light sweep under them,
-and Stop (for a package manager, pressed once it says "May leave it half
-installed" and turns into Stop anyway for 4 s). Ended, the card is one
-line: the command and ✓ with how long, ✕ with the exit code, Denied or
-Stopped. With the island closed, a waiting card comes as an alert with Deny
-and Run.
-
-**The conversation.** Scrolling up on the pill, or a click on the line above
-the field, grows it (up to 420 px) into the conversation: "Conversation"
-with + and a chevron to close; a time between messages more than 5 minutes
-apart; your messages as right-aligned bubbles; answers on the left after a
-small bot; commands that ran as one-line terminals with how they went. The
-field stays at the bottom, with the mic in it until there are words, then
-Send. Text can be selected and is copied as the selection settles; a click
-on a command copies it. + shows "Started a new chat · Undo" for 5 s.
-
-Closed while it works, the request and its command carry on: the bot shows
-in the closed island and the answer comes as an alert. Resting the pointer on
-it shows the work without taking the keyboard, and it goes back when the
-pointer leaves; a click keeps it open, Esc putting it back.
-
 ### Notifications and Do Not Disturb
 
 The island replaces GNOME's banners and its calendar drop-down while the
@@ -961,14 +857,8 @@ hovering opens the Notifications page.
 - Idle, nothing playing: one wake-up per minute (the clock, GNOME's own WallClock, which also catches
   waking from suspend and time-zone changes). No polling.
 - `isled` sleeps until its next real deadline (a timer phase, a reminder, midnight) and re-checks the
-  clock on waking from suspend; AI usage asks nothing while it is off, nor Claude while the screen is
-  locked.
-- Speech recognition runs only while a request is heard. The assistant's AI starts as the assistant
-  opens and quits 3 minutes after the last request; both run at a lower priority, in a process group
-  of their own that is killed whole; transcribing uses at most half the cores. A command the user ran
-  is followed by reading its log 2.5 times a second, only while it runs. An agent's hook waiting for
-  an answer sleeps on D-Bus. The files tray's helper quits 20 seconds after the tray closes.
-- The bot in the closed island is drawn once and moves only while the assistant works.
+  clock on waking from suspend.
+- The files tray's helper quits 20 seconds after the tray closes.
 - Animations run on the display's frame clock only while a spring moves.
 - The open island ticks only the visible page (scrubber 4×/s, timer 1×/s); the closed island's timer
   time left ticks once a second, and its ring every 5 s, only while on screen.

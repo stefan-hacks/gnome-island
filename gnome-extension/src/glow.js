@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 stefan-hacks
 
-// The assistant's light: light rising from a shape's edge, brightest along the bottom and gone by the top of the
+// The aura's light: light rising from a shape's edge, brightest along the bottom and gone by the top of the
 // sides, its colours flowing round. Cairo draws it for Settings; on the island a shader draws the same per frame.
 
 import Cairo from 'cairo';
@@ -10,7 +10,7 @@ import * as Theme from './theme.js';
 
 const STOPS = 24;
 
-// Light from the edge of a box `height` tall: `time` (s) moves it, `level` (0..1, the voice) swells it,
+// Light from the edge of a box `height` tall: `time` (s) moves it, `level` (0..1) swells it,
 // `strength` fades it; `cache` keeps the rising mask while the height stays, `scale` is the shell's `uiScale`.
 export function paintRim(cr, {left, right, top, radius}, height, colors, motion, strength, cache = {}, scale = 1) {
     const r = Math.max(0, radius);
@@ -219,7 +219,7 @@ const bump = (x, at, width) => {
 };
 
 // A left-to-right gradient of `colors`, flowing with `time`; `streaks` (a time) sends two brighter streaks
-// along it in opposite directions, and `work` (0..1, the assistant at work) makes them brighter. `balanced`
+// along it in opposite directions, and `work` (0..1) makes them brighter. `balanced`
 // dims the lighter colours by their lightness.
 function flow(colors, left, right, time, alpha, streaks = null, work = 0, balanced = false) {
     const gradient = new Cairo.LinearGradient(left, 0, right, 0);

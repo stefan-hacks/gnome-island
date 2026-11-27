@@ -12,7 +12,5 @@ pub mod lrc;
 pub mod pomodoro;
 pub mod reminders;
 pub mod shelf;
-pub mod speech;
 pub mod todo;
 pub mod track;
-pub mod voice;

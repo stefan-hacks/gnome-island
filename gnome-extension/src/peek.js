@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 stefan-hacks
 
-// Short-lived alerts the island grows to show. An alert has a key (same key replaces), an icon, art, ring or bot, a
+// Short-lived alerts the island grows to show. An alert has a key (same key replaces), an icon, art, ring, a
 // title and subtitle, tone, a value or level, actions, duration and priority; `setAlert` reads the rest.
 
 import Clutter from 'gi://Clutter';
@@ -10,7 +10,6 @@ import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import {BotIcon} from './botIcon.js';
 import {VERTICAL, onUiScale, px} from './compat.js';
 import * as Palette from './palette.js';
 import * as Theme from './theme.js';
@@ -22,22 +21,23 @@ const MAX_WIDTH = 380;
 /** Room round the badge, as much on every side (see .isle-peek-row); PEEK_RADIUS in controller.js is the
  * badge's radius plus this, so the corners follow it. */
 const PADDING = 12;
-/** Room round one lit along its edges (an agent's ask): its buttons clear of the light (see .isle-peek-row-glow). */
+/** Room round one lit along its edges: its buttons clear of the light (see .isle-peek-row-glow). */
 const GLOW_PADDING = 16;
 /** Height of the part that hangs below the top bar: the badge and its room above and below. */
 const HEIGHT = 32 + 2 * PADDING;
 /** A two-line title's width: the widest alert less its padding, badge (32) and spacing (10). */
 const TITLE_WRAP_WIDTH = MAX_WIDTH - 2 * PADDING - 42;
-/** The widest an alert that asks (Allow, Deny…) gets; narrower, it fits what it says. The assistant is this big beside it. */
+/** The widest an alert that asks (Allow, Deny…) gets; narrower, it fits what it says. */
 const DECISION_WIDTH = 440;
 /** As wide as its buttons need, up to this (the open island is 600); past it, they go on to a line below. */
 const ACTIONS_WIDTH = 560;
 /** Between its buttons, and between their lines. */
 const ACTIONS_SPACING = 8;
-const BOT_SIZE = 46;
-/** Its texts' widest: less its padding, the assistant and the spacing (12); see .isle-peek-row-asks. */
-const DECISION_TEXT_WIDTH = DECISION_WIDTH - 2 * PADDING - BOT_SIZE - 12;
-/** Its answer shows this long (ms), the assistant hopping or shaking, before the alert goes. */
+/** The badge's size, in CSS pixels. */
+const BADGE_SIZE = 32;
+/** Its texts' widest: less its padding, the badge and the spacing (12); see .isle-peek-row-asks. */
+const DECISION_TEXT_WIDTH = DECISION_WIDTH - 2 * PADDING - BADGE_SIZE - 12;
+/** Its answer shows this long (ms) before the alert goes. */
 const ANSWERED_MS = 850;
 /** Buttons that answer (Allow, Run) take no press this soon after they show. */
 const ARMED_AFTER_MS = 500;
@@ -53,15 +53,16 @@ const TONE_COLORS = {
     good: Palette.GREEN,
     focus: Palette.GREEN,
     bad: Palette.RED,
-    // The plans' colours on the Usage page (see pages/usage.js).
-    claude: [0.85, 0.47, 0.34],
-    codex: [0.06, 0.64, 0.5],
-    grok: [0.93, 0.94, 0.96],
-    agy: [0.3, 0.55, 1],
     warn: Palette.ORANGE,
-    break: Palette.accent(),
-    calendar: Palette.accent(),
 };
+
+/** The colour of an alert's tone. The break and calendar tones are the user's GNOME accent as it is now, so
+ * they follow it when it changes. */
+function toneColor(tone) {
+    if (tone === 'break' || tone === 'calendar')
+        return Palette.accent();
+    return TONE_COLORS[tone] ?? TONE_COLORS.neutral;
+}
 
 /** An [r, g, b] colour, each 0 to 1, as CSS rgba(). */
 const css = ([r, g, b], alpha = 1) =>
@@ -70,7 +71,7 @@ const css = ([r, g, b], alpha = 1) =>
 /** The badge behind an icon, lit from the top in the alert's colour; grey when neutral. */
 function badgeStyle(rgb, neutral) {
     const [top, bottom] = neutral ? [0.16, 0.08] : [0.34, 0.16];
-    const base = neutral ? [1, 1, 1] : rgb;
+    const base = neutral ? Theme.ink() : rgb;
     return `background-gradient-direction: vertical; background-gradient-start: ${css(base, top)}; ` +
         `background-gradient-end: ${css(base, bottom)};`;
 }
@@ -129,8 +130,6 @@ export const PeekView = GObject.registerClass({
         this._ringBadge = new St.Bin({style_class: 'isle-peek-ring-badge', child: this._ringIcon});
         this._ring = new Ring({size: 32, lineWidth: 3, child: this._ringBadge});
         this._volume = new VolumeGlyph();
-        // The assistant, for what it or an AI agent asks or has done.
-        this._bot = new BotIcon(BOT_SIZE);
         // The badge, with a × on its corner under the pointer; a fixed-size box, so the × moves nothing.
         this._close = cornerClose(() => this.emit('close-requested'));
         this._lead = new St.Widget({layout_manager: new Clutter.BinLayout(), y_align: Clutter.ActorAlign.CENTER});
@@ -156,12 +155,6 @@ export const PeekView = GObject.registerClass({
         this._subtitle.clutter_text.line_wrap = false;
         this._subtitleLines = 1;
         this._subtitleLineHeight = 0;
-        // What an agent wants to run, and the answers to give it.
-        this._code = new St.Label({style_class: 'isle-peek-code', x_align: Clutter.ActorAlign.START});
-        // Whole, over as many lines as it takes: what is allowed is all there to read.
-        this._code.clutter_text.set({line_wrap: true, line_wrap_mode: Pango.WrapMode.WORD_CHAR,
-            ellipsize: Pango.EllipsizeMode.NONE});
-        texts.add_child(this._code);
         // Its buttons small, each as wide as its label, from where the texts start; whole, a line below if need be.
         const wrap = new WrapLayout();
         this._actions = new St.Widget({style_class: 'isle-peek-actions', layout_manager: wrap, x_expand: true});
@@ -219,7 +212,7 @@ export const PeekView = GObject.registerClass({
             this._forget();
         // Its button stays under its words while it updates in place, the same button under the pointer.
         under = Boolean(alert.action) && (under || alert.key === this._underKey);
-        const rgb = Theme.semantic(TONE_COLORS[alert.tone] ?? TONE_COLORS.neutral);
+        const rgb = Theme.semantic(toneColor(alert.tone));
         const color = css(rgb);
         const gicon = alert.gicon ? ownIcon(alert.gicon) : icon(alert.icon ?? 'dialog-information-symbolic');
         const hasRing = alert.ring !== undefined && alert.ring !== null;
@@ -229,23 +222,17 @@ export const PeekView = GObject.registerClass({
         const actions = alert.actions ?? (under ? [{...alert.action, accent: alert.action.primary}] : []);
         this._asks = actions.length > 0;
         this._shown = alert;
-        // One that asks reads from the left, like a dialog, the assistant level with its title.
-        const decision = this._asks || Boolean(alert.code);
+        // One that asks reads from the left, like a dialog.
+        const decision = this._asks;
         this._lit = Boolean(alert.glow);
         this._row.style_class = decision ? `isle-peek-row isle-peek-row-asks${this._lit ? ' isle-peek-row-glow' : ''}` : 'isle-peek-row';
         this._lead.y_align = this._texts.y_align = decision ? Clutter.ActorAlign.START : Clutter.ActorAlign.CENTER;
         // One that asks is answered with its own buttons; the volume and the like pass by themselves.
         // From what it is, not where its button went: one moved under its words keeps its ×.
-        this._closable = alert.closable ?? (!(alert.actions?.length || alert.code) && !alert.transient);
+        this._closable = alert.closable ?? (!alert.actions?.length && !alert.transient);
         if (!this._closable)
             this.showClose(false);
-        if (alert.bot) {
-            this._bot.look = alert.bot.look;
-            this._bot.form = alert.bot.form ?? 'attentive';
-            this._bot.badge = alert.bot.glyph ? {color: rgb, glyph: alert.bot.glyph} : null;
-            this._setChild(this._badge, this._bot);
-            this._badge.style_class = '';
-        } else if (alert.art !== undefined) {
+        if (alert.art !== undefined) {
             this._artBadgeIcon.gicon = alert.badge ?? null;
             this._art.setPath(alert.art);
             this._syncArtBadge();
@@ -288,7 +275,7 @@ export const PeekView = GObject.registerClass({
             this._ringKey = null;
         this._volumeKey = alert.volume ? alert.key : null;
         // Its icon's motion plays once, for a new alert (not one updating in place), once the island made room.
-        const moving = hasRing ? this._ringIcon : alert.art === undefined && !alert.volume && !alert.bot ? this._icon : null;
+        const moving = hasRing ? this._ringIcon : alert.art === undefined && !alert.volume ? this._icon : null;
         const motionKey = `${alert.key}:${alert.title}`;
         if (moving && motionKey !== this._motionKey)
             playMotion(moving, alert.motion, {delay: RING_DELAY});
@@ -323,8 +310,6 @@ export const PeekView = GObject.registerClass({
         this._subtitle.text = subtitle;
         this._subtitle.visible = Boolean(subtitle);
 
-        this._code.text = alert.code ?? '';
-        this._code.visible = Boolean(alert.code);
         this._showActions(actions, onDone, alert.key, fresh);
 
         // The same alert updating in place with the same button keeps it, under the pointer (see `_showActions`).
@@ -369,7 +354,7 @@ export const PeekView = GObject.registerClass({
             this._setChild(this._accessory, this._value);
         } else if (alert.status) {
             this._status.text = alert.status;
-            this._status.style = `color: ${color}; background-color: ${css(alert.tone === 'neutral' || !alert.tone ? [1, 1, 1] : rgb, 0.14)};`;
+            this._status.style = `color: ${color}; background-color: ${css(alert.tone === 'neutral' || !alert.tone ? Theme.ink() : rgb, 0.14)};`;
             this._setChild(this._accessory, this._status);
         } else {
             this._setChild(this._accessory, null);
@@ -443,9 +428,6 @@ export const PeekView = GObject.registerClass({
             return;
         }
         const allowed = action.answer === 'allow';
-        this._bot.badge = {color: Theme.semantic(allowed ? Palette.GREEN : Palette.RED), glyph: allowed ? 'check' : 'cross'};
-        this._bot.form = allowed ? 'success' : 'attentive';
-        this._bot.play(allowed ? 'hop' : 'shake');
         this._answeredIcon.gicon = icon(allowed ? 'isle-check-symbolic' : 'isle-close-symbolic');
         this._answeredText.text = action.done ?? (allowed ? 'Allowed' : 'Denied');
         this._answered.style_class = `isle-peek-answered ${allowed ? 'isle-peek-allowed' : 'isle-peek-denied'}`;
@@ -490,9 +472,9 @@ export const PeekView = GObject.registerClass({
     /** The height below the top bar this alert needs: less with a title alone. */
     get preferredHeight() {
         this._fit();
-        // One that asks: as tall as its lines, code and buttons, with even room above and below.
-        if (this._asks || this._code.visible) {
-            // Its texts as wide as the island leaves them: a narrower one wraps its code sooner.
+        // One that asks: as tall as its lines and buttons, with even room above and below.
+        if (this._asks) {
+            // Its texts as wide as the island leaves them.
             const [, row] = this._row.get_preferred_width(-1);
             const [, texts] = this._texts.get_preferred_width(-1);
             const [, natural] = this._texts.get_preferred_height(this.preferredWidth - (row - texts));
@@ -557,7 +539,7 @@ export const PeekView = GObject.registerClass({
     get preferredWidth() {
         this._fit();
         const [, natural] = this._row.get_preferred_width(-1);
-        if (this._asks || this._code.visible) {
+        if (this._asks) {
             // Its words up to the usual width; its buttons, whole, a little wider if they need it.
             const widest = Math.max(px(DECISION_WIDTH), Math.min(px(ACTIONS_WIDTH), this._actionsWidth()));
             if (this._titleLines > 1 || this._subtitleLines > 1)
@@ -581,7 +563,7 @@ export const PeekView = GObject.registerClass({
     _onDestroy() {
         this._clearAnswer();
         // Pieces not currently shown are not children and must be freed here.
-        for (const actor of [this._icon, this._artBox, this._ring, this._volume, this._bot, this._value, this._status, this._levelBox]) {
+        for (const actor of [this._icon, this._artBox, this._ring, this._volume, this._value, this._status, this._levelBox]) {
             if (!actor.get_parent())
                 actor.destroy();
         }

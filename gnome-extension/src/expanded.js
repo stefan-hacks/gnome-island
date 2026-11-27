@@ -40,12 +40,11 @@ const TABS = {
     calendar: {icon: 'isle-calendar', label: 'Calendar'},
     apps: {icon: 'isle-apps', label: 'Apps'},
     devices: {icon: 'isle-headphones', label: 'Devices'},
-    usage: {icon: 'isle-gauge', label: 'Usage'},
     system: {icon: 'isle-gauge-fill', label: 'System'},
 };
 /** How bright a tab's icon is: open, under the pointer, otherwise. */
 const TAB_OPACITY = {open: 255, hover: 200, idle: 140};
-/** The settings icon's, as bright as the sparkle's colour (0.6) beside it. */
+/** The settings icon's, as bright as the header's other icons (0.6). */
 const SETTINGS_OPACITY = 153;
 
 /** The music bars' opacity while the song is paused, as on the closed island. */
@@ -80,8 +79,6 @@ export const ExpandedView = GObject.registerClass({
         'tint-changed': {},
         // The current page's 'aura' tint moved: time (s), level (0..1).
         'tint-motion': {param_types: [GObject.TYPE_DOUBLE, GObject.TYPE_DOUBLE]},
-        // The mic button: open the voice assistant.
-        'voice-requested': {},
         // The gear by the clock: Isle's settings.
         'settings-requested': {},
     },
@@ -193,11 +190,6 @@ export const ExpandedView = GObject.registerClass({
         status.add_child(this._recordingButton);
         status.add_child(this._privacyDots);
         status.add_child(this._headerBars);
-        // The assistant, as AI rather than a microphone: it listens, and it can be typed to.
-        this._micButton = iconButton('isle-sparkle-symbolic', 'isle-button-flat isle-header-mic',
-            () => this.emit('voice-requested'), {size: 15, accessibleName: 'AI assistant'});
-        status.add_child(this._micButton);
-
         const clock = new St.BoxLayout({y_align: Clutter.ActorAlign.CENTER, style_class: 'isle-header-clock'});
         this._headerRing = new Ring({size: 15, lineWidth: 2.5});
         this._date = label('', 'isle-header-date');
@@ -213,19 +205,12 @@ export const ExpandedView = GObject.registerClass({
         status.add_child(clock);
         const settings = iconButton('isle-settings', 'isle-button-flat isle-header-settings',
             () => this.emit('settings-requested'), {size: 15, accessibleName: 'Settings'});
-        // Its icon is an image, which takes no CSS colour: dimmed as the sparkle beside it, lit under the pointer.
+        // Its icon is an image, which takes no CSS colour: dimmed as the header's other icons, lit under the pointer.
         settings.child.opacity = SETTINGS_OPACITY;
         settings.connect('notify::hover', () => settings.child.ease({opacity: settings.hover ? 255 : SETTINGS_OPACITY, duration: 120}));
         status.add_child(settings);
         header.add_child(status);
         return header;
-    }
-
-    /** Whether the voice assistant is on, to show its mic button. */
-    set voiceEnabled(enabled) {
-        this._micButton.visible = enabled;
-        // The header's width goes with it: an open island fits it now, as it would opened anew.
-        this._syncWidth();
     }
 
     /** A tab per page; the open one is lit and says its name. */

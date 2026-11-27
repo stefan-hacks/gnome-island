@@ -1,5 +1,5 @@
 pkgbase = isle-bin
-	pkgdesc = A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, app usage and a voice assistant
+	pkgdesc = A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, and app usage
 	pkgver = 1.7.3
 	pkgrel = 1
 	url = https://github.com/stefan-hacks/gnome-island
@@ -16,7 +16,6 @@ pkgbase = isle-bin
 	depends = gcc-libs
 	depends = glibc
 	depends = bash
-	optdepends = vulkan-icd-loader: speech recognition on the graphics card, else on the processor
 	provides = isle
 	conflicts = isle
 	options = !strip

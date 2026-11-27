@@ -25,7 +25,7 @@ const MAYBE = 'maybe';
 const SERVICE_GRACE_US = 15 * 1000 * 1000;
 /** A call outlasts the microphone closing this long, as apps reopen it to switch devices. */
 const END_DELAY_MS = 4000;
-/** Isle's own recordings: the voice assistant listening. */
+/** Isle's own app id: its recordings are never a call. */
 const OWN_APP_ID = 'io.github.stefanhacks.gnomeisland';
 /** Apps that record rather than call, matched in their names. */
 const RECORDERS = ['obs', 'audacity', 'tenacity', 'recorder', 'kooha', 'kdenlive', 'ardour'];

@@ -55,7 +55,7 @@ impl CalendarService {
         }
     }
 
-    /// The events, for the assistant and the agenda; let go of before any wait.
+    /// The events, for the agenda; let go of before any wait.
     pub fn calendar(&self) -> MutexGuard<'_, Calendar> {
         self.calendar.lock().unwrap_or_else(PoisonError::into_inner)
     }
