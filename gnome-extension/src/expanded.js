@@ -13,6 +13,7 @@ import {timerColor} from './compact.js';
 import {VERTICAL, iconSize, onUiScale, px, uiScale} from './compat.js';
 import * as Format from './format.js';
 import * as Playback from './playback.js';
+import * as Theme from './theme.js';
 import {watchClock} from './wallClock.js';
 import {Bars, PrivacyDots, RecordingDot, Ring, easeTo, fence, icon, iconButton, label, slideBy} from './widgets.js';
 
@@ -207,6 +208,7 @@ export const ExpandedView = GObject.registerClass({
             () => this.emit('settings-requested'), {size: 15, accessibleName: 'Settings'});
         // Its icon is an image, which takes no CSS colour: dimmed as the header's other icons, lit under the pointer.
         settings.child.opacity = SETTINGS_OPACITY;
+        this._settingsIcon = settings.child;
         settings.connect('notify::hover', () => settings.child.ease({opacity: settings.hover ? 255 : SETTINGS_OPACITY, duration: 120}));
         status.add_child(settings);
         header.add_child(status);
@@ -322,6 +324,30 @@ export const ExpandedView = GObject.registerClass({
         });
         // The open tab's name may need more room.
         this._syncWidth();
+        this._syncIconInk();
+    }
+
+    /** The theme changed (see `refreshTheme` in island.js): the header's icons take the new ink. */
+    syncTheme() {
+        this._syncIconInk();
+    }
+
+    /** Isle's icons are white images and take no CSS colour: on the light island the header's are darkened by an
+     * effect that takes white to the island's text colour. The open tab stays white, on the accent. */
+    _syncIconInk() {
+        const light = !Theme.gnomeDark();
+        const ink = (actor, on) => {
+            actor.remove_effect_by_name('isle-ink');
+            if (!on)
+                return;
+            const effect = new Clutter.BrightnessContrastEffect();
+            effect.set_brightness(-0.88);
+            actor.add_effect_with_name('isle-ink', effect);
+        };
+        for (const entry of this._tabs ?? [])
+            ink(entry.icon, light && this._tabs[this._index] !== entry);
+        if (this._settingsIcon)
+            ink(this._settingsIcon, light);
     }
 
     /** Every page stacked in one clipped area, only the open one shown. */
