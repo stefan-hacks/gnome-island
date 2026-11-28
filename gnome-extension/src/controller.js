@@ -41,16 +41,20 @@ import * as Playback from './playback.js';
 import {KeyboardWatcher, OsdHook, REACH_PX, TopBar, windowAtTop} from './shell.js';
 import {ShelfHelper} from './shelfHelper.js';
 import {isShelfCopy, saveToDownloads, showInFiles} from './downloads.js';
+import {KeepAwake} from './awake.js';
 import {AppsPage} from './pages/apps.js';
 import {CallPage} from './pages/call.js';
 import {CalendarPage} from './pages/calendar.js';
 import {DevicesPage} from './pages/devices.js';
+import {DrivesPage} from './pages/drives.js';
 import {MediaPage} from './pages/media.js';
+import {MixerPage} from './pages/mixer.js';
 import {NotificationsPage} from './pages/notifications.js';
 import {ShelfPage} from './pages/shelf.js';
 import {SystemPage} from './pages/system.js';
 import {TasksPage} from './pages/tasks.js';
 import {TimerPage} from './pages/timer.js';
+import {WeatherPage} from './pages/weather.js';
 import {ReminderWatcher} from './reminders.js';
 import * as Theme from './theme.js';
 import {autoHide, revealBand} from './visibilityRules.js';
@@ -136,7 +140,7 @@ const PILL_HEADER_TOP = 8;
 /** The pages a shortcut of their own may open from anywhere (Settings → Shortcuts; `shortcut-<page>`, none set at
  * first: the usual ones are GNOME's). As prefs.js lists them. */
 const SHORTCUT_PAGES = ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps', 'devices',
-    'system'];
+    'mixer', 'drives', 'weather', 'system'];
 
 /** Where in its flow, and how bright, the still glow of an alert that asks is drawn. */
 const ALERT_GLOW_TIME = 2.2;
@@ -238,6 +242,7 @@ export class Controller {
         this._focusMode = new FocusMode(this._daemon, this._notifications, this._settings);
         this._clipboard = new ClipboardHistory(this._daemon, this._settings);
         this._appUsage = new AppUsage(this._daemon);
+        this._awake = new KeepAwake();
         this._clearingAppUsage = false;
     }
 
@@ -377,6 +382,9 @@ export class Controller {
             () => new CalendarPage(this._daemon, this._settings, size),
             () => new AppsPage(this._daemon, this._appUsage, size),
             () => new DevicesPage(this._daemon, size),
+            () => new MixerPage(this._daemon, size),
+            () => new DrivesPage(this._daemon, size),
+            () => new WeatherPage(this._daemon, this._settings, size),
             () => new SystemPage(this._daemon, size),
         ];
     }
@@ -421,6 +429,11 @@ export class Controller {
             if (this._presentation === 'expanded')
                 this._island.setTintMotion(time, level);
         });
+        // Keep awake: the header's button, lit while on.
+        expanded.connect('awake-toggled', () => this._awake.toggle());
+        this._awake.onChanged = () => {
+            expanded.awake = this._awake.active;
+        };
         // Settings open in their own window; the island gets out of its way.
         expanded.connect('settings-requested', () => {
             this.collapse();
@@ -2396,6 +2409,7 @@ export class Controller {
         this._destroyMirrors();
         this._island.destroy();
         this._appUsage.destroy();
+        this._awake.destroy();
         this._clipboard.destroy();
         this._call.destroy();
         this._privacy.destroy();
@@ -2464,7 +2478,7 @@ export class Controller {
         }
         this._destroyMirrors();
         this._island?.destroy();
-        for (const service of [this._topBar, this._appUsage, this._clipboard, this._focusMode, this._call,
+        for (const service of [this._topBar, this._appUsage, this._awake, this._clipboard, this._focusMode, this._call,
             this._privacy, this._audio, this._notifications, this._daemon])
             service?.destroy();
         this._settings = null;

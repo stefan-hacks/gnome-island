@@ -314,6 +314,7 @@ export default class IslePreferences extends ExtensionPreferences {
         look.add(hideDelay);
         page.add(look);
         page.add(pagesGroup(settings, window));
+        page.add(weatherGroup(settings));
         // "gnome", from before, opens the island's calendar now: shown as that.
         if (settings.get_string('super-v') === 'gnome')
             settings.set_string('super-v', 'calendar');
@@ -751,13 +752,15 @@ const PAGES = [
     ['reminders', 'Reminders', 'object-select-symbolic', 'Your to-do list'],
     ['shelf', 'Shelf', 'edit-paste-symbolic', 'Clipboard history (Super+V), the files tray and sharing with a phone'],
     ['calendar', 'Calendar', 'x-office-calendar-symbolic', 'The month, its events and world clocks'],
+    ['mixer', 'Mixer', 'audio-volume-high-symbolic', 'A volume slider for each app playing sound; its tab shows only while one is'],
+    ['drives', 'Drives', 'drive-removable-media-symbolic', 'USB sticks, SD cards and external disks, with eject; its tab shows only while one is plugged in'],
+    ['weather', 'Weather', 'weather-clear-symbolic', 'Now and the next days for the city set below'],
     ['system', 'System', 'utilities-system-monitor-symbolic', 'CPU, memory, network, storage and temperature sensors'],
 ];
 
 /** The pages a shortcut of their own may open from anywhere, as the controller's SHORTCUT_PAGES, with their names. */
 const SHORTCUT_PAGES = [...PAGES.map(([name, title, iconName]) => [name, title, iconName]),
     ['apps', 'Apps', 'view-app-grid-symbolic'], ['devices', 'Devices', 'bluetooth-active-symbolic'],
-    ['system', 'System', 'utilities-system-monitor-symbolic'],
 ];
 function shortcutsGroup(settings) {
     const group = new Adw.PreferencesGroup({
@@ -844,6 +847,24 @@ function superVPageRow(settings, name, title) {
             row.get_root()?.add_toast?.(new Adw.Toast({title: problem}));
     }, {superV: true}));
     return row;
+}
+
+/** The Weather page's city and units. The city's name is the only thing sent, to open-meteo.com, while the page is open. */
+function weatherGroup(settings) {
+    const group = new Adw.PreferencesGroup({title: 'Weather',
+        description: 'The city and units for the Weather page. Only the city’s name is sent, to open-meteo.com, and only while the page is open.'});
+    const city = new Adw.EntryRow({title: 'City, for example Bedford or Bedford, England', show_apply_button: true});
+    city.text = settings.get_string('weather-city');
+    city.connect('apply', () => settings.set_string('weather-city', city.text.trim()));
+    const changed = settings.connect('changed::weather-city', () => {
+        if (city.text.trim() !== settings.get_string('weather-city'))
+            city.text = settings.get_string('weather-city');
+    });
+    city.connect('destroy', () => settings.disconnect(changed));
+    group.add(city);
+    group.add(choiceRow(settings, 'weather-units', 'Units', 'Temperature and wind speed',
+        [['metric', '°C, km/h'], ['imperial', '°F, mph']]));
+    return group;
 }
 
 /** A switch per page, in tab order, with arrows to move each tab; the last one on can't be turned off, so the island

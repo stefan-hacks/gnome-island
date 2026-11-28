@@ -6,6 +6,18 @@ All notable changes to GNOME Island are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Weather page**: now and the next four days for the city set in Settings → Island → Weather, in °C or °F. It
+  asks Open-Meteo (no key) only while the page is open and its data is over ten minutes old; only the city's name is
+  sent.
+- **Keep awake**: a cup button in the open island's header. While on, the screen does not blank and the computer does
+  not suspend from being idle (a GNOME session inhibitor, released if the shell goes).
+- **Mixer page**: a volume slider and mute for each app playing sound. Its tab shows only while one is.
+- **Drives page**: USB sticks, SD cards and external disks with their space, Open in Files and Eject (Mount for one
+  that is plugged in but not mounted). Its tab shows only while one is plugged in.
+- Shortcuts for the three pages, and the Pages list in Settings now has them (moved with the others).
+
 ### Removed
 
 - **The voice assistant and every AI feature**: voice input and speech recognition (`isle-whisper`, whisper.cpp,

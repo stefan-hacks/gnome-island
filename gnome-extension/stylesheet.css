@@ -1408,3 +1408,66 @@
 #isleIsland.isle-light.isle-accent-system .isle-reminders-count,
 #isleIsland.isle-light.isle-accent-system .isle-cal-month-name,
 #isleIsland.isle-light.isle-accent-system .isle-cal-accounts { color: st-darken(-st-accent-color, 35%); }
+
+/* ── Weather, Mixer, Drives ───────────────────────────────
+   Their icons are the theme's symbolic ones and follow `color`, so each states its colour for dark and light. */
+
+.isle-weather { spacing: 18px; }
+.isle-weather-now { spacing: 1px; min-width: 150px; }
+.isle-weather-top { spacing: 8px; }
+.isle-weather-icon { color: #ffffff; }
+.isle-weather-temp { font-size: 26pt; font-weight: 300; color: #ffffff; }
+.isle-weather-label { font-size: 10.5pt; font-weight: 600; color: #ffffff; }
+.isle-weather-detail { font-size: 9pt; color: rgba(255, 255, 255, 0.62); }
+.isle-weather-place { font-size: 9pt; color: rgba(255, 255, 255, 0.5); max-width: 170px; }
+.isle-weather-days { spacing: 4px; }
+.isle-weather-day { spacing: 3px; min-width: 52px; padding: 6px 2px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.06); }
+.isle-weather-dayname { font-size: 8.5pt; font-weight: 600; color: rgba(255, 255, 255, 0.7); }
+.isle-weather-high { font-size: 10.5pt; font-weight: 600; color: #ffffff; }
+.isle-weather-low { font-size: 9pt; color: rgba(255, 255, 255, 0.55); }
+.isle-weather-rain { font-size: 8pt; color: rgba(255, 255, 255, 0.5); min-height: 12px; }
+
+.isle-mixer-list, .isle-drives-list { spacing: 6px; }
+.isle-mixer-row { spacing: 10px; padding: 4px 2px; }
+.isle-mixer-icon, .isle-drive-icon { color: #ffffff; }
+.isle-mixer-info { spacing: 2px; }
+.isle-mixer-name { font-size: 9.5pt; font-weight: 600; color: #ffffff; }
+.isle-mixer-percent { font-size: 9pt; min-width: 34px; text-align: right; color: rgba(255, 255, 255, 0.62); }
+.isle-mixer-mute { color: rgba(255, 255, 255, 0.8); padding: 4px; border-radius: 8px; }
+.isle-mixer-mute:hover, .isle-drive-button:hover { background-color: rgba(255, 255, 255, 0.12); }
+.isle-mixer-scroll, .isle-drives-scroll { -st-vfade-offset: 16px; }
+
+.isle-drive-row { spacing: 10px; padding: 6px 8px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.06); }
+.isle-drive-info { spacing: 2px; }
+.isle-drive-name { font-size: 10.5pt; font-weight: 600; color: #ffffff; }
+.isle-drive-space { font-size: 8.5pt; color: rgba(255, 255, 255, 0.6); }
+.isle-drive-track { height: 4px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.18); }
+.isle-drive-fill { height: 4px; border-radius: 2px; background-color: #ffffff; }
+.isle-drive-buttons { spacing: 4px; }
+.isle-drive-button { color: rgba(255, 255, 255, 0.85); padding: 6px; border-radius: 8px; }
+.isle-header-awake { padding: 4px; }
+
+#isleIsland.isle-light .isle-weather-icon,
+#isleIsland.isle-light .isle-weather-temp,
+#isleIsland.isle-light .isle-weather-label,
+#isleIsland.isle-light .isle-weather-high,
+#isleIsland.isle-light .isle-mixer-icon,
+#isleIsland.isle-light .isle-mixer-name,
+#isleIsland.isle-light .isle-drive-icon,
+#isleIsland.isle-light .isle-drive-name { color: #1e1e1e; }
+#isleIsland.isle-light .isle-weather-detail,
+#isleIsland.isle-light .isle-weather-dayname,
+#isleIsland.isle-light .isle-mixer-percent,
+#isleIsland.isle-light .isle-drive-space { color: rgba(30, 30, 30, 0.68); }
+#isleIsland.isle-light .isle-weather-place,
+#isleIsland.isle-light .isle-weather-low,
+#isleIsland.isle-light .isle-weather-rain { color: rgba(30, 30, 30, 0.6); }
+#isleIsland.isle-light .isle-weather-day,
+#isleIsland.isle-light .isle-drive-row { background-color: rgba(0, 0, 0, 0.05); }
+#isleIsland.isle-light .isle-mixer-mute,
+#isleIsland.isle-light .isle-drive-button { color: rgba(30, 30, 30, 0.8); }
+#isleIsland.isle-light .isle-mixer-mute:hover,
+#isleIsland.isle-light .isle-drive-button:hover { background-color: rgba(0, 0, 0, 0.08); }
+#isleIsland.isle-light .isle-drive-track { background-color: rgba(0, 0, 0, 0.14); }
+#isleIsland.isle-light .isle-drive-fill { background-color: #1e1e1e; }
+#isleIsland.isle-accent-system .isle-drive-fill { background-color: -st-accent-color; }

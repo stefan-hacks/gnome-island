@@ -37,6 +37,8 @@ export const PREVIEWS = {
 
     // A page's own settings: that page.
     'devices-page': page('devices'),
+    'weather-city': page('weather'),
+    'weather-units': page('weather'),
     'app-usage': page('apps'),
     'clipboard-history': page('shelf'),
     'clipboard-layout': page('shelf'),
@@ -99,6 +101,9 @@ export const PREVIEWS = {
     'shortcut-calendar': null,
     'shortcut-apps': null,
     'shortcut-devices': null,
+    'shortcut-mixer': null,
+    'shortcut-drives': null,
+    'shortcut-weather': null,
     'shortcut-system': null,
 
     // Written by the shell itself (a page remembered, a question answered once, a count cleared): never a preview.

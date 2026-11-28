@@ -12,17 +12,19 @@ test('none set is the order the tabs always had', () => {
     assert.deepEqual(pageOrder([]), DEFAULT_ORDER);
     assert.deepEqual(pageOrder(null), DEFAULT_ORDER);
     assert.deepEqual(DEFAULT_ORDER, ['music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps',
-        'devices', 'system']);
+        'devices', 'mixer', 'drives', 'weather', 'system']);
 });
 
 test('a full order is kept as it is', () => {
-    const order = ['devices', 'system', 'apps', 'music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar'];
+    const order = ['devices', 'mixer', 'drives', 'weather', 'system', 'apps', 'music', 'notifications', 'focus', 'reminders',
+        'shelf', 'calendar'];
     assert.deepEqual(pageOrder(order), order);
 });
 
 test('unknown names and repeats are dropped; the call never moves', () => {
     assert.deepEqual(pageOrder(['calendar', 'call', 'nope', 'calendar', 'music']),
-        ['calendar', 'apps', 'devices', 'system', 'music', 'notifications', 'focus', 'reminders', 'shelf']);
+        ['calendar', 'apps', 'devices', 'mixer', 'drives', 'weather', 'system', 'music', 'notifications', 'focus',
+            'reminders', 'shelf']);
 });
 
 test('a page left out goes after the one it follows by default, or first', () => {
@@ -46,5 +48,12 @@ test('moving swaps with the neighbour and stops at the ends', () => {
 test('the default order is stored as none, so it follows Isle', () => {
     assert.deepEqual(storedOrder(DEFAULT_ORDER), []);
     assert.deepEqual(storedOrder(movePage(DEFAULT_ORDER, 'calendar', 1)),
-        ['music', 'notifications', 'focus', 'reminders', 'shelf', 'apps', 'calendar', 'devices', 'system']);
+        ['music', 'notifications', 'focus', 'reminders', 'shelf', 'apps', 'calendar', 'devices', 'mixer', 'drives', 'weather',
+            'system']);
+});
+
+test('an order stored before the new pages gets them after the page they follow', () => {
+    const before = ['system', 'devices', 'music', 'notifications', 'focus', 'reminders', 'shelf', 'calendar', 'apps'];
+    assert.deepEqual(pageOrder(before), ['system', 'devices', 'mixer', 'drives', 'weather', 'music', 'notifications', 'focus',
+        'reminders', 'shelf', 'calendar', 'apps']);
 });

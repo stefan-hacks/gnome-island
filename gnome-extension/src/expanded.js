@@ -15,7 +15,7 @@ import * as Format from './format.js';
 import * as Playback from './playback.js';
 import * as Theme from './theme.js';
 import {watchClock} from './wallClock.js';
-import {Bars, PrivacyDots, RecordingDot, Ring, easeTo, fence, icon, iconButton, label, slideBy} from './widgets.js';
+import {Bars, PrivacyDots, RecordingDot, Ring, easeTo, fence, icon, iconButton, label, setButtonIcon, slideBy} from './widgets.js';
 
 /** Sizes and distances in CSS pixels (see `px`). */
 export const EXPANDED_WIDTH = 600;
@@ -41,6 +41,9 @@ const TABS = {
     calendar: {icon: 'isle-calendar', label: 'Calendar'},
     apps: {icon: 'isle-apps', label: 'Apps'},
     devices: {icon: 'isle-headphones', label: 'Devices'},
+    mixer: {icon: 'isle-mixer', label: 'Mixer'},
+    drives: {icon: 'isle-drive', label: 'Drives'},
+    weather: {icon: 'isle-weather', label: 'Weather'},
     system: {icon: 'isle-gauge-fill', label: 'System'},
 };
 /** How bright a tab's icon is: open, under the pointer, otherwise. */
@@ -82,6 +85,8 @@ export const ExpandedView = GObject.registerClass({
         'tint-motion': {param_types: [GObject.TYPE_DOUBLE, GObject.TYPE_DOUBLE]},
         // The gear by the clock: Isle's settings.
         'settings-requested': {},
+        // The keep-awake button in the header was pressed.
+        'awake-toggled': {},
     },
 }, class ExpandedView extends St.BoxLayout {
     /** `privacy` and `call` feed the header's status; `pages` are built by the island, in tab order. */
@@ -204,6 +209,12 @@ export const ExpandedView = GObject.registerClass({
         clock.add_child(this._date);
         clock.add_child(time);
         status.add_child(clock);
+        // Keep awake: dimmed as the settings icon while off, lit and filled while on (see `awake`).
+        this._awakeButton = iconButton('isle-awake', 'isle-button-flat isle-header-awake',
+            () => this.emit('awake-toggled'), {size: 15, accessibleName: 'Keep awake'});
+        this._awakeButton.child.opacity = SETTINGS_OPACITY;
+        this._awakeButton.connect('notify::hover', () => this._syncAwake());
+        status.add_child(this._awakeButton);
         const settings = iconButton('isle-settings', 'isle-button-flat isle-header-settings',
             () => this.emit('settings-requested'), {size: 15, accessibleName: 'Settings'});
         // Its icon is an image, which takes no CSS colour: dimmed as the header's other icons, lit under the pointer.
@@ -327,6 +338,19 @@ export const ExpandedView = GObject.registerClass({
         this._syncIconInk();
     }
 
+    /** Whether keep awake is on: its button is filled and lit. */
+    set awake(on) {
+        this._awake = Boolean(on);
+        this._syncAwake();
+    }
+
+    _syncAwake() {
+        const on = Boolean(this._awake);
+        setButtonIcon(this._awakeButton, on ? 'isle-awake-fill' : 'isle-awake');
+        this._awakeButton.child.opacity = on || this._awakeButton.hover ? 255 : SETTINGS_OPACITY;
+        this._awakeButton.accessible_name = on ? 'Keep awake: on' : 'Keep awake';
+    }
+
     /** The theme changed (see `refreshTheme` in island.js): the header's icons take the new ink. */
     syncTheme() {
         this._syncIconInk();
@@ -348,6 +372,8 @@ export const ExpandedView = GObject.registerClass({
             ink(entry.icon, light && this._tabs[this._index] !== entry);
         if (this._settingsIcon)
             ink(this._settingsIcon, light);
+        if (this._awakeButton)
+            ink(this._awakeButton.child, light);
     }
 
     /** Every page stacked in one clipped area, only the open one shown. */

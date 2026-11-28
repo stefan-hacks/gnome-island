@@ -25,6 +25,10 @@ appear in the same place instead of in the middle of the screen.
 
 - **System monitoring** — CPU usage, frequency, per-core stats, memory, swap, load average, network speed, storage, temperatures, fans, voltages, battery, and GPU (NVIDIA/AMD) with color-coded thresholds
 - **Music with synced lyrics** — LRCLIB, NetEase Cloud Music, and Musixmatch (with your own API key)
+- **Weather** — now and the next four days for the city you set (Open-Meteo, no key)
+- **Keep awake** — a header button that stops the screen blanking and the computer sleeping while on
+- **Per-app volume** — a slider and mute for each app playing sound
+- **Removable drives** — USB sticks, SD cards and external disks with space, Open and Eject
 - **Cava visualizer** — audio bars behind the player and lyrics
 - **GNOME adaptive theme** — the island follows your GNOME light/dark preference automatically
 - **Richer closed island** — song title and artist scroll in the closed island; timer shows beside music
@@ -294,7 +298,8 @@ events, timer, and app usage stay in
 online only for synced lyrics ([LRCLIB](https://lrclib.net), then NetEase and,
 with your own key, Musixmatch, in the order Settings → Music player gives) and
 cover art, once per song (lyrics, and each provider, can be turned off in
-Settings); a look for a newer GNOME Island on GitHub at most once a
+Settings); the weather, when the Weather page is open and has a city set (only
+the city's name is sent, to Open-Meteo); a look for a newer GNOME Island on GitHub at most once a
 day (also in Settings). A meeting's link is read
 from the event on this computer, and only opened when you click Join.
 Sharing the Shelf with your phone runs a small web server on your local
